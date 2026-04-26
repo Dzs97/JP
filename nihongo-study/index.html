@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nihongo Study · 日本語学習</title>
+
+<template id="__bundler_thumbnail" data-bg-color="#F9F9FA">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#F9F9FA"/>
+    <rect x="380" y="200" width="440" height="400" rx="40" fill="#FFFFFF" stroke="#EAEAEB" stroke-width="2"/>
+    <text x="600" y="470" font-family="'Noto Serif JP', serif" font-size="280" font-weight="700" fill="#C0392B" text-anchor="middle">日</text>
+  </svg>
+</template>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100%; background: #F9F9FA; }
+  body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; }
+</style>
+
+<!-- Production React (smaller and faster than .development.js) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Data + engine (plain JS) -->
+  <script src="src/data.js"></script>
+  <script src="src/vocab-n5.js"></script>
+  <script src="src/kanji-data.js"></script>
+  <script src="src/ime.js"></script>
+  <script src="src/lang.js"></script>
+  <script src="src/engine.js"></script>
+  <script src="src/theme.js"></script>
+
+  <!-- Merge expanded N5 vocab into CARD_DATA -->
+  <script>
+    if (window.EXTRA_N5 && window.CARD_DATA) {
+      window.CARD_DATA.vocabulary = [...window.CARD_DATA.vocabulary, ...window.EXTRA_N5.vocabulary];
+      window.CARD_DATA.verbs = window.EXTRA_N5.verbs;
+      window.CARD_DATA.adjectives = window.EXTRA_N5.adjectives;
+      window.ALL_CARDS = Object.values(window.CARD_DATA).flat();
+      window.CATEGORY_META = [
+        ...window.CATEGORY_META,
+        { id: "verbs",      label: "Verbs",      icon: "動", count: window.CARD_DATA.verbs.length },
+        { id: "adjectives", label: "Adjectives", icon: "形", count: window.CARD_DATA.adjectives.length },
+      ];
+    }
+  </script>
+
+  <!-- UI modules (pre-compiled — no in-browser Babel needed) -->
+  <script src="src-compiled/ui.js"></script>
+  <script src="src-compiled/features.js"></script>
+  <script src="src-compiled/home.js"></script>
+  <script src="src-compiled/study.js"></script>
+  <script src="src-compiled/screens.js"></script>
+  <script src="src-compiled/app.js"></script>
+
+  <!-- Mount -->
+  <script>
+    ReactDOM.createRoot(document.getElementById("root"))
+      .render(React.createElement(window.App));
+  </script>
+</body>
+</html>
