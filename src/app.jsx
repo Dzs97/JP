@@ -246,7 +246,8 @@ function App() {
   const buildSessionDeck = useCallback(() => {
     let pool = [];
     categories.forEach(c => { if (window.CARD_DATA[c]) pool = [...pool, ...window.CARD_DATA[c]]; });
-    if (mode === "build") pool = window.CARD_DATA.sentences.slice();
+    if (mode === "build" || mode === "cloze") pool = window.CARD_DATA.sentences.slice();
+    if (mode === "conjugate") pool = (window.CARD_DATA.verbs || []).slice();
     let ordered;
     if (dueOnly || sessionGoal.kind === "due") {
       const due = pool.filter(c => window.isDue(progress.cardStats[window.cardKey(c)]))
@@ -314,7 +315,7 @@ function App() {
   // ── Mode-specific setup on card change ────────────────────────────
   useEffect(() => {
     if (!card || screen !== "study") return;
-    if (mode === "quiz") {
+    if (mode === "quiz" || mode === "speed") {
       setQuizOptions(window.shuffle([card.back, ...window.getWrongChoices(card, window.ALL_CARDS)]));
       setQuizSelected(null);
     }

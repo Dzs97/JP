@@ -1,0 +1,16 @@
+{
+  "name": "Nihongo Study",
+  "short_name": "日本語",
+  "description": "Japanese study — flashcards, kana, kanji, grammar, SRS.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F9F9FA",
+  "theme_color": "#C0392B",
+  "lang": "en",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

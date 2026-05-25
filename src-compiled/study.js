@@ -38,7 +38,7 @@ function StudyScreen(p) {
       transition: "width 0.4s cubic-bezier(.2,.7,.2,1)",
       boxShadow: `0 0 10px ${t.accent}80`
     }
-  })), mode === "flashcard" && /*#__PURE__*/React.createElement(FlashcardMode, p), mode === "quiz" && /*#__PURE__*/React.createElement(QuizMode, p), mode === "write" && /*#__PURE__*/React.createElement(WriteMode, p), mode === "listen" && /*#__PURE__*/React.createElement(ListenMode, p), mode === "build" && /*#__PURE__*/React.createElement(BuildMode, p));
+  })), mode === "flashcard" && /*#__PURE__*/React.createElement(FlashcardMode, p), mode === "quiz" && /*#__PURE__*/React.createElement(QuizMode, p), mode === "write" && /*#__PURE__*/React.createElement(WriteMode, p), mode === "listen" && /*#__PURE__*/React.createElement(ListenMode, p), mode === "build" && /*#__PURE__*/React.createElement(BuildMode, p), window.EXTRA_MODES && window.EXTRA_MODES[mode] && /*#__PURE__*/React.createElement(window.EXTRA_MODES[mode], p));
 }
 
 // ── Flashcard ───────────────────────────────────────────────────────────

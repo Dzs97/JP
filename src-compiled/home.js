@@ -49,7 +49,7 @@ function HomeScreen(p) {
     label: "Build",
     hint: "Arrange sentences",
     glyph: "⊞"
-  }];
+  }, ...(window.EXTRA_MODES_META || [])];
   const goals = [{
     kind: "cards",
     value: 10,
@@ -67,14 +67,15 @@ function HomeScreen(p) {
     value: 0,
     label: "Due only"
   }];
+  const fixedPoolFor = m => m === "build" || m === "cloze" ? window.CARD_DATA.sentences : m === "conjugate" ? (window.CARD_DATA.verbs || []) : null;
   const totalInSelection = useMemoHome(() => {
-    if (mode === "build") return window.CARD_DATA.sentences.length;
+    const fixed = fixedPoolFor(mode);
+    if (fixed) return fixed.length;
     return categories.reduce((sum, c) => sum + (window.CARD_DATA[c]?.length || 0), 0);
   }, [categories, mode]);
   const dueInSelection = useMemoHome(() => {
-    if (mode === "build") {
-      return window.CARD_DATA.sentences.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).length;
-    }
+    const fixed = fixedPoolFor(mode);
+    if (fixed) return fixed.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).length;
     return categories.reduce((sum, c) => sum + (window.CARD_DATA[c]?.filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length || 0), 0);
   }, [categories, mode, progress]);
   return /*#__PURE__*/React.createElement("div", {
@@ -280,24 +281,25 @@ function HomeScreen(p) {
       letterSpacing: -0.4,
       color: t.text
     }
-  }, mode === "build" ? "Sentence bank" : "Categories")), /*#__PURE__*/React.createElement("span", {
+  }, fixedPoolFor(mode) ? (mode === "conjugate" ? "Verb bank" : "Sentence bank") : "Categories")), /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 12,
       color: t.textFaint,
       fontFamily: t.fontMono
     }
-  }, totalInSelection, " cards \xB7 ", dueInSelection, " due")), mode === "build" ? /*#__PURE__*/React.createElement("div", {
+  }, totalInSelection, " cards \xB7 ", dueInSelection, " due")), fixedPoolFor(mode) ? /*#__PURE__*/React.createElement("div", {
     className: "surface",
     style: {
       padding: 18,
       fontSize: 13,
       color: t.textMuted
     }
-  }, "Build mode drills the ", /*#__PURE__*/React.createElement("b", {
-    style: {
-      color: t.text
-    }
-  }, "sentence bank"), " \u2014 arrange tokens (words + particles) in order. Categories don't apply here.") : /*#__PURE__*/React.createElement("div", {
+  },
+    mode === "build"     && /*#__PURE__*/React.createElement(React.Fragment, null, "Build mode drills the ", /*#__PURE__*/React.createElement("b", { style: { color: t.text } }, "sentence bank"), " \u2014 arrange tokens (words + particles) in order."),
+    mode === "cloze"     && /*#__PURE__*/React.createElement(React.Fragment, null, "Cloze drills the ", /*#__PURE__*/React.createElement("b", { style: { color: t.text } }, "sentence bank"), " \u2014 fill the blank with the right particle, ending, or word."),
+    mode === "conjugate" && /*#__PURE__*/React.createElement(React.Fragment, null, "Conjugate drills the ", /*#__PURE__*/React.createElement("b", { style: { color: t.text } }, "verb bank"), " \u2014 type the \u307e\u3059 form of each dictionary-form verb."),
+    /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, fontSize: 12, color: t.textFaint } }, "Categories don't apply here.")
+  ) : /*#__PURE__*/React.createElement("div", {
     className: "resp-cats-2"
   }, window.CATEGORY_META.map(c => {
     const on = categories.includes(c.id);

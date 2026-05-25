@@ -18,12 +18,15 @@ function KanjiScreen(p) {
   } = p;
   const [selected, setSelected] = useS2(null);
   const [filter, setFilter] = useS2("");
+  const [level, setLevel] = useS2("all");
   const list = useM2(() => {
     const f = filter.trim().toLowerCase();
-    if (!f) return window.KANJI_DATA;
-    return window.KANJI_DATA.filter(k => k.char.includes(f) || k.meaning.toLowerCase().includes(f) || k.on.some(r => r.toLowerCase().includes(f)) || k.kun.some(r => r.toLowerCase().includes(f)));
-  }, [filter]);
-  const cur = selected || list[0];
+    let base = window.KANJI_DATA;
+    if (level !== "all") base = base.filter(k => k.jlpt === level);
+    if (!f) return base;
+    return base.filter(k => k.char.includes(f) || k.meaning.toLowerCase().includes(f) || k.on.some(r => r.toLowerCase().includes(f)) || k.kun.some(r => r.toLowerCase().includes(f)));
+  }, [filter, level]);
+  const cur = selected && list.some(k => k.char === selected.char) ? selected : list[0];
   return /*#__PURE__*/React.createElement("div", {
     className: "fade-up",
     style: {
@@ -53,23 +56,45 @@ function KanjiScreen(p) {
       fontSize: 14,
       margin: 0
     }
-  }, "Tap any character for readings (on'yomi / kun'yomi), meaning, and example compounds.")), /*#__PURE__*/React.createElement("input", {
+  }, "Tap any character for readings (on'yomi / kun'yomi), meaning, and example compounds.")), /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }
+  }, /*#__PURE__*/React.createElement("input", {
     value: filter,
     onChange: e => setFilter(e.target.value),
     placeholder: "Filter by character, meaning, or reading...",
     style: {
-      width: "100%",
+      flex: "1 1 220px",
       padding: "12px 16px",
       background: t.inputBg,
       color: t.text,
       border: `1px solid ${t.inputBorder}`,
       borderRadius: 12,
       fontSize: 14,
-      marginBottom: 16,
       outline: "none",
       fontFamily: t.fontUi
     }
   }), /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 4, background: t.surfaceSunken, padding: 4, borderRadius: 10 }
+  }, [{ id: "all", label: "All" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => {
+    const on = level === o.id;
+    const count = o.id === "all" ? window.KANJI_DATA.length : (window.KANJI_BY_LEVEL[o.id]?.length || 0);
+    return /*#__PURE__*/React.createElement("button", {
+      key: String(o.id),
+      className: "btn",
+      onClick: () => setLevel(o.id),
+      style: {
+        padding: "8px 14px", borderRadius: 8,
+        background: on ? t.surfaceBg : "transparent",
+        color: on ? t.text : t.textMuted,
+        fontSize: 12, fontWeight: 600, fontFamily: t.fontUi,
+        boxShadow: on ? t.shadowCard : "none",
+        display: "flex", alignItems: "center", gap: 6
+      }
+    }, o.label, /*#__PURE__*/React.createElement("span", {
+      className: "mono",
+      style: { fontSize: 10, color: on ? t.accent : t.textFaint }
+    }, count));
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "resp-grid-kanji"
   }, /*#__PURE__*/React.createElement("div", {
     className: "surface-raised",
@@ -131,14 +156,17 @@ function KanjiScreen(p) {
       flex: 1,
       minWidth: 0
     }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }
   }, /*#__PURE__*/React.createElement(window.Pill, {
     t: t,
     tone: "accent",
-    size: "sm",
-    style: {
-      marginBottom: 6
-    }
-  }, cur.strokes, " strokes"), /*#__PURE__*/React.createElement("div", {
+    size: "sm"
+  }, cur.strokes, " strokes"), cur.jlpt && /*#__PURE__*/React.createElement(window.Pill, {
+    t: t,
+    tone: "success",
+    size: "sm"
+  }, "N", cur.jlpt)), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 24,
       fontWeight: 800,

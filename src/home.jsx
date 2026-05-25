@@ -13,6 +13,7 @@ function HomeScreen(p) {
     { id: "write",     label: "Write",      hint: "Type the reading",      glyph: "✎" },
     { id: "listen",    label: "Listen",     hint: "Audio → meaning",       glyph: "♪" },
     { id: "build",     label: "Build",      hint: "Arrange sentences",     glyph: "⊞" },
+    ...(window.EXTRA_MODES_META || []),
   ];
 
   const goals = [
@@ -22,15 +23,20 @@ function HomeScreen(p) {
     { kind: "due",   value: 0,  label: "Due only" },
   ];
 
+  const fixedPoolFor = (m) =>
+    m === "build" || m === "cloze" ? window.CARD_DATA.sentences :
+    m === "conjugate"               ? (window.CARD_DATA.verbs || []) :
+    null;
+
   const totalInSelection = useMemoHome(() => {
-    if (mode === "build") return window.CARD_DATA.sentences.length;
+    const fixed = fixedPoolFor(mode);
+    if (fixed) return fixed.length;
     return categories.reduce((sum, c) => sum + (window.CARD_DATA[c]?.length || 0), 0);
   }, [categories, mode]);
 
   const dueInSelection = useMemoHome(() => {
-    if (mode === "build") {
-      return window.CARD_DATA.sentences.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).length;
-    }
+    const fixed = fixedPoolFor(mode);
+    if (fixed) return fixed.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).length;
     return categories.reduce((sum, c) =>
       sum + (window.CARD_DATA[c]?.filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length || 0), 0);
   }, [categories, mode, progress]);
@@ -148,9 +154,12 @@ function HomeScreen(p) {
             </span>
           </div>
 
-          {mode === "build" ? (
+          {fixedPoolFor(mode) ? (
             <div className="surface" style={{ padding: 18, fontSize: 13, color: t.textMuted }}>
-              Build mode drills the <b style={{ color: t.text }}>sentence bank</b> — arrange tokens (words + particles) in order. Categories don't apply here.
+              {mode === "build" && <>Build mode drills the <b style={{ color: t.text }}>sentence bank</b> — arrange tokens (words + particles) in order.</>}
+              {mode === "cloze" && <>Cloze drills the <b style={{ color: t.text }}>sentence bank</b> — fill the blank with the right particle, ending, or word.</>}
+              {mode === "conjugate" && <>Conjugate drills the <b style={{ color: t.text }}>verb bank</b> — type the ます form of each dictionary-form verb.</>}
+              <div style={{ marginTop: 6, fontSize: 12, color: t.textFaint }}>Categories don't apply here.</div>
             </div>
           ) : (
             <div className="resp-cats-2">

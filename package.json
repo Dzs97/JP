@@ -1,0 +1,14 @@
+{
+  "name": "nihongo-study",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static React app for studying Japanese. JSX is precompiled into src-compiled/ at build time.",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "chokidar": "^3.6.0"
+  }
+}

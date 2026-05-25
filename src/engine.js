@@ -166,10 +166,76 @@ const storage = {
   },
 };
 
+// ── Verb conjugation (ます-form only — the most-drilled N5 pattern) ────
+function conjugateMasu(verb) {
+  if (!verb || verb.type !== "Verb") return null;
+  const { front, romanji, group } = verb;
+
+  // Irregulars
+  if (group === "irregular") {
+    if (front === "する") return { kanji: "します", romanji: "shimasu" };
+    if (front === "来る") return { kanji: "来ます", romanji: "kimasu" };
+    if (front.endsWith("する")) {
+      return {
+        kanji: front.slice(0, -2) + "します",
+        romanji: romanji.replace(/suru$/, "shimasu"),
+      };
+    }
+  }
+
+  // Ichidan (-eru / -iru ending verbs that drop る)
+  if (group === "ichidan") {
+    return {
+      kanji: front.slice(0, -1) + "ます",
+      romanji: romanji.replace(/ru$/, "masu"),
+    };
+  }
+
+  // Godan + godan-iku
+  const kanaMap = { "う":"い","く":"き","ぐ":"ぎ","す":"し","つ":"ち","ぬ":"に","ぶ":"び","む":"み","る":"り" };
+  const last = front.slice(-1);
+  const newK = front.slice(0, -1) + (kanaMap[last] || last) + "ます";
+
+  // romanji last syllable → -i + masu (tsu→chi, mu→mi, ku→ki, etc.)
+  const syllableMap = { "tsu":"chi", "ku":"ki", "gu":"gi", "su":"shi", "nu":"ni", "bu":"bi", "mu":"mi", "ru":"ri", "u":"i" };
+  let newR = romanji;
+  const m = romanji.match(/(tsu|ku|gu|su|nu|bu|mu|ru|u)$/);
+  if (m) newR = romanji.slice(0, -m[0].length) + syllableMap[m[0]] + "masu";
+  return { kanji: newK, romanji: newR };
+}
+
+// ── Cloze: pick one token in a sentence to blank out, plus distractors ──
+function makeClozeFromSentence(card, allCards) {
+  const tokens = tokenizeSentence(card.front);
+  if (tokens.length < 2) return null;
+  // Prefer particles & verb-endings; otherwise random non-edge token
+  const particles = new Set(["は","が","を","に","で","と","も","の","から","まで","へ","か","ね","よ"]);
+  const endings = new Set(["です","ます","ません","ました","たい","ください","ている","ています","でいる","でいます"]);
+  const preferredIdx = tokens
+    .map((t, i) => (particles.has(t) || endings.has(t)) ? i : -1)
+    .filter((i) => i >= 0);
+  const candidates = preferredIdx.length ? preferredIdx : tokens.map((_, i) => i);
+  const blankIdx = candidates[Math.floor(Math.random() * candidates.length)];
+  const answer = tokens[blankIdx];
+
+  // Build distractors from same-type pool
+  const isParticle = particles.has(answer);
+  const isEnding = endings.has(answer);
+  let pool;
+  if (isParticle) pool = [...particles];
+  else if (isEnding) pool = [...endings];
+  else pool = (allCards || []).map((c) => c.front).filter((s) => s.length <= 4);
+  const distractors = shuffle(pool.filter((x) => x !== answer)).slice(0, 3);
+  const options = shuffle([answer, ...distractors]);
+
+  return { tokens, blankIdx, answer, options };
+}
+
 Object.assign(window, {
   cardKey, shuffle, getWrongChoices,
   srsReview, isDue, formatInterval, tokenizeSentence,
   emptyProgress, todayKey, storage,
   DAY_MS,
   forecastDueByDay, pushMistake, clearMistake,
+  conjugateMasu, makeClozeFromSentence,
 });

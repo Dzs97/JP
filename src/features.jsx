@@ -10,19 +10,22 @@ function KanjiScreen(p) {
   const { t, speakForce } = p;
   const [selected, setSelected] = useS2(null);
   const [filter, setFilter] = useS2("");
+  const [level, setLevel] = useS2("all"); // "all" | 5 | 4
 
   const list = useM2(() => {
     const f = filter.trim().toLowerCase();
-    if (!f) return window.KANJI_DATA;
-    return window.KANJI_DATA.filter(k =>
+    let base = window.KANJI_DATA;
+    if (level !== "all") base = base.filter(k => k.jlpt === level);
+    if (!f) return base;
+    return base.filter(k =>
       k.char.includes(f) ||
       k.meaning.toLowerCase().includes(f) ||
       k.on.some(r => r.toLowerCase().includes(f)) ||
       k.kun.some(r => r.toLowerCase().includes(f))
     );
-  }, [filter]);
+  }, [filter, level]);
 
-  const cur = selected || list[0];
+  const cur = selected && list.some(k => k.char === selected.char) ? selected : list[0];
 
   return (
     <div className="fade-up" style={{ maxWidth: 1080, margin: "0 auto", paddingTop: 32 }}>
@@ -36,18 +39,40 @@ function KanjiScreen(p) {
         </p>
       </div>
 
-      <input
-        value={filter}
-        onChange={e => setFilter(e.target.value)}
-        placeholder="Filter by character, meaning, or reading..."
-        style={{
-          width: "100%", padding: "12px 16px",
-          background: t.inputBg, color: t.text,
-          border: `1px solid ${t.inputBorder}`,
-          borderRadius: 12, fontSize: 14, marginBottom: 16, outline: "none",
-          fontFamily: t.fontUi,
-        }}
-      />
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <input
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          placeholder="Filter by character, meaning, or reading..."
+          style={{
+            flex: "1 1 220px", padding: "12px 16px",
+            background: t.inputBg, color: t.text,
+            border: `1px solid ${t.inputBorder}`,
+            borderRadius: 12, fontSize: 14, outline: "none",
+            fontFamily: t.fontUi,
+          }}
+        />
+        <div style={{ display: "flex", gap: 4, background: t.surfaceSunken, padding: 4, borderRadius: 10 }}>
+          {[{ id: "all", label: "All" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => {
+            const on = level === o.id;
+            const count = o.id === "all" ? window.KANJI_DATA.length : (window.KANJI_BY_LEVEL[o.id]?.length || 0);
+            return (
+              <button key={String(o.id)} className="btn" onClick={() => setLevel(o.id)}
+                style={{
+                  padding: "8px 14px", borderRadius: 8,
+                  background: on ? t.surfaceBg : "transparent",
+                  color: on ? t.text : t.textMuted,
+                  fontSize: 12, fontWeight: 600, fontFamily: t.fontUi,
+                  boxShadow: on ? t.shadowCard : "none",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>
+                {o.label}
+                <span className="mono" style={{ fontSize: 10, color: on ? t.accent : t.textFaint }}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="resp-grid-kanji">
         {/* Grid */}
@@ -87,7 +112,10 @@ function KanjiScreen(p) {
                 </div>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <window.Pill t={t} tone="accent" size="sm" style={{ marginBottom: 6 }}>{cur.strokes} strokes</window.Pill>
+                <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
+                  <window.Pill t={t} tone="accent" size="sm">{cur.strokes} strokes</window.Pill>
+                  {cur.jlpt && <window.Pill t={t} tone="success" size="sm">N{cur.jlpt}</window.Pill>}
+                </div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: t.text, fontFamily: t.fontUi, letterSpacing: -0.4, marginTop: 6, textTransform: "capitalize" }}>
                   {cur.meaning}
                 </div>

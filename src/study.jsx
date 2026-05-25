@@ -27,6 +27,7 @@ function StudyScreen(p) {
       {mode === "write"     && <WriteMode {...p} />}
       {mode === "listen"    && <ListenMode {...p} />}
       {mode === "build"     && <BuildMode {...p} />}
+      {window.EXTRA_MODES && window.EXTRA_MODES[mode] && React.createElement(window.EXTRA_MODES[mode], p)}
     </div>
   );
 }
