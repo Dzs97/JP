@@ -123,6 +123,20 @@ const emptyProgress = () => ({
   onboardingDone: false,
 });
 
+// Backfill missing fields onto loaded progress so older save shapes still work.
+function migrateProgress(p) {
+  if (!p) return emptyProgress();
+  const base = emptyProgress();
+  return {
+    ...base,
+    ...p,
+    cardStats: { ...base.cardStats, ...(p.cardStats || {}) },
+    dayLog: { ...base.dayLog, ...(p.dayLog || {}) },
+    history: Array.isArray(p.history) ? p.history : [],
+    mistakeQueue: Array.isArray(p.mistakeQueue) ? p.mistakeQueue : [],
+  };
+}
+
 // ── SRS forecast: count of cards due on each of the next N days ────────
 function forecastDueByDay(cardStats, days = 14) {
   const now = Date.now();
@@ -238,4 +252,5 @@ Object.assign(window, {
   DAY_MS,
   forecastDueByDay, pushMistake, clearMistake,
   conjugateMasu, makeClozeFromSentence,
+  migrateProgress,
 });

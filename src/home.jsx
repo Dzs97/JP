@@ -5,7 +5,12 @@ const { useMemo: useMemoHome } = React;
 
 function HomeScreen(p) {
   const { t, stats, progress, mode, setMode, categories, toggleCat, sessionGoal, setSessionGoal,
-          dueOnly, setDueOnly, startStudy, startWeakReview, startMistakeDrill, setScreen, density } = p;
+          dueOnly, setDueOnly, startStudy, startWeakReview, startMistakeDrill, setScreen, density,
+          levelFocus, setLevelFocus, setProgress } = p;
+
+  const todayKey = window.todayKey();
+  const todayCards = progress.dayLog?.[todayKey]?.cards || 0;
+  const dailyGoal = progress.dailyGoal || 20;
 
   const modes = [
     { id: "flashcard", label: "Flashcards", hint: "Flip & self-rate (SRS)", glyph: "⎙" },
@@ -28,18 +33,21 @@ function HomeScreen(p) {
     m === "conjugate"               ? (window.CARD_DATA.verbs || []) :
     null;
 
+  const applyLevel = (arr) => (window.filterByLevel ? window.filterByLevel(arr, levelFocus) : arr);
+
   const totalInSelection = useMemoHome(() => {
     const fixed = fixedPoolFor(mode);
-    if (fixed) return fixed.length;
-    return categories.reduce((sum, c) => sum + (window.CARD_DATA[c]?.length || 0), 0);
-  }, [categories, mode]);
+    if (fixed) return applyLevel(fixed).length;
+    return categories.reduce((sum, c) => sum + applyLevel(window.CARD_DATA[c] || []).length, 0);
+  }, [categories, mode, levelFocus]);
 
   const dueInSelection = useMemoHome(() => {
     const fixed = fixedPoolFor(mode);
-    if (fixed) return fixed.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).length;
+    const isDueCard = (card) => window.isDue(progress.cardStats[window.cardKey(card)]);
+    if (fixed) return applyLevel(fixed).filter(isDueCard).length;
     return categories.reduce((sum, c) =>
-      sum + (window.CARD_DATA[c]?.filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length || 0), 0);
-  }, [categories, mode, progress]);
+      sum + applyLevel(window.CARD_DATA[c] || []).filter(isDueCard).length, 0);
+  }, [categories, mode, progress, levelFocus]);
 
   return (
     <div className="fade-up" style={{ maxWidth: 1080, margin: "0 auto", paddingTop: 32 }}>
@@ -63,6 +71,21 @@ function HomeScreen(p) {
               ? <>You have <b style={{ color: t.accent }}>{stats.dueCount}</b> cards due for review. Spaced repetition keeps recall strong.</>
               : "No reviews due right now. A short new-card session keeps momentum."}
           </p>
+
+          {/* Daily goal ring */}
+          {window.DailyGoalRing && (
+            <div style={{ position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ textAlign: "right" }}>
+                <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", color: t.textFaint }}>
+                  today
+                </div>
+                <div style={{ fontSize: 11, color: todayCards >= dailyGoal ? t.success : t.textMuted, fontFamily: t.fontUi, fontWeight: 600 }}>
+                  {todayCards >= dailyGoal ? "goal hit ✓" : `${dailyGoal - todayCards} to go`}
+                </div>
+              </div>
+              <window.DailyGoalRing t={t} today={todayCards} goal={dailyGoal} />
+            </div>
+          )}
 
           <div style={{ display: "flex", gap: 10, marginTop: 22, flexWrap: "wrap" }}>
             <window.PrimaryButton t={t} onClick={startStudy}>
@@ -149,9 +172,28 @@ function HomeScreen(p) {
                 {mode === "build" ? "Sentence bank" : "Categories"}
               </h2>
             </div>
-            <span style={{ fontSize: 12, color: t.textFaint, fontFamily: t.fontMono }}>
-              {totalInSelection} cards · {dueInSelection} due
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {setLevelFocus && (
+                <div style={{ display: "flex", gap: 2, background: t.surfaceSunken, padding: 3, borderRadius: 8 }}>
+                  {[{ id: "all", label: "All" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => {
+                    const on = levelFocus === o.id;
+                    return (
+                      <button key={String(o.id)} className="btn" onClick={() => setLevelFocus(o.id)}
+                        style={{
+                          padding: "4px 10px", borderRadius: 6,
+                          background: on ? t.surfaceBg : "transparent",
+                          color: on ? t.text : t.textMuted,
+                          fontSize: 11, fontWeight: 600, fontFamily: t.fontUi,
+                          boxShadow: on ? t.shadowCard : "none",
+                        }}>{o.label}</button>
+                    );
+                  })}
+                </div>
+              )}
+              <span style={{ fontSize: 12, color: t.textFaint, fontFamily: t.fontMono }}>
+                {totalInSelection} cards · {dueInSelection} due
+              </span>
+            </div>
           </div>
 
           {fixedPoolFor(mode) ? (

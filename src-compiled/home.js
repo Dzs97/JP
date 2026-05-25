@@ -22,8 +22,13 @@ function HomeScreen(p) {
     startWeakReview,
     startMistakeDrill,
     setScreen,
-    density
+    density,
+    levelFocus,
+    setLevelFocus
   } = p;
+  const todayKey = window.todayKey();
+  const todayCards = (progress.dayLog && progress.dayLog[todayKey] && progress.dayLog[todayKey].cards) || 0;
+  const dailyGoal = progress.dailyGoal || 20;
   const modes = [{
     id: "flashcard",
     label: "Flashcards",
@@ -68,16 +73,18 @@ function HomeScreen(p) {
     label: "Due only"
   }];
   const fixedPoolFor = m => m === "build" || m === "cloze" ? window.CARD_DATA.sentences : m === "conjugate" ? (window.CARD_DATA.verbs || []) : null;
+  const applyLevel = arr => window.filterByLevel ? window.filterByLevel(arr, levelFocus) : arr;
   const totalInSelection = useMemoHome(() => {
     const fixed = fixedPoolFor(mode);
-    if (fixed) return fixed.length;
-    return categories.reduce((sum, c) => sum + (window.CARD_DATA[c]?.length || 0), 0);
-  }, [categories, mode]);
+    if (fixed) return applyLevel(fixed).length;
+    return categories.reduce((sum, c) => sum + applyLevel(window.CARD_DATA[c] || []).length, 0);
+  }, [categories, mode, levelFocus]);
   const dueInSelection = useMemoHome(() => {
     const fixed = fixedPoolFor(mode);
-    if (fixed) return fixed.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).length;
-    return categories.reduce((sum, c) => sum + (window.CARD_DATA[c]?.filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length || 0), 0);
-  }, [categories, mode, progress]);
+    const isDueCard = card => window.isDue(progress.cardStats[window.cardKey(card)]);
+    if (fixed) return applyLevel(fixed).filter(isDueCard).length;
+    return categories.reduce((sum, c) => sum + applyLevel(window.CARD_DATA[c] || []).filter(isDueCard).length, 0);
+  }, [categories, mode, progress, levelFocus]);
   return /*#__PURE__*/React.createElement("div", {
     className: "fade-up",
     style: {
@@ -135,7 +142,18 @@ function HomeScreen(p) {
     style: {
       color: t.accent
     }
-  }, stats.dueCount), " cards due for review. Spaced repetition keeps recall strong.") : "No reviews due right now. A short new-card session keeps momentum."), /*#__PURE__*/React.createElement("div", {
+  }, stats.dueCount), " cards due for review. Spaced repetition keeps recall strong.") : "No reviews due right now. A short new-card session keeps momentum."),
+  window.DailyGoalRing && /*#__PURE__*/React.createElement("div", {
+    style: { position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }
+  },
+    /*#__PURE__*/React.createElement("div", { style: { textAlign: "right" } },
+      /*#__PURE__*/React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", color: t.textFaint } }, "today"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: todayCards >= dailyGoal ? t.success : t.textMuted, fontFamily: t.fontUi, fontWeight: 600 } },
+        todayCards >= dailyGoal ? "goal hit ✓" : (dailyGoal - todayCards) + " to go")
+    ),
+    /*#__PURE__*/React.createElement(window.DailyGoalRing, { t: t, today: todayCards, goal: dailyGoal })
+  ),
+  /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
@@ -281,13 +299,27 @@ function HomeScreen(p) {
       letterSpacing: -0.4,
       color: t.text
     }
-  }, fixedPoolFor(mode) ? (mode === "conjugate" ? "Verb bank" : "Sentence bank") : "Categories")), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 12,
-      color: t.textFaint,
-      fontFamily: t.fontMono
-    }
-  }, totalInSelection, " cards \xB7 ", dueInSelection, " due")), fixedPoolFor(mode) ? /*#__PURE__*/React.createElement("div", {
+  }, fixedPoolFor(mode) ? (mode === "conjugate" ? "Verb bank" : "Sentence bank") : "Categories")),
+  /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
+    setLevelFocus && /*#__PURE__*/React.createElement("div", {
+      style: { display: "flex", gap: 2, background: t.surfaceSunken, padding: 3, borderRadius: 8 }
+    }, [{ id: "all", label: "All" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => {
+      const on = levelFocus === o.id;
+      return /*#__PURE__*/React.createElement("button", {
+        key: String(o.id), className: "btn", onClick: () => setLevelFocus(o.id),
+        style: {
+          padding: "4px 10px", borderRadius: 6,
+          background: on ? t.surfaceBg : "transparent",
+          color: on ? t.text : t.textMuted,
+          fontSize: 11, fontWeight: 600, fontFamily: t.fontUi,
+          boxShadow: on ? t.shadowCard : "none"
+        }
+      }, o.label);
+    })),
+    /*#__PURE__*/React.createElement("span", {
+      style: { fontSize: 12, color: t.textFaint, fontFamily: t.fontMono }
+    }, totalInSelection, " cards \xB7 ", dueInSelection, " due")
+  )), fixedPoolFor(mode) ? /*#__PURE__*/React.createElement("div", {
     className: "surface",
     style: {
       padding: 18,

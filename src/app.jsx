@@ -38,6 +38,7 @@ function App() {
   const [categories, setCategories] = useState(["vocabulary", "phrases"]);
   const [sessionGoal, setSessionGoal] = useState({ kind: "cards", value: 20 });
   const [dueOnly, setDueOnly] = useState(false);
+  const [levelFocus, setLevelFocus] = useState("all"); // "all" | 5 | 4
 
   // ── Study runtime ─────────────────────────────────────────────────
   const [deck, setDeck] = useState([]);
@@ -71,7 +72,7 @@ function App() {
     (async () => {
       try {
         const r = await window.storage.get("jp-study-progress");
-        if (r?.value) setProgress(JSON.parse(r.value));
+        if (r?.value) setProgress(window.migrateProgress(JSON.parse(r.value)));
       } catch (_) {}
       try {
         const p = await window.storage.get("jp-study-prefs");
@@ -83,6 +84,7 @@ function App() {
           if (Array.isArray(parsed.categories) && parsed.categories.length) setCategories(parsed.categories);
           if (parsed.mode) setMode(parsed.mode);
           if (parsed.sessionGoal) setSessionGoal(parsed.sessionGoal);
+          if (parsed.levelFocus !== undefined) setLevelFocus(parsed.levelFocus);
         }
       } catch (_) {}
     })();
@@ -92,11 +94,11 @@ function App() {
     (async () => {
       try {
         await window.storage.set("jp-study-prefs", JSON.stringify({
-          darkMode, showRomanji, voiceOn, categories, mode, sessionGoal,
+          darkMode, showRomanji, voiceOn, categories, mode, sessionGoal, levelFocus,
         }));
       } catch (_) {}
     })();
-  }, [darkMode, showRomanji, voiceOn, categories, mode, sessionGoal]);
+  }, [darkMode, showRomanji, voiceOn, categories, mode, sessionGoal, levelFocus]);
 
   const saveProgress = useCallback(async (p) => {
     try { await window.storage.set("jp-study-progress", JSON.stringify(p)); } catch (_) {}
@@ -248,6 +250,7 @@ function App() {
     categories.forEach(c => { if (window.CARD_DATA[c]) pool = [...pool, ...window.CARD_DATA[c]]; });
     if (mode === "build" || mode === "cloze") pool = window.CARD_DATA.sentences.slice();
     if (mode === "conjugate") pool = (window.CARD_DATA.verbs || []).slice();
+    if (window.filterByLevel) pool = window.filterByLevel(pool, levelFocus);
     let ordered;
     if (dueOnly || sessionGoal.kind === "due") {
       const due = pool.filter(c => window.isDue(progress.cardStats[window.cardKey(c)]))
@@ -259,7 +262,7 @@ function App() {
     }
     const limit = sessionGoal.kind === "cards" ? sessionGoal.value : ordered.length;
     return ordered.slice(0, Math.min(limit, ordered.length));
-  }, [categories, mode, dueOnly, sessionGoal, progress]);
+  }, [categories, mode, dueOnly, sessionGoal, progress, levelFocus]);
 
   const startStudy = useCallback(() => {
     const d = buildSessionDeck();
@@ -458,6 +461,7 @@ function App() {
     kanaSection, setKanaSection, kanaQuizPool, setKanaQuizPool,
     kanaQuizIdx, setKanaQuizIdx, kanaQuizSelected, setKanaQuizSelected,
     kanaQuizScore, setKanaQuizScore, kanaQuizDone, setKanaQuizDone,
+    levelFocus, setLevelFocus,
   };
 
   return (
@@ -537,6 +541,18 @@ function App() {
         speechLog={speechLog}
         doSpeak={doSpeak}
       />
+
+      {window.FuriganaToggle && <window.FuriganaToggle t={t} />}
+      {window.SearchOverlay && <window.SearchOverlay t={t} setScreen={setScreen} />}
+      {window.OnboardingModal && !progress.onboardingDone && (
+        <window.OnboardingModal t={t} progress={progress}
+          onDone={(picks) => {
+            const up = { ...progress, onboardingDone: true,
+              dailyGoal: picks.dailyGoal ?? progress.dailyGoal ?? 20 };
+            saveProgress(up);
+            if (picks.levelFocus !== undefined) setLevelFocus(picks.levelFocus);
+          }} />
+      )}
     </div>
   );
 }

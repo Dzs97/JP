@@ -48,6 +48,7 @@ function App() {
     value: 20
   });
   const [dueOnly, setDueOnly] = useState(false);
+  const [levelFocus, setLevelFocus] = useState("all");
 
   // ── Study runtime ─────────────────────────────────────────────────
   const [deck, setDeck] = useState([]);
@@ -86,7 +87,7 @@ function App() {
     (async () => {
       try {
         const r = await window.storage.get("jp-study-progress");
-        if (r?.value) setProgress(JSON.parse(r.value));
+        if (r?.value) setProgress(window.migrateProgress(JSON.parse(r.value)));
       } catch (_) {}
       try {
         const p = await window.storage.get("jp-study-prefs");
@@ -98,6 +99,7 @@ function App() {
           if (Array.isArray(parsed.categories) && parsed.categories.length) setCategories(parsed.categories);
           if (parsed.mode) setMode(parsed.mode);
           if (parsed.sessionGoal) setSessionGoal(parsed.sessionGoal);
+          if (parsed.levelFocus !== undefined) setLevelFocus(parsed.levelFocus);
         }
       } catch (_) {}
     })();
@@ -111,11 +113,12 @@ function App() {
           voiceOn,
           categories,
           mode,
-          sessionGoal
+          sessionGoal,
+          levelFocus
         }));
       } catch (_) {}
     })();
-  }, [darkMode, showRomanji, voiceOn, categories, mode, sessionGoal]);
+  }, [darkMode, showRomanji, voiceOn, categories, mode, sessionGoal, levelFocus]);
   const saveProgress = useCallback(async p => {
     try {
       await window.storage.set("jp-study-progress", JSON.stringify(p));
@@ -313,6 +316,7 @@ function App() {
     });
     if (mode === "build" || mode === "cloze") pool = window.CARD_DATA.sentences.slice();
     if (mode === "conjugate") pool = (window.CARD_DATA.verbs || []).slice();
+    if (window.filterByLevel) pool = window.filterByLevel(pool, levelFocus);
     let ordered;
     if (dueOnly || sessionGoal.kind === "due") {
       const due = pool.filter(c => window.isDue(progress.cardStats[window.cardKey(c)])).sort((a, b) => (progress.cardStats[window.cardKey(a)]?.due || 0) - (progress.cardStats[window.cardKey(b)]?.due || 0));
@@ -323,7 +327,7 @@ function App() {
     }
     const limit = sessionGoal.kind === "cards" ? sessionGoal.value : ordered.length;
     return ordered.slice(0, Math.min(limit, ordered.length));
-  }, [categories, mode, dueOnly, sessionGoal, progress]);
+  }, [categories, mode, dueOnly, sessionGoal, progress, levelFocus]);
   const startStudy = useCallback(() => {
     const d = buildSessionDeck();
     if (d.length === 0) return;
@@ -560,6 +564,8 @@ function App() {
     setSessionGoal,
     dueOnly,
     setDueOnly,
+    levelFocus,
+    setLevelFocus,
     deck,
     setDeck,
     idx,
@@ -737,7 +743,19 @@ function App() {
     voiceRef: voiceRef,
     speechLog: speechLog,
     doSpeak: doSpeak
-  }));
+  }),
+  window.FuriganaToggle && /*#__PURE__*/React.createElement(window.FuriganaToggle, { t: t }),
+  window.SearchOverlay && /*#__PURE__*/React.createElement(window.SearchOverlay, { t: t, setScreen: setScreen }),
+  window.OnboardingModal && !progress.onboardingDone && /*#__PURE__*/React.createElement(window.OnboardingModal, {
+    t: t,
+    progress: progress,
+    onDone: (picks) => {
+      const up = Object.assign({}, progress, { onboardingDone: true, dailyGoal: picks.dailyGoal != null ? picks.dailyGoal : (progress.dailyGoal || 20) });
+      saveProgress(up);
+      if (picks.levelFocus !== undefined) setLevelFocus(picks.levelFocus);
+    }
+  })
+  );
 }
 window.App = App;
 })();
