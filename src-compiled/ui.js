@@ -351,6 +351,17 @@ function TopBar({
     }
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn",
+    onClick: () => window.openSearch && window.openSearch(),
+    title: "Search cards & kanji (press /)",
+    "aria-label": "Search",
+    style: {
+      width: 36, height: 36, borderRadius: 10,
+      background: t.btnGhost, color: t.textMuted,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: 15
+    }
+  }, "🔍"), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
     onClick: () => setVoiceOn(!voiceOn),
     title: voiceOn ? "Mute" : "Unmute",
     style: {

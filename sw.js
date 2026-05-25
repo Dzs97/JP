@@ -1,7 +1,7 @@
 // Nihongo Study — minimal service worker
 // Strategy: cache-first for app shell + same-origin assets; network-first for
 // navigations (so deploys appear without users having to clear the cache).
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL = `nihongo-shell-${VERSION}`;
 const RUNTIME = `nihongo-runtime-${VERSION}`;
 
@@ -23,6 +23,9 @@ const PRECACHE = [
   "/src-compiled/study.js",
   "/src-compiled/screens.js",
   "/src-compiled/app.js",
+  "/src/extra-modes.js",
+  "/src/extras-quickwins.js",
+  "/src/extras-sync.js",
 ];
 
 self.addEventListener("install", (event) => {
@@ -48,6 +51,7 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // skip cross-origin (fonts/CDNs)
+  if (url.pathname.startsWith("/api/")) return;    // never cache API responses
 
   // Network-first for navigations so deploys are picked up.
   if (req.mode === "navigate") {

@@ -144,6 +144,7 @@ function HomeScreen(p) {
     }
   }, stats.dueCount), " cards due for review. Spaced repetition keeps recall strong.") : "No reviews due right now. A short new-card session keeps momentum."),
   window.DailyGoalRing && /*#__PURE__*/React.createElement("div", {
+    className: "jq-goal-ring",
     style: { position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }
   },
     /*#__PURE__*/React.createElement("div", { style: { textAlign: "right" } },

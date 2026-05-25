@@ -126,6 +126,20 @@ function App() {
     setProgress(p);
   }, []);
 
+  // React to remote pulls from the sync layer
+  useEffect(() => {
+    const onPull = (e) => {
+      try {
+        const v = e?.detail;
+        if (!v) return;
+        const parsed = window.migrateProgress ? window.migrateProgress(JSON.parse(v)) : JSON.parse(v);
+        setProgress(parsed);
+      } catch (_) {}
+    };
+    window.addEventListener("jp-progress-pulled", onPull);
+    return () => window.removeEventListener("jp-progress-pulled", onPull);
+  }, []);
+
   // ── Tweaks / Edit mode protocol ───────────────────────────────────
   useEffect(() => {
     const handler = e => {
@@ -745,6 +759,7 @@ function App() {
     doSpeak: doSpeak
   }),
   window.FuriganaToggle && /*#__PURE__*/React.createElement(window.FuriganaToggle, { t: t }),
+  window.SyncChip && /*#__PURE__*/React.createElement(window.SyncChip, { t: t }),
   window.SearchOverlay && /*#__PURE__*/React.createElement(window.SearchOverlay, { t: t, setScreen: setScreen }),
   window.OnboardingModal && !progress.onboardingDone && /*#__PURE__*/React.createElement(window.OnboardingModal, {
     t: t,

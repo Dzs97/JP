@@ -74,7 +74,7 @@ function HomeScreen(p) {
 
           {/* Daily goal ring */}
           {window.DailyGoalRing && (
-            <div style={{ position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }}>
+            <div className="jq-goal-ring" style={{ position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ textAlign: "right" }}>
                 <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", color: t.textFaint }}>
                   today

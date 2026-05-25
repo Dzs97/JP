@@ -137,7 +137,7 @@
 
   // ── Speed mode ────────────────────────────────────────────────────────
   // Quiz with a per-card countdown. If you run out, it counts as wrong.
-  const SPEED_PER_CARD_SECONDS = 8;
+  const SPEED_PER_CARD_SECONDS = 10;
   function SpeedMode(p) {
     const { t, card, quizOptions, quizSelected, setQuizSelected, next, speakForce } = p;
     const [remaining, setRemaining] = useState(SPEED_PER_CARD_SECONDS);
@@ -217,6 +217,6 @@
   window.EXTRA_MODES_META = [
     { id: "conjugate", label: "Conjugate", hint: "Verb → ます form", glyph: "活" },
     { id: "cloze",     label: "Cloze",     hint: "Fill the blank",   glyph: "空" },
-    { id: "speed",     label: "Speed",     hint: "8s per card",      glyph: "速" },
+    { id: "speed",     label: "Speed",     hint: "10s per card",      glyph: "速" },
   ];
 })();
