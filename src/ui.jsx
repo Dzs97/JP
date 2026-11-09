@@ -177,9 +177,10 @@ function GlobalStyles({ t }) {
 }
 
 // ── Top bar ─────────────────────────────────────────────────────────────
-function TopBar({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoiceOn, score, idx, deck, finished }) {
+function TopBar({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoiceOn, score, idx, deck, finished, exitTo = "home" }) {
   const inStudy = screen === "study" && !finished && deck?.length > 0;
   const tabs = [
+    { id: "course",   label: "Curso" },
     { id: "home",     label: "Study" },
     { id: "kana",     label: "Kana" },
     { id: "kanji",    label: "Kanji" },
@@ -196,7 +197,7 @@ function TopBar({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoice
     }}>
       <div className="resp-topbar-inner">
         {/* Wordmark */}
-        <button className="btn" onClick={() => setScreen("home")}
+        <button className="btn" onClick={() => setScreen("course")}
           style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <div style={{
             width: 32, height: 32, borderRadius: 10,
@@ -236,7 +237,7 @@ function TopBar({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoice
         {/* Study HUD */}
         {inStudy && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <button className="btn" onClick={() => setScreen("home")}
+            <button className="btn" onClick={() => setScreen(exitTo)}
               style={{ padding: "7px 12px", borderRadius: 10, background: t.btnGhost, color: t.textMuted, fontSize: 13, fontWeight: 600, fontFamily: t.fontUi }}>
               ← Exit
             </button>

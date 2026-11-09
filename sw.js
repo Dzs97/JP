@@ -1,7 +1,7 @@
 // Nihongo Study — minimal service worker
 // Strategy: cache-first for app shell + same-origin assets; network-first for
 // navigations (so deploys appear without users having to clear the cache).
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = `nihongo-shell-${VERSION}`;
 const RUNTIME = `nihongo-runtime-${VERSION}`;
 
@@ -17,11 +17,13 @@ const PRECACHE = [
   "/src/lang.js",
   "/src/engine.js",
   "/src/theme.js",
+  "/src/course-data.js",
   "/src-compiled/ui.js",
   "/src-compiled/features.js",
   "/src-compiled/home.js",
   "/src-compiled/study.js",
   "/src-compiled/screens.js",
+  "/src-compiled/course.js",
   "/src-compiled/app.js",
   "/src/extra-modes.js",
   "/src/extras-quickwins.js",
