@@ -61,9 +61,14 @@
   }
 
   // Decide what a pull should do. Pure, so it can be tested.
-  function pick(localTs, remote, force) {
+  const answered = (json) => { try { return JSON.parse(json).totalAnswered || 0; } catch (_) { return 0; } };
+  function pick(localTs, remote, force, firstContact, localValue) {
     if (!remote || !remote.value) return "push";
-    if (force || remote.updatedAt > localTs) return "pull";
+    if (force) return "pull";
+    // First contact on this device: keep whichever copy has more study in it, so
+    // an empty cloud record can't wipe real local progress (and vice versa).
+    if (firstContact) return answered(localValue) > answered(remote.value) ? "push" : "pull";
+    if (remote.updatedAt > localTs) return "pull";
     if (localTs > remote.updatedAt) return "push";
     return "none";
   }
@@ -98,14 +103,14 @@
     setStatus("pulling");
     try {
       const remote = await apiGet(id);
-      // A device's first contact takes the server copy, so a fresh install
-      // (or one that saved onboarding before going online) can't wipe real progress.
-      const action = pick(getLocalTs(), remote, force || !isJoined());
+      const firstContact = !isJoined();
+      const cur = await readLocalProgressString();
+      const action = pick(getLocalTs(), remote, force, firstContact, cur);
       setJoined();
       if (action === "push") {
-        // Remote empty or older — push our local state if we have any
-        const cur = await readLocalProgressString();
-        if (cur) schedulePush(cur);
+        // Remote empty, older, or (first contact) has less study — push local state.
+        // Stamp now so other devices see this upload as newer than what they have.
+        if (cur) { if (firstContact) setLocalTs(Date.now()); schedulePush(cur); }
         setStatus("ok");
         return null;
       }

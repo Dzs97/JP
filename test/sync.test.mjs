@@ -32,6 +32,13 @@ assert.equal(pick(200, { value: "{}", updatedAt: 200 }), "none");
 assert.equal(pick(0, { value: null, updatedAt: 0 }), "push");
 assert.equal(pick(999, { value: "{}", updatedAt: 1 }, true), "pull");
 
+// First contact keeps the copy with more answers, whatever the timestamps say.
+const prog = (n) => JSON.stringify({ totalAnswered: n });
+assert.equal(pick(0, { value: prog(0), updatedAt: 999 }, false, true, prog(120)), "push"); // empty cloud can't wipe local
+assert.equal(pick(999, { value: prog(80), updatedAt: 1 }, false, true, prog(0)), "pull");  // fresh install takes the cloud
+assert.equal(pick(0, { value: prog(5), updatedAt: 1 }, false, true, null), "pull");        // nothing local
+assert.equal(pick(0, { value: prog(5), updatedAt: 1 }, false, true, prog(5)), "pull");     // tie: take the cloud
+
 // Saving progress stamps the local timestamp, even before any upload.
 await win.storage.set("jp-study-progress", "{}");
 assert.ok(Number(store["jp-sync-local-ts"]) > 0);
