@@ -235,46 +235,10 @@
       display: flex; align-items: flex-start; justify-content: center;
       padding: 80px 20px 20px;
     }
-    .jq-furigana-btn {
-      position: fixed; top: 12px; right: 12px; z-index: 60;
-    }
-    .jq-sync-btn {
-      position: fixed; bottom: 20px; right: 20px; z-index: 60;
-    }
-    .jq-sync-panel {
-      position: fixed; bottom: 70px; right: 20px; z-index: 100;
-      width: 320px; padding: 16px;
-      border-radius: 16px;
-    }
 
     /* Mobile (< 720px): re-stack floating chrome so nothing overlaps */
     @media (max-width: 720px) {
-      .jq-furigana-btn {
-        top: auto !important;
-        right: max(12px, env(safe-area-inset-right)) !important;
-        bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
-        padding: 6px 10px !important;
-        font-size: 11px !important;
-      }
-      .jq-sync-btn {
-        right: max(12px, env(safe-area-inset-right)) !important;
-        bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-      }
-      .jq-sync-panel {
-        left: 12px !important;
-        right: 12px !important;
-        bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
-        width: auto !important;
-      }
       .jq-search-backdrop { padding: 40px 12px 12px !important; }
-      .jq-goal-ring {
-        position: static !important;
-        margin: 14px 0 4px !important;
-        justify-content: flex-start !important;
-      }
-    }
-    @media (max-width: 400px) {
-      .jq-furigana-btn span { display: none; }
     }
   `;
   const styleTag = document.createElement("style");

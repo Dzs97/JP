@@ -7,8 +7,8 @@ function App() {
   // ── Tweakable defaults (wrapped in EDITMODE markers for persistence) ──
   const TWEAKS = /*EDITMODE-BEGIN*/{
     "darkMode": false,
-    "accent": "crimson",
-    "fonts": "sans",
+    "accent": "shu",
+    "fonts": "brush",
     "romanjiPosition": "below",
     "density": "comfortable",
     "showKeyboardHints": true
@@ -71,11 +71,11 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await window.storage.get("jp-study-progress");
+        const r = await window.storage.get(window.userKey("jp-study-progress"));
         if (r?.value) setProgress(window.migrateProgress(JSON.parse(r.value)));
       } catch (_) {}
       try {
-        const p = await window.storage.get("jp-study-prefs");
+        const p = await window.storage.get(window.userKey("jp-study-prefs"));
         if (p?.value) {
           const parsed = JSON.parse(p.value);
           if (typeof parsed.darkMode === "boolean") setDarkMode(parsed.darkMode);
@@ -93,7 +93,7 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        await window.storage.set("jp-study-prefs", JSON.stringify({
+        await window.storage.set(window.userKey("jp-study-prefs"), JSON.stringify({
           darkMode, showRomanji, voiceOn, categories, mode, sessionGoal, levelFocus,
         }));
       } catch (_) {}
@@ -101,7 +101,7 @@ function App() {
   }, [darkMode, showRomanji, voiceOn, categories, mode, sessionGoal, levelFocus]);
 
   const saveProgress = useCallback(async (p) => {
-    try { await window.storage.set("jp-study-progress", JSON.stringify(p)); } catch (_) {}
+    try { await window.storage.set(window.userKey("jp-study-progress"), JSON.stringify(p)); } catch (_) {}
     setProgress(p);
   }, []);
 
@@ -395,7 +395,8 @@ function App() {
       if (up.history.length > 50) up.history = up.history.slice(-50);
       const todayStr = new Date().toDateString();
       if (up.lastStudied !== todayStr) {
-        const y = new Date(Date.now() - window.DAY_MS).toDateString();
+        const yd = new Date(); yd.setDate(yd.getDate() - 1); // calendar day, safe across DST changes
+        const y = yd.toDateString();
         up.streakDays = up.lastStudied === y ? (up.streakDays || 0) + 1 : 1;
         up.lastStudied = todayStr;
       }
@@ -487,13 +488,18 @@ function App() {
       transition: "background 0.3s ease, color 0.3s ease",
     }}>
       <window.GlobalStyles t={t} />
-      <window.TopBar
+      <window.AppShell
         t={t} screen={screen} setScreen={setScreen}
         darkMode={darkMode} setDarkMode={setDarkMode}
         voiceOn={voiceOn} setVoiceOn={setVoiceOn}
         score={score} idx={idx} deck={deck} finished={finished}
-      />
-
+        utilities={<>
+          {window.UserChip && <window.UserChip t={t} />}
+          {window.SyncChip && <window.SyncChip t={t} />}
+          {window.FuriganaToggle && <window.FuriganaToggle t={t} />}
+          <window.AudioDebug t={t} voiceState={voiceState} voiceRef={voiceRef} speechLog={speechLog} doSpeak={doSpeak} />
+        </>}
+      >
       <main className="resp-main-pad">
         {voiceState.ready && !voiceState.hasJapanese && !voiceState.warnDismissed && (
           <div style={{ maxWidth: 1080, margin: "16px auto 0", padding: "12px 16px",
@@ -528,6 +534,7 @@ function App() {
         {screen === "grammar" && <window.GrammarScreen {...screenProps} />}
         {finished && <window.FinishScreen {...screenProps} />}
       </main>
+      </window.AppShell>
 
       {tweaksAvailable && tweaksOpen && (
         <window.TweaksPanel
@@ -548,16 +555,6 @@ function App() {
         />
       )}
 
-      <window.AudioDebug
-        t={t}
-        voiceState={voiceState}
-        voiceRef={voiceRef}
-        speechLog={speechLog}
-        doSpeak={doSpeak}
-      />
-
-      {window.FuriganaToggle && <window.FuriganaToggle t={t} />}
-      {window.SyncChip && <window.SyncChip t={t} />}
       {window.SearchOverlay && <window.SearchOverlay t={t} setScreen={setScreen} />}
       {window.OnboardingModal && !progress.onboardingDone && (
         <window.OnboardingModal t={t} progress={progress}

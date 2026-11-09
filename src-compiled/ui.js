@@ -1,16 +1,6 @@
 (function(){
-// ═══════════════════════════════════════════════════════════════════════
-//  Shared UI primitives — GlobalStyles, TopBar, Card, Pill, Chip, Badge
-// ═══════════════════════════════════════════════════════════════════════
-const {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo
-} = React;
-function GlobalStyles({
-  t
-}) {
+const { useState, useEffect, useCallback, useMemo } = React;
+function GlobalStyles({ t }) {
   const css = `
     *, *::before, *::after { box-sizing: border-box; }
     html, body, #root { margin: 0; padding: 0; min-height: 100%; background: ${t.appBg}; }
@@ -87,7 +77,7 @@ function GlobalStyles({
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: ${t.surfaceBorderStrong}; border-radius: 4px; }
 
-    /* ───────── Responsive helpers ───────── */
+    /* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Responsive helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
     .resp-grid-12 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
     .resp-grid-21 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
     .resp-grid-11 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -104,12 +94,81 @@ function GlobalStyles({
     .resp-kana-table { display: grid; grid-template-columns: 40px repeat(5, 1fr); gap: 4px; }
     .resp-rating-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .resp-finish-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .resp-topbar-inner {
-      max-width: 1080px; margin: 0 auto; padding: 14px 20px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    /* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 App shell: sidebar rail (desktop) / header + tab bar (mobile) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+    .shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+    .rail {
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 22px;
+      padding: 22px 14px 18px;
+      background: ${t.surfaceSunken};
+      border-right: 1px solid ${t.surfaceBorder};
     }
-    .resp-tabs { display: flex; gap: 4px; background: ${t.surfaceSunken}; padding: 4px; border-radius: 12px; }
-    .resp-main-pad { padding: 0 20px 80px; }
+    .rail-brand { display: flex; align-items: center; gap: 12px; padding: 2px 6px; text-align: left; }
+    .rail-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+    .rail-brand-text b { font-family: ${t.fontUi}; font-size: 15px; font-weight: 700; color: ${t.text}; letter-spacing: -0.2px; }
+    .rail-brand-text small { font-family: ${t.fontMono}; font-size: 10px; color: ${t.textFaint}; letter-spacing: 1px; text-transform: uppercase; }
+    .hanko {
+      width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: ${t.accent}; color: ${t.onAccent};
+      font-family: ${t.fontJp}; font-weight: 700; font-size: 19px;
+      box-shadow: inset 0 0 0 2px ${t.onAccent}33;
+      transform: rotate(-3deg);
+    }
+    .rail-nav { display: flex; flex-direction: column; gap: 2px; }
+    .rail-link {
+      position: relative; display: flex; align-items: center; gap: 12px;
+      min-height: 44px; padding: 8px 12px; border-radius: 8px;
+      font-family: ${t.fontUi}; font-size: 14px; font-weight: 600; text-align: left;
+      color: ${t.textMuted};
+    }
+    .rail-link:hover { background: ${t.surfaceBg}80; color: ${t.text}; }
+    .rail-link.active { background: ${t.surfaceBg}; color: ${t.text}; box-shadow: ${t.shadowCard}; }
+    .rail-link.active::before {
+      content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px;
+      border-radius: 0 3px 3px 0; background: ${t.accent};
+    }
+    .rail-glyph { width: 24px; text-align: center; font-family: ${t.fontJp}; font-size: 18px; font-weight: 600; }
+    .rail-link.active .rail-glyph { color: ${t.accent}; }
+    .rail-hud { display: flex; flex-direction: column; gap: 10px; padding: 0 6px; }
+    .rail-hud-count { font-family: ${t.fontMono}; font-size: 13px; color: ${t.textMuted}; display: flex; gap: 10px; }
+    .rail-utils { order: 3; margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+    .rail-utils > .btn { width: 100%; text-align: left; }
+    .rail-utils .jq-user-btn, .rail-utils .jq-sync-btn, .rail-utils .jq-furigana-btn,
+    .rail-utils .resp-audio-debug-btn { position: static !important; box-shadow: none !important; }
+    .rail-actions { order: 4; display: flex; gap: 6px; }
+    .icon-btn {
+      width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: ${t.surfaceBg}; color: ${t.textMuted}; border: 1px solid ${t.surfaceBorder};
+    }
+    .icon-btn[aria-pressed="true"] { color: ${t.accent}; border-color: ${t.accent}55; }
+    .rail-more, .utils-mobile-only { display: none !important; }
+    .shell-main { min-width: 0; }
+
+    /* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Chips + segmented controls (home session builder) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      min-height: 40px; padding: 8px 14px; border-radius: 999px;
+      background: ${t.surfaceBg}; color: ${t.textPrimary};
+      border: 1px solid ${t.surfaceBorder};
+      font-family: ${t.fontUi}; font-size: 13px; font-weight: 600;
+    }
+    .chip:hover:not(:disabled) { border-color: ${t.surfaceBorderStrong}; }
+    .chip.on { background: ${t.accent}; color: ${t.onAccent}; border-color: ${t.accent}; }
+    .chip .chip-glyph { font-family: ${t.fontJp}; font-size: 16px; }
+    .chip .chip-meta { font-family: ${t.fontMono}; font-size: 10px; opacity: 0.75; }
+    .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: ${t.surfaceSunken}; border: 1px solid ${t.surfaceBorder}; }
+    .seg button { min-height: 34px; padding: 4px 12px; border-radius: 8px; font-family: ${t.fontUi}; font-size: 12px; font-weight: 600; color: ${t.textMuted}; }
+    .seg button[aria-pressed="true"] { background: ${t.surfaceBg}; color: ${t.text}; box-shadow: ${t.shadowCard}; }
+    .builder-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 18px 0; border-top: 1px solid ${t.surfaceBorder}; }
+    .builder-row:first-of-type { border-top: 0; }
+    .builder-label { font-family: ${t.fontUi}; font-size: 13px; font-weight: 700; color: ${t.text}; padding-top: 10px; }
+    .builder-label small { display: block; font-family: ${t.fontJp}; font-weight: 500; font-size: 12px; color: ${t.textFaint}; margin-top: 2px; }
+    .stat-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 0; border-top: 1px solid ${t.surfaceBorder}; }
+    .stat-row:first-child { border-top: 0; padding-top: 0; }
+    .stat-row:last-child { padding-bottom: 0; }
+    .resp-main-pad { padding: 0 32px 64px; }
     .resp-hide-mobile { display: initial; }
     .resp-show-mobile { display: none; }
     .resp-hero-kanji { font-size: 220px; right: -20px; bottom: -40px; }
@@ -118,7 +177,35 @@ function GlobalStyles({
 
     /* Phones (< 720px) */
     @media (max-width: 720px) {
-      .resp-main-pad { padding: 0 14px 80px; }
+      .shell { display: block; }
+      .rail {
+        position: sticky; top: 0; z-index: 50; height: auto; overflow: visible;
+        flex-direction: row; align-items: center; gap: 10px;
+        padding: 10px 14px; padding-top: max(10px, env(safe-area-inset-top));
+        border-right: 0; border-bottom: 1px solid ${t.surfaceBorder};
+      }
+      .rail-brand { padding: 0; }
+      .rail-nav {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+        flex-direction: row; gap: 0;
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+        background: ${t.surfaceBg}; border-top: 1px solid ${t.surfaceBorder};
+      }
+      .rail-link { flex: 1; flex-direction: column; justify-content: center; gap: 2px; padding: 6px 2px; font-size: 11px; text-align: center; }
+      .rail-link.active { box-shadow: none; background: transparent; }
+      .rail-link.active::before { left: 30%; right: 30%; top: 0; bottom: auto; width: auto; height: 3px; border-radius: 0 0 3px 3px; }
+      .rail-hud { flex-direction: row; align-items: center; padding: 0; flex: 1; min-width: 0; }
+      .rail-actions { margin-left: auto; }
+      .rail-more { display: inline-flex !important; }
+      .act-hide-mobile { display: none !important; }
+      .utils-mobile-only { display: flex !important; }
+      .rail-utils { display: none; }
+      .rail-utils.open {
+        display: flex; position: fixed; top: 64px; left: 12px; right: 12px; z-index: 70;
+        padding: 12px; border-radius: 12px; margin: 0;
+        background: ${t.surfaceBg}; border: 1px solid ${t.surfaceBorder}; box-shadow: ${t.shadowFloating};
+      }
+      .resp-main-pad { padding: 0 14px calc(96px + env(safe-area-inset-bottom, 0px)); }
 
       .resp-grid-12, .resp-grid-21, .resp-grid-11, .resp-grid-kanji {
         grid-template-columns: 1fr; gap: 16px;
@@ -146,6 +233,10 @@ function GlobalStyles({
       .resp-tabs::-webkit-scrollbar { display: none; }
       .resp-tabs button { flex-shrink: 0; }
 
+      .builder-row { grid-template-columns: 1fr; gap: 10px; padding: 16px 0; }
+      .builder-label { padding-top: 0; }
+      .builder-label small { display: inline; margin-left: 6px; }
+
       .resp-hide-mobile { display: none !important; }
       .resp-show-mobile { display: initial; }
 
@@ -171,7 +262,12 @@ function GlobalStyles({
         left: 10px !important; right: 10px !important; bottom: 10px !important;
         width: auto !important;
       }
-      .resp-audio-debug-btn { bottom: 12px !important; left: 12px !important; }
+    }
+
+    @media (max-width: 480px) { .rail-brand-text { display: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
 
     /* Very narrow (< 400px): even smaller kanji grid */
@@ -180,15 +276,36 @@ function GlobalStyles({
       .resp-modes-5 { grid-template-columns: 1fr; }
     }
   `;
-  return /*#__PURE__*/React.createElement("style", {
-    dangerouslySetInnerHTML: {
-      __html: css
-    }
-  });
+  return /* @__PURE__ */ React.createElement("style", { dangerouslySetInnerHTML: { __html: css } });
 }
-
-// ── Top bar ─────────────────────────────────────────────────────────────
-function TopBar({
+const ICON_PATHS = {
+  search: "M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM21 21l-4.35-4.35",
+  volume: "M11 5 6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14",
+  mute: "M11 5 6 9H2v6h4l5 4V5zM22 9l-6 6M16 9l6 6",
+  moon: "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z",
+  sun: "M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4",
+  more: "M5 12h.01M12 12h.01M19 12h.01",
+  close: "M18 6 6 18M6 6l12 12",
+  back: "M15 18l-6-6 6-6"
+};
+function Icon({ name, size = 18, strokeWidth = 2 }) {
+  return /* @__PURE__ */ React.createElement(
+    "svg",
+    {
+      width: size,
+      height: size,
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: name === "more" ? 3 : strokeWidth,
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      "aria-hidden": "true"
+    },
+    /* @__PURE__ */ React.createElement("path", { d: ICON_PATHS[name] })
+  );
+}
+function AppShell({
   t,
   screen,
   setScreen,
@@ -199,388 +316,213 @@ function TopBar({
   score,
   idx,
   deck,
-  finished
+  finished,
+  utilities,
+  children
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const inStudy = screen === "study" && !finished && deck?.length > 0;
-  const tabs = [{
-    id: "home",
-    label: "Study"
-  }, {
-    id: "kana",
-    label: "Kana"
-  }, {
-    id: "kanji",
-    label: "Kanji"
-  }, {
-    id: "grammar",
-    label: "Grammar"
-  }, {
-    id: "progress",
-    label: "Progress"
-  }];
-  return /*#__PURE__*/React.createElement("header", {
-    style: {
-      position: "sticky",
-      top: 0,
-      zIndex: 50,
-      background: `${t.appBg}F0`,
-      backdropFilter: "saturate(1.1) blur(10px)",
-      WebkitBackdropFilter: "saturate(1.1) blur(10px)",
-      borderBottom: `1px solid ${t.surfaceBorder}`
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "resp-topbar-inner"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setScreen("home"),
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      flexShrink: 0
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 32,
-      height: 32,
-      borderRadius: 10,
-      background: t.accent,
-      color: t.onAccent,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: t.fontJp,
-      fontWeight: 700,
-      fontSize: 17,
-      boxShadow: t.shadowCard
-    }
-  }, "\u65E5"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "left",
-      lineHeight: 1.1
-    },
-    className: "resp-hide-mobile"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: t.fontUi,
-      fontWeight: 700,
-      fontSize: 15,
-      color: t.text,
-      letterSpacing: -0.2
-    }
-  }, "Nihongo"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 10,
-      color: t.textFaint,
-      letterSpacing: 1
-    }
-  }, "STUDY \xB7 \u5B66\u7FD2"))), !inStudy && /*#__PURE__*/React.createElement("nav", {
-    className: "resp-tabs"
-  }, tabs.map(tab => {
-    const active = screen === tab.id || tab.id === "home" && screen === "study";
-    return /*#__PURE__*/React.createElement("button", {
-      key: tab.id,
+  const tabs = [
+    { id: "home", label: "Study", glyph: "\u5B66" },
+    { id: "kana", label: "Kana", glyph: "\u3042" },
+    { id: "kanji", label: "Kanji", glyph: "\u6F22" },
+    { id: "grammar", label: "Grammar", glyph: "\u6587" },
+    { id: "progress", label: "Progress", glyph: "\u9032" }
+  ];
+  const go = (id) => {
+    setScreen(id);
+    setMenuOpen(false);
+  };
+  const voiceLabel = voiceOn ? "Mute audio" : "Unmute audio";
+  const themeLabel = darkMode ? "Light mode" : "Dark mode";
+  return /* @__PURE__ */ React.createElement("div", { className: "shell" }, /* @__PURE__ */ React.createElement("aside", { className: "rail" }, /* @__PURE__ */ React.createElement("button", { className: "btn rail-brand", onClick: () => go("home"), "aria-label": "Nihongo Study, home" }, /* @__PURE__ */ React.createElement("span", { className: "hanko", "aria-hidden": "true" }, "\u65E5"), /* @__PURE__ */ React.createElement("span", { className: "rail-brand-text" }, /* @__PURE__ */ React.createElement("b", null, "Nihongo"), /* @__PURE__ */ React.createElement("small", null, window.getUser ? window.getUser() : "study", " \xB7 \u5B66\u7FD2"))), inStudy ? /* @__PURE__ */ React.createElement("div", { className: "rail-hud" }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
       className: "btn",
-      onClick: () => setScreen(tab.id),
+      onClick: () => go("home"),
       style: {
-        padding: "7px 14px",
-        borderRadius: 8,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        minHeight: 40,
+        padding: "0 12px",
+        borderRadius: 10,
+        background: t.surfaceBg,
+        border: `1px solid ${t.surfaceBorder}`,
+        color: t.textMuted,
         fontSize: 13,
         fontWeight: 600,
         fontFamily: t.fontUi,
-        background: active ? t.surfaceBg : "transparent",
-        color: active ? t.text : t.textMuted,
-        boxShadow: active ? t.shadowCard : "none"
+        alignSelf: "flex-start"
       }
-    }, tab.label);
-  })), inStudy && /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      flexWrap: "wrap"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setScreen("home"),
-    style: {
-      padding: "7px 12px",
-      borderRadius: 10,
-      background: t.btnGhost,
-      color: t.textMuted,
-      fontSize: 13,
-      fontWeight: 600,
-      fontFamily: t.fontUi
-    }
-  }, "\u2190 Exit"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 13,
-      color: t.textMuted
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.accent,
-      fontWeight: 700
-    }
-  }, idx + 1), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.textFaint
-    }
-  }, " / ", deck.length)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      fontFamily: t.fontMono,
-      fontSize: 13
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.success
-    }
-  }, "\u2713 ", score.correct), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.danger
-    }
-  }, "\u2717 ", score.incorrect))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 6
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => window.openSearch && window.openSearch(),
-    title: "Search cards & kanji (press /)",
-    "aria-label": "Search",
-    style: {
-      width: 36, height: 36, borderRadius: 10,
-      background: t.btnGhost, color: t.textMuted,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: 15
-    }
-  }, "🔍"), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setVoiceOn(!voiceOn),
-    title: voiceOn ? "Mute" : "Unmute",
-    style: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      background: voiceOn ? `${t.accent}14` : t.btnGhost,
-      color: voiceOn ? t.accent : t.textFaint,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 15
-    }
-  }, voiceOn ? "🔊" : "🔇"), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setDarkMode(!darkMode),
-    title: darkMode ? "Light mode" : "Dark mode",
-    style: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      background: t.btnGhost,
-      color: t.textMuted,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 15
-    }
-  }, darkMode ? "☀" : "☾"))));
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: "back", size: 16 }),
+    " Exit"
+  ), /* @__PURE__ */ React.createElement("div", { className: "rail-hud-count", "aria-live": "polite" }, /* @__PURE__ */ React.createElement("span", null, /* @__PURE__ */ React.createElement("b", { style: { color: t.accent } }, idx + 1), /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, " / ", deck.length)), /* @__PURE__ */ React.createElement("span", { style: { color: t.success }, "aria-label": `${score.correct} correct` }, "\u2713 ", score.correct), /* @__PURE__ */ React.createElement("span", { style: { color: t.danger }, "aria-label": `${score.incorrect} wrong` }, "\u2717 ", score.incorrect))) : /* @__PURE__ */ React.createElement("nav", { className: "rail-nav", "aria-label": "Main" }, tabs.map((tab) => {
+    const active = screen === tab.id || tab.id === "home" && screen === "study";
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: tab.id,
+        className: "btn rail-link" + (active ? " active" : ""),
+        "aria-current": active ? "page" : void 0,
+        onClick: () => go(tab.id)
+      },
+      /* @__PURE__ */ React.createElement("span", { className: "rail-glyph", "aria-hidden": "true" }, tab.glyph),
+      /* @__PURE__ */ React.createElement("span", null, tab.label)
+    );
+  })), /* @__PURE__ */ React.createElement("div", { className: "rail-utils" + (menuOpen ? " open" : "") }, utilities, /* @__PURE__ */ React.createElement("div", { className: "utils-mobile-only", style: { gap: 8 } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn icon-btn",
+      onClick: () => setVoiceOn(!voiceOn),
+      "aria-pressed": voiceOn,
+      "aria-label": voiceLabel,
+      title: voiceLabel
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: voiceOn ? "volume" : "mute" })
+  ), /* @__PURE__ */ React.createElement("button", { className: "btn icon-btn", onClick: () => setDarkMode(!darkMode), "aria-label": themeLabel, title: themeLabel }, /* @__PURE__ */ React.createElement(Icon, { name: darkMode ? "sun" : "moon" })))), /* @__PURE__ */ React.createElement("div", { className: "rail-actions" }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn icon-btn",
+      onClick: () => window.openSearch && window.openSearch(),
+      "aria-label": "Search cards and kanji",
+      title: "Search cards & kanji (press /)"
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: "search" })
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn icon-btn act-hide-mobile",
+      onClick: () => setVoiceOn(!voiceOn),
+      "aria-pressed": voiceOn,
+      "aria-label": voiceLabel,
+      title: voiceLabel
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: voiceOn ? "volume" : "mute" })
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn icon-btn act-hide-mobile",
+      onClick: () => setDarkMode(!darkMode),
+      "aria-label": themeLabel,
+      title: themeLabel
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: darkMode ? "sun" : "moon" })
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn icon-btn rail-more",
+      onClick: () => setMenuOpen((o) => !o),
+      "aria-expanded": menuOpen,
+      "aria-label": "More settings",
+      title: "More settings"
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: menuOpen ? "close" : "more" })
+  ))), /* @__PURE__ */ React.createElement("div", { className: "shell-main" }, children));
 }
-
-// ── Small reusable bits ─────────────────────────────────────────────────
-function Eyebrow({
-  t,
-  children,
-  accent
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 10,
-      letterSpacing: 2,
-      textTransform: "uppercase",
-      color: accent ? t.accent : t.textFaint,
-      fontWeight: 600
-    }
-  }, children);
+function Eyebrow({ t, children, accent }) {
+  return /* @__PURE__ */ React.createElement("div", { className: "mono", style: {
+    fontSize: 10,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: accent ? t.accent : t.textFaint,
+    fontWeight: 600
+  } }, children);
 }
-function Pill({
-  t,
-  children,
-  tone = "default",
-  size = "md",
-  style
-}) {
+function Pill({ t, children, tone = "default", size = "md", style }) {
   const tones = {
-    default: {
-      bg: t.btnGhost,
-      fg: t.textMuted,
-      bd: t.btnGhostBorder
-    },
-    accent: {
-      bg: `${t.accent}14`,
-      fg: t.accent,
-      bd: `${t.accent}40`
-    },
-    success: {
-      bg: t.successBg,
-      fg: t.success,
-      bd: t.successBorder
-    },
-    warn: {
-      bg: t.warnBg,
-      fg: t.warn,
-      bd: t.warnBorder
-    },
-    danger: {
-      bg: t.dangerBg,
-      fg: t.danger,
-      bd: t.dangerBorder
-    }
+    default: { bg: t.btnGhost, fg: t.textMuted, bd: t.btnGhostBorder },
+    accent: { bg: `${t.accent}14`, fg: t.accent, bd: `${t.accent}40` },
+    success: { bg: t.successBg, fg: t.success, bd: t.successBorder },
+    warn: { bg: t.warnBg, fg: t.warn, bd: t.warnBorder },
+    danger: { bg: t.dangerBg, fg: t.danger, bd: t.dangerBorder }
   }[tone];
-  const sizes = {
-    sm: {
-      p: "3px 8px",
-      fs: 10
-    },
-    md: {
-      p: "4px 10px",
-      fs: 11
-    }
-  }[size];
-  return /*#__PURE__*/React.createElement("span", {
-    className: "mono",
-    style: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 4,
-      padding: sizes.p,
-      borderRadius: 999,
-      background: tones.bg,
-      color: tones.fg,
-      border: `1px solid ${tones.bd}`,
-      fontSize: sizes.fs,
-      fontWeight: 600,
-      letterSpacing: 0.5,
-      textTransform: "uppercase",
-      ...style
-    }
-  }, children);
+  const sizes = { sm: { p: "3px 8px", fs: 10 }, md: { p: "4px 10px", fs: 11 } }[size];
+  return /* @__PURE__ */ React.createElement("span", { className: "mono", style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 4,
+    padding: sizes.p,
+    borderRadius: 999,
+    background: tones.bg,
+    color: tones.fg,
+    border: `1px solid ${tones.bd}`,
+    fontSize: sizes.fs,
+    fontWeight: 600,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    ...style
+  } }, children);
 }
-function StatTile({
-  t,
-  label,
-  value,
-  sub,
-  tone = "accent"
-}) {
+function StatTile({ t, label, value, sub, tone = "accent" }) {
   const toneColor = tone === "success" ? t.success : tone === "warn" ? t.warn : t.accent;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "surface-raised",
-    style: {
-      padding: "16px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 9,
-      letterSpacing: 1.5,
-      color: t.textFaint,
-      textTransform: "uppercase",
-      marginBottom: 8,
-      fontWeight: 600
-    }
-  }, label), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Inter', system-ui, sans-serif",
-      fontSize: 30,
-      fontWeight: 800,
-      lineHeight: 1,
-      color: toneColor,
-      letterSpacing: -1
-    }
-  }, value), sub && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: t.textMuted,
-      marginTop: 6
-    }
-  }, sub));
+  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "16px 18px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8, fontWeight: 600 } }, label), /* @__PURE__ */ React.createElement("div", { style: {
+    fontFamily: "'Inter', system-ui, sans-serif",
+    fontSize: 30,
+    fontWeight: 800,
+    lineHeight: 1,
+    color: toneColor,
+    letterSpacing: -1
+  } }, value), sub && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: t.textMuted, marginTop: 6 } }, sub));
 }
-function PrimaryButton({
-  t,
-  onClick,
-  disabled,
-  children,
-  style
-}) {
-  return /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onClick,
-    disabled: disabled,
-    style: {
-      background: t.accent,
-      color: t.onAccent,
-      padding: "14px 28px",
-      borderRadius: 16,
-      fontSize: 15,
-      fontWeight: 700,
-      fontFamily: t.fontUi,
-      letterSpacing: -0.2,
-      boxShadow: `0 4px 20px ${t.accent}33`,
-      ...style
-    }
-  }, children);
+function PrimaryButton({ t, onClick, disabled, children, style }) {
+  return /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick,
+      disabled,
+      style: {
+        background: t.accent,
+        color: t.onAccent,
+        padding: "14px 28px",
+        borderRadius: 16,
+        fontSize: 15,
+        fontWeight: 700,
+        fontFamily: t.fontUi,
+        letterSpacing: -0.2,
+        boxShadow: `0 4px 20px ${t.accent}33`,
+        ...style
+      }
+    },
+    children
+  );
 }
-function SecondaryButton({
-  t,
-  onClick,
-  children,
-  style
-}) {
-  return /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onClick,
-    style: {
-      background: t.btnGhost,
-      color: t.text,
-      padding: "13px 22px",
-      borderRadius: 16,
-      fontSize: 14,
-      fontWeight: 600,
-      fontFamily: t.fontUi,
-      border: `1px solid ${t.btnGhostBorder}`,
-      ...style
-    }
-  }, children);
+function SecondaryButton({ t, onClick, children, style }) {
+  return /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick,
+      style: {
+        background: t.btnGhost,
+        color: t.text,
+        padding: "13px 22px",
+        borderRadius: 16,
+        fontSize: 14,
+        fontWeight: 600,
+        fontFamily: t.fontUi,
+        border: `1px solid ${t.btnGhostBorder}`,
+        ...style
+      }
+    },
+    children
+  );
 }
-function RomanjiLabel({
-  t,
-  text,
-  position,
-  onClick
-}) {
+function RomanjiLabel({ t, text, position, onClick }) {
   if (position === "hidden" || !text) return null;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    onClick: onClick,
-    style: {
-      fontSize: 13,
-      color: t.textMuted,
-      letterSpacing: 0.5,
-      userSelect: "text"
-    }
-  }, text);
+  return /* @__PURE__ */ React.createElement("div", { className: "mono", onClick, style: {
+    fontSize: 13,
+    color: t.textMuted,
+    letterSpacing: 0.5,
+    userSelect: "text"
+  } }, text);
 }
 Object.assign(window, {
   GlobalStyles,
-  TopBar,
+  AppShell,
+  Icon,
   Eyebrow,
   Pill,
   StatTile,

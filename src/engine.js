@@ -2,8 +2,16 @@
 //  UTILITIES, SRS ENGINE, SENTENCE TOKENIZER, STORAGE SHIM
 // ═══════════════════════════════════════════════════════════════════════
 
-const cardKey = (card) => `jp::${card.front}`;
-const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+// Grammar cards get their own namespace: grammar か must not share stats with kana か.
+const cardKey = (card) => card.type === "Grammar" ? `jp::grammar::${card.front}` : `jp::${card.front}`;
+const shuffle = (arr) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
 const getWrongChoices = (correct, pool, n = 3) =>
   shuffle(pool.filter(c => c.back !== correct.back)).slice(0, n).map(c => c.back);
@@ -127,10 +135,16 @@ const emptyProgress = () => ({
 function migrateProgress(p) {
   if (!p) return emptyProgress();
   const base = emptyProgress();
+  const cardStats = { ...(p.cardStats || {}) };
+  // Copy grammar stats from the old shared `jp::<front>` key to the new grammar key.
+  for (const c of (typeof window !== "undefined" && window.CARD_DATA?.grammar) || []) {
+    const k = cardKey(c), old = `jp::${c.front}`;
+    if (!cardStats[k] && cardStats[old]) cardStats[k] = cardStats[old];
+  }
   return {
     ...base,
     ...p,
-    cardStats: { ...base.cardStats, ...(p.cardStats || {}) },
+    cardStats,
     dayLog: { ...base.dayLog, ...(p.dayLog || {}) },
     history: Array.isArray(p.history) ? p.history : [],
     mistakeQueue: Array.isArray(p.mistakeQueue) ? p.mistakeQueue : [],
@@ -167,6 +181,19 @@ function clearMistake(progress, cardFront) {
 const todayKey = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
+
+// ── Users: each one gets their own progress, prefs and sync ID ─────────
+const USERS = ["Diego", "Mariana"];
+const getUser = () => {
+  try { const u = localStorage.getItem("jp-user"); return USERS.includes(u) ? u : USERS[0]; }
+  catch { return USERS[0]; }
+};
+// The first user keeps the original un-suffixed keys, so existing progress stays theirs.
+const userKey = (base) => getUser() === USERS[0] ? base : `${base}:${getUser().toLowerCase()}`;
+const switchUser = (name) => {
+  try { localStorage.setItem("jp-user", name); } catch {}
+  location.reload(); // every module reads its keys on load, so a reload is the simplest clean switch
 };
 
 // ── localStorage shim that mimics window.storage API ───────────────────
@@ -253,4 +280,5 @@ Object.assign(window, {
   forecastDueByDay, pushMistake, clearMistake,
   conjugateMasu, makeClozeFromSentence,
   migrateProgress,
+  USERS, getUser, userKey, switchUser,
 });

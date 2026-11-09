@@ -225,7 +225,7 @@ function DataPanel({ t, progress, setProgress }) {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!parsed.cardStats) throw new Error("Invalid file");
-      setProgress(parsed);
+      setProgress(window.migrateProgress(parsed));
       setStatus({ ok: true, msg: "Progress imported." });
     } catch (err) {
       setStatus({ ok: false, msg: "Import failed. Not a valid progress file." });
