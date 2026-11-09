@@ -1,10 +1,5 @@
 (function(){
-// ═══════════════════════════════════════════════════════════════════════
-//  Home / Config screen
-// ═══════════════════════════════════════════════════════════════════════
-const {
-  useMemo: useMemoHome
-} = React;
+const { useMemo: useMemoHome } = React;
 function HomeScreen(p) {
   const {
     t,
@@ -24,56 +19,28 @@ function HomeScreen(p) {
     setScreen,
     density,
     levelFocus,
-    setLevelFocus
+    setLevelFocus,
+    setProgress
   } = p;
   const todayKey = window.todayKey();
-  const todayCards = (progress.dayLog && progress.dayLog[todayKey] && progress.dayLog[todayKey].cards) || 0;
+  const todayCards = progress.dayLog?.[todayKey]?.cards || 0;
   const dailyGoal = progress.dailyGoal || 20;
-  const modes = [{
-    id: "flashcard",
-    label: "Flashcards",
-    hint: "Flip & self-rate (SRS)",
-    glyph: "⎙"
-  }, {
-    id: "quiz",
-    label: "Quiz",
-    hint: "Multiple choice",
-    glyph: "✕"
-  }, {
-    id: "write",
-    label: "Write",
-    hint: "Type the reading",
-    glyph: "✎"
-  }, {
-    id: "listen",
-    label: "Listen",
-    hint: "Audio → meaning",
-    glyph: "♪"
-  }, {
-    id: "build",
-    label: "Build",
-    hint: "Arrange sentences",
-    glyph: "⊞"
-  }, ...(window.EXTRA_MODES_META || [])];
-  const goals = [{
-    kind: "cards",
-    value: 10,
-    label: "10 cards"
-  }, {
-    kind: "cards",
-    value: 20,
-    label: "20 cards"
-  }, {
-    kind: "cards",
-    value: 40,
-    label: "40 cards"
-  }, {
-    kind: "due",
-    value: 0,
-    label: "Due only"
-  }];
-  const fixedPoolFor = m => m === "build" || m === "cloze" ? window.CARD_DATA.sentences : m === "conjugate" ? (window.CARD_DATA.verbs || []) : null;
-  const applyLevel = arr => window.filterByLevel ? window.filterByLevel(arr, levelFocus) : arr;
+  const modes = [
+    { id: "flashcard", label: "Flashcards", hint: "Flip & self-rate (SRS)", glyph: "\u2399" },
+    { id: "quiz", label: "Quiz", hint: "Multiple choice", glyph: "\u2715" },
+    { id: "write", label: "Write", hint: "Type the reading", glyph: "\u270E" },
+    { id: "listen", label: "Listen", hint: "Audio \u2192 meaning", glyph: "\u266A" },
+    { id: "build", label: "Build", hint: "Arrange sentences", glyph: "\u229E" },
+    ...window.EXTRA_MODES_META || []
+  ];
+  const goals = [
+    { kind: "cards", value: 10, label: "10 cards" },
+    { kind: "cards", value: 20, label: "20 cards" },
+    { kind: "cards", value: 40, label: "40 cards" },
+    { kind: "due", value: 0, label: "Due only" }
+  ];
+  const fixedPoolFor = (m) => m === "build" || m === "cloze" ? window.CARD_DATA.sentences : m === "conjugate" ? window.CARD_DATA.verbs || [] : null;
+  const applyLevel = (arr) => window.filterByLevel ? window.filterByLevel(arr, levelFocus) : arr;
   const totalInSelection = useMemoHome(() => {
     const fixed = fixedPoolFor(mode);
     if (fixed) return applyLevel(fixed).length;
@@ -81,433 +48,65 @@ function HomeScreen(p) {
   }, [categories, mode, levelFocus]);
   const dueInSelection = useMemoHome(() => {
     const fixed = fixedPoolFor(mode);
-    const isDueCard = card => window.isDue(progress.cardStats[window.cardKey(card)]);
+    const isDueCard = (card) => window.isDue(progress.cardStats[window.cardKey(card)]);
     if (fixed) return applyLevel(fixed).filter(isDueCard).length;
     return categories.reduce((sum, c) => sum + applyLevel(window.CARD_DATA[c] || []).filter(isDueCard).length, 0);
   }, [categories, mode, progress, levelFocus]);
-  return /*#__PURE__*/React.createElement("div", {
-    className: "fade-up",
-    style: {
-      maxWidth: 1080,
-      margin: "0 auto",
-      paddingTop: 32
-    }
-  }, /*#__PURE__*/React.createElement(window.MistakeBanner, {
-    t: t,
-    progress: progress,
-    onDrill: startMistakeDrill
-  }), /*#__PURE__*/React.createElement("section", {
-    className: "resp-grid-12",
-    style: {
-      marginBottom: 32
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "surface-raised",
-    style: {
-      padding: "28px 32px",
-      position: "relative",
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement(window.Eyebrow, {
-    t: t,
-    accent: true
-  }, new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric"
-  })), /*#__PURE__*/React.createElement("h1", {
-    className: "resp-hero-title",
-    style: {
-      margin: "10px 0 6px",
-      fontFamily: t.fontUi,
-      fontWeight: 800,
-      letterSpacing: -1.2,
-      color: t.text,
-      lineHeight: 1.05
-    }
-  }, "\u4ECA\u65E5\u306E\u5B66\u7FD2 ", /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.textFaint,
-      fontWeight: 400,
-      fontFamily: t.fontUi
-    }
-  }, "/ Today's study")), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontSize: 14,
-      color: t.textMuted,
-      margin: 0,
-      maxWidth: 420
-    }
-  }, stats.dueCount > 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, "You have ", /*#__PURE__*/React.createElement("b", {
-    style: {
-      color: t.accent
-    }
-  }, stats.dueCount), " cards due for review. Spaced repetition keeps recall strong.") : "No reviews due right now. A short new-card session keeps momentum."),
-  window.DailyGoalRing && /*#__PURE__*/React.createElement("div", {
-    className: "jq-goal-ring",
-    style: { position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }
-  },
-    /*#__PURE__*/React.createElement("div", { style: { textAlign: "right" } },
-      /*#__PURE__*/React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", color: t.textFaint } }, "today"),
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: todayCards >= dailyGoal ? t.success : t.textMuted, fontFamily: t.fontUi, fontWeight: 600 } },
-        todayCards >= dailyGoal ? "goal hit ✓" : (dailyGoal - todayCards) + " to go")
-    ),
-    /*#__PURE__*/React.createElement(window.DailyGoalRing, { t: t, today: todayCards, goal: dailyGoal })
-  ),
-  /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 10,
-      marginTop: 22,
-      flexWrap: "wrap"
-    }
-  }, /*#__PURE__*/React.createElement(window.PrimaryButton, {
-    t: t,
-    onClick: startStudy
-  }, "Start session \u2192"), stats.dueCount > 0 && /*#__PURE__*/React.createElement(window.SecondaryButton, {
-    t: t,
-    onClick: () => {
-      setDueOnly(true);
-      setSessionGoal({
-        kind: "due",
-        value: 0
-      });
-      startStudy();
-    }
-  }, "Review ", stats.dueCount, " due"), stats.weakCount > 0 && /*#__PURE__*/React.createElement(window.SecondaryButton, {
-    t: t,
-    onClick: startWeakReview
-  }, "Weak-spot drill (", stats.weakCount, ")")), /*#__PURE__*/React.createElement("div", {
-    "aria-hidden": true,
-    className: "resp-hero-kanji",
-    style: {
-      position: "absolute",
-      fontFamily: t.fontJp,
-      fontWeight: 900,
-      color: `${t.accent}0D`,
-      letterSpacing: -10,
-      lineHeight: 1,
-      pointerEvents: "none"
-    }
-  }, "\u5B66")), /*#__PURE__*/React.createElement("div", {
-    className: "resp-stats-22"
-  }, /*#__PURE__*/React.createElement(window.StatTile, {
-    t: t,
-    label: "Streak",
-    value: progress.streakDays || 0,
-    sub: "consecutive days",
-    tone: "warn"
-  }), /*#__PURE__*/React.createElement(window.StatTile, {
-    t: t,
-    label: "Accuracy",
-    value: `${stats.acc}%`,
-    sub: `${progress.totalAnswered} answers`
-  }), /*#__PURE__*/React.createElement(window.StatTile, {
-    t: t,
-    label: "Mastered",
-    value: stats.mastered,
-    sub: `of ${stats.total} cards`,
-    tone: "success"
-  }), /*#__PURE__*/React.createElement(window.StatTile, {
-    t: t,
-    label: "Due",
-    value: stats.dueCount,
-    sub: "ready to review"
-  }))), /*#__PURE__*/React.createElement("section", {
-    style: {
-      marginBottom: 28
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "baseline",
-      justifyContent: "space-between",
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(window.Eyebrow, {
-    t: t
-  }, "01 \xB7 Mode"), /*#__PURE__*/React.createElement("h2", {
-    style: {
-      margin: "4px 0 0",
-      fontSize: 20,
-      fontWeight: 700,
-      fontFamily: t.fontUi,
-      letterSpacing: -0.4,
-      color: t.text
-    }
-  }, "How do you want to practice?")), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 12,
-      color: t.textFaint,
-      fontFamily: t.fontMono
-    }
-  }, modes.find(m => m.id === mode)?.hint)), /*#__PURE__*/React.createElement("div", {
-    className: "resp-modes-5"
-  }, modes.map(m => {
-    const active = mode === m.id;
-    return /*#__PURE__*/React.createElement("button", {
+  const user = window.getUser ? window.getUser() : null;
+  const goalHit = todayCards >= dailyGoal;
+  const activeMode = modes.find((m) => m.id === mode);
+  const deckSize = sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection;
+  const stat = (label, jp, value, sub, color) => /* @__PURE__ */ React.createElement("div", { className: "stat-row" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi } }, label, " ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 } }, jp)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textMuted, marginTop: 2 } }, sub)), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color } }, value));
+  return /* @__PURE__ */ React.createElement("div", { className: "fade-up", style: { maxWidth: 1080, margin: "0 auto", paddingTop: 32 } }, /* @__PURE__ */ React.createElement(window.MistakeBanner, { t, progress, onDrill: startMistakeDrill }), /* @__PURE__ */ React.createElement("header", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement(window.Eyebrow, { t, accent: true }, (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })), /* @__PURE__ */ React.createElement("h1", { className: "resp-hero-title", style: {
+    margin: "8px 0 4px",
+    fontFamily: t.fontJp,
+    fontWeight: 700,
+    letterSpacing: -0.5,
+    color: t.text,
+    lineHeight: 1.1
+  } }, "\u4ECA\u65E5\u306E\u5B66\u7FD2"), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 15, color: t.textMuted } }, user ? /* @__PURE__ */ React.createElement(React.Fragment, null, "Welcome back, ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, user), ". ") : null, stats.dueCount > 0 ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("b", { style: { color: t.accent } }, stats.dueCount), " cards are due for review.") : "Nothing due right now. A few new cards keeps the streak alive.")), /* @__PURE__ */ React.createElement("section", { className: "resp-grid-12", style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: {
+    padding: "26px 28px",
+    position: "relative",
+    overflow: "hidden",
+    display: "flex",
+    gap: 24,
+    alignItems: "center",
+    flexWrap: "wrap"
+  } }, window.DailyGoalRing && /* @__PURE__ */ React.createElement(window.DailyGoalRing, { t, today: todayCards, goal: dailyGoal, size: 112 }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 200, position: "relative", zIndex: 1 } }, /* @__PURE__ */ React.createElement(window.Eyebrow, { t }, "Daily goal \xB7 \u76EE\u6A19"), /* @__PURE__ */ React.createElement("div", { style: { margin: "6px 0 16px", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, color: goalHit ? t.success : t.text, letterSpacing: -0.3 } }, goalHit ? "Goal reached. \u304A\u75B2\u308C\u3055\u307E\uFF01" : `${dailyGoal - todayCards} cards to go today`), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(window.PrimaryButton, { t, onClick: startStudy }, "Start session \u2192"), stats.dueCount > 0 && /* @__PURE__ */ React.createElement(window.SecondaryButton, { t, onClick: () => {
+    setDueOnly(true);
+    setSessionGoal({ kind: "due", value: 0 });
+    startStudy();
+  } }, "Review ", stats.dueCount, " due"), stats.weakCount > 0 && /* @__PURE__ */ React.createElement(window.SecondaryButton, { t, onClick: startWeakReview }, "Weak spots (", stats.weakCount, ")"))), /* @__PURE__ */ React.createElement("div", { "aria-hidden": true, className: "resp-hero-kanji", style: {
+    position: "absolute",
+    fontFamily: t.fontJp,
+    fontWeight: 700,
+    color: `${t.accent}0F`,
+    lineHeight: 1,
+    pointerEvents: "none"
+  } }, "\u5B66")), /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "22px 24px" } }, stat("Streak", "\u9023\u7D9A", progress.streakDays || 0, "days in a row", t.warn), stat("Accuracy", "\u6B63\u7B54", `${stats.acc}%`, `${progress.totalAnswered} answers`, t.accent), stat("Mastered", "\u7FD2\u5F97", stats.mastered, `of ${stats.total} cards`, t.success), stat("Due", "\u5FA9\u7FD2", stats.dueCount, "ready to review", t.text))), /* @__PURE__ */ React.createElement("section", { className: "surface-raised", style: { padding: "8px 28px 22px" }, "aria-labelledby": "builder-title" }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, padding: "18px 0 4px", flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("h2", { id: "builder-title", style: { margin: 0, fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text } }, "Build a session ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontWeight: 500, color: t.textFaint, fontSize: 16, marginLeft: 6 } }, "\u7DF4\u7FD2")), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textMuted } }, totalInSelection, " cards \xB7 ", dueInSelection, " due")), /* @__PURE__ */ React.createElement("div", { className: "builder-row" }, /* @__PURE__ */ React.createElement("div", { className: "builder-label" }, "Mode", /* @__PURE__ */ React.createElement("small", null, "\u65B9\u6CD5")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } }, modes.map((m) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
       key: m.id,
-      className: "btn",
-      onClick: () => setMode(m.id),
-      style: {
-        padding: "18px 14px",
-        background: active ? t.surfaceBg : t.surfaceSunken,
-        border: `1px solid ${active ? t.accent : t.surfaceBorder}`,
-        borderRadius: 16,
-        textAlign: "left",
-        boxShadow: active ? `0 0 0 3px ${t.accent}14, ${t.shadowCard}` : "none",
-        position: "relative"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontFamily: t.fontJp,
-        fontSize: 22,
-        color: active ? t.accent : t.textMuted,
-        marginBottom: 10,
-        fontWeight: 500
-      }
-    }, m.glyph), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 14,
-        fontWeight: 700,
-        color: t.text,
-        fontFamily: t.fontUi
-      }
-    }, m.label), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: t.textFaint,
-        marginTop: 2
-      }
-    }, m.hint));
-  }))), /*#__PURE__*/React.createElement("section", {
-    className: "resp-grid-21"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "baseline",
-      justifyContent: "space-between",
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(window.Eyebrow, {
-    t: t
-  }, "02 \xB7 Content"), /*#__PURE__*/React.createElement("h2", {
-    style: {
-      margin: "4px 0 0",
-      fontSize: 20,
-      fontWeight: 700,
-      fontFamily: t.fontUi,
-      letterSpacing: -0.4,
-      color: t.text
-    }
-  }, fixedPoolFor(mode) ? (mode === "conjugate" ? "Verb bank" : "Sentence bank") : "Categories")),
-  /*#__PURE__*/React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
-    setLevelFocus && /*#__PURE__*/React.createElement("div", {
-      style: { display: "flex", gap: 2, background: t.surfaceSunken, padding: 3, borderRadius: 8 }
-    }, [{ id: "all", label: "All" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => {
-      const on = levelFocus === o.id;
-      return /*#__PURE__*/React.createElement("button", {
-        key: String(o.id), className: "btn", onClick: () => setLevelFocus(o.id),
-        style: {
-          padding: "4px 10px", borderRadius: 6,
-          background: on ? t.surfaceBg : "transparent",
-          color: on ? t.text : t.textMuted,
-          fontSize: 11, fontWeight: 600, fontFamily: t.fontUi,
-          boxShadow: on ? t.shadowCard : "none"
-        }
-      }, o.label);
-    })),
-    /*#__PURE__*/React.createElement("span", {
-      style: { fontSize: 12, color: t.textFaint, fontFamily: t.fontMono }
-    }, totalInSelection, " cards \xB7 ", dueInSelection, " due")
-  )), fixedPoolFor(mode) ? /*#__PURE__*/React.createElement("div", {
-    className: "surface",
-    style: {
-      padding: 18,
-      fontSize: 13,
-      color: t.textMuted
-    }
-  },
-    mode === "build"     && /*#__PURE__*/React.createElement(React.Fragment, null, "Build mode drills the ", /*#__PURE__*/React.createElement("b", { style: { color: t.text } }, "sentence bank"), " \u2014 arrange tokens (words + particles) in order."),
-    mode === "cloze"     && /*#__PURE__*/React.createElement(React.Fragment, null, "Cloze drills the ", /*#__PURE__*/React.createElement("b", { style: { color: t.text } }, "sentence bank"), " \u2014 fill the blank with the right particle, ending, or word."),
-    mode === "conjugate" && /*#__PURE__*/React.createElement(React.Fragment, null, "Conjugate drills the ", /*#__PURE__*/React.createElement("b", { style: { color: t.text } }, "verb bank"), " \u2014 type the \u307e\u3059 form of each dictionary-form verb."),
-    /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, fontSize: 12, color: t.textFaint } }, "Categories don't apply here.")
-  ) : /*#__PURE__*/React.createElement("div", {
-    className: "resp-cats-2"
-  }, window.CATEGORY_META.map(c => {
-    const on = categories.includes(c.id);
-    const dueN = window.CARD_DATA[c.id].filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length;
-    return /*#__PURE__*/React.createElement("button", {
-      key: c.id,
-      className: "btn",
-      onClick: () => toggleCat(c.id),
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "12px 14px",
-        background: on ? t.surfaceBg : t.surfaceSunken,
-        border: `1px solid ${on ? t.accent : t.surfaceBorder}`,
-        borderRadius: 12,
-        textAlign: "left",
-        boxShadow: on ? `0 0 0 2px ${t.accent}14` : "none"
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        background: on ? t.accent : t.btnGhost,
-        color: on ? t.onAccent : t.textMuted,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: t.fontJp,
-        fontSize: 17,
-        fontWeight: 700
-      }
-    }, c.icon), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 14,
-        fontWeight: 600,
-        color: t.text,
-        fontFamily: t.fontUi
-      }
-    }, c.label), /*#__PURE__*/React.createElement("div", {
-      className: "mono",
-      style: {
-        fontSize: 10,
-        color: t.textFaint,
-        marginTop: 1
-      }
-    }, c.count, " cards ", dueN > 0 && /*#__PURE__*/React.createElement("span", {
-      style: {
-        color: t.accent
-      }
-    }, "\xB7 ", dueN, " due"))));
-  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(window.Eyebrow, {
-    t: t
-  }, "03 \xB7 Session"), /*#__PURE__*/React.createElement("h2", {
-    style: {
-      margin: "4px 0 14px",
-      fontSize: 20,
-      fontWeight: 700,
-      fontFamily: t.fontUi,
-      letterSpacing: -0.4,
-      color: t.text
-    }
-  }, "Length"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 8,
-      marginBottom: 14
+      className: "btn chip" + (mode === m.id ? " on" : ""),
+      "aria-pressed": mode === m.id,
+      onClick: () => setMode(m.id)
     },
-    className: "resp-cats-2"
-  }, goals.map(g => {
-    const active = sessionGoal.kind === g.kind && sessionGoal.value === g.value;
-    return /*#__PURE__*/React.createElement("button", {
+    /* @__PURE__ */ React.createElement("span", { className: "chip-glyph", "aria-hidden": "true" }, m.glyph),
+    m.label
+  ))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textMuted, marginTop: 8 } }, activeMode?.hint))), /* @__PURE__ */ React.createElement("div", { className: "builder-row" }, /* @__PURE__ */ React.createElement("div", { className: "builder-label" }, mode === "build" ? "Sentences" : "Content", /* @__PURE__ */ React.createElement("small", null, "\u5185\u5BB9")), /* @__PURE__ */ React.createElement("div", null, setLevelFocus && /* @__PURE__ */ React.createElement("div", { className: "seg", role: "group", "aria-label": "JLPT level", style: { marginBottom: 10 } }, [{ id: "all", label: "All levels" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map((o) => /* @__PURE__ */ React.createElement("button", { key: String(o.id), className: "btn", "aria-pressed": levelFocus === o.id, onClick: () => setLevelFocus(o.id) }, o.label))), fixedPoolFor(mode) ? /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: t.textMuted, lineHeight: 1.5 } }, mode === "build" && /* @__PURE__ */ React.createElement(React.Fragment, null, "Build mode drills the ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, "sentence bank"), ": arrange words and particles in order."), mode === "cloze" && /* @__PURE__ */ React.createElement(React.Fragment, null, "Cloze drills the ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, "sentence bank"), ": fill the blank with the right particle, ending, or word."), mode === "conjugate" && /* @__PURE__ */ React.createElement(React.Fragment, null, "Conjugate drills the ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, "verb bank"), ": type the \u307E\u3059 form of each verb."), " ", "Categories don't apply here.") : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } }, window.CATEGORY_META.map((c) => {
+    const on = categories.includes(c.id);
+    const dueN = window.CARD_DATA[c.id].filter((card) => window.isDue(progress.cardStats[window.cardKey(card)])).length;
+    return /* @__PURE__ */ React.createElement("button", { key: c.id, className: "btn chip" + (on ? " on" : ""), "aria-pressed": on, onClick: () => toggleCat(c.id) }, /* @__PURE__ */ React.createElement("span", { className: "chip-glyph", "aria-hidden": "true" }, c.icon), c.label, /* @__PURE__ */ React.createElement("span", { className: "chip-meta" }, window.CARD_DATA[c.id].length, dueN > 0 ? ` \xB7 ${dueN} due` : ""));
+  })))), /* @__PURE__ */ React.createElement("div", { className: "builder-row" }, /* @__PURE__ */ React.createElement("div", { className: "builder-label" }, "Length", /* @__PURE__ */ React.createElement("small", null, "\u9577\u3055")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { className: "seg", role: "group", "aria-label": "Session length" }, goals.map((g) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
       key: g.label,
       className: "btn",
-      onClick: () => setSessionGoal(g),
-      style: {
-        padding: "14px 12px",
-        background: active ? t.accent : t.surfaceSunken,
-        color: active ? t.onAccent : t.text,
-        border: `1px solid ${active ? t.accent : t.surfaceBorder}`,
-        borderRadius: 12,
-        fontSize: 14,
-        fontWeight: 700,
-        fontFamily: t.fontUi
-      }
-    }, g.label);
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "surface",
-    style: {
-      padding: 14,
-      fontSize: 12,
-      color: t.textMuted
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      marginBottom: 4
-    }
-  }, /*#__PURE__*/React.createElement("span", null, "Mode"), /*#__PURE__*/React.createElement("b", {
-    style: {
-      color: t.text,
-      fontFamily: t.fontUi
-    }
-  }, modes.find(m => m.id === mode)?.label)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      marginBottom: 4
-    }
-  }, /*#__PURE__*/React.createElement("span", null, "Deck size"), /*#__PURE__*/React.createElement("b", {
-    className: "mono",
-    style: {
-      color: t.text
-    }
-  }, sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between"
-    }
-  }, /*#__PURE__*/React.createElement("span", null, "Est. time"), /*#__PURE__*/React.createElement("b", {
-    className: "mono",
-    style: {
-      color: t.text
-    }
-  }, "~", Math.max(1, Math.round((sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection) * 0.25)), " min"))))), progress.history?.length > 0 && /*#__PURE__*/React.createElement("section", {
-    style: {
-      marginTop: 32
-    }
-  }, /*#__PURE__*/React.createElement(window.Eyebrow, {
-    t: t
-  }, "Recent sessions"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-      gap: 10,
-      marginTop: 10
-    }
-  }, progress.history.slice().reverse().slice(0, 4).map((h, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: "surface",
-    style: {
-      padding: "12px 14px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "baseline",
-      marginBottom: 6
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 12,
-      color: t.textMuted,
-      fontFamily: t.fontUi,
-      textTransform: "capitalize"
-    }
-  }, h.mode), /*#__PURE__*/React.createElement(window.Pill, {
-    t: t,
-    tone: h.score >= 80 ? "success" : h.score >= 60 ? "warn" : "danger",
-    size: "sm"
-  }, h.score, "%")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: t.textFaint,
-      fontFamily: t.fontMono
-    }
-  }, h.date, " \xB7 ", h.cards, "c \xB7 ", Math.round(h.duration / 60), "m"))))));
+      "aria-pressed": sessionGoal.kind === g.kind && sessionGoal.value === g.value,
+      onClick: () => setSessionGoal(g)
+    },
+    g.label
+  ))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textMuted } }, deckSize, " cards \xB7 ~", Math.max(1, Math.round(deckSize * 0.25)), " min"), /* @__PURE__ */ React.createElement(window.PrimaryButton, { t, onClick: startStudy, disabled: deckSize === 0, style: { padding: "11px 22px" } }, "Start ", activeMode?.label?.toLowerCase(), " \u2192"))))), progress.history?.length > 0 && /* @__PURE__ */ React.createElement("section", { style: { marginTop: 28 } }, /* @__PURE__ */ React.createElement(window.Eyebrow, { t }, "Recent sessions \xB7 \u5C65\u6B74"), /* @__PURE__ */ React.createElement("div", { className: "surface", style: { marginTop: 10, padding: "4px 20px" } }, progress.history.slice().reverse().slice(0, 4).map((hst, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "stat-row", style: { alignItems: "center", padding: "12px 0" } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi, textTransform: "capitalize" } }, hst.mode), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textMuted, marginTop: 2 } }, hst.date, " \xB7 ", hst.cards, " cards \xB7 ", Math.max(1, Math.round(hst.duration / 60)), " min")), /* @__PURE__ */ React.createElement(window.Pill, { t, tone: hst.score >= 80 ? "success" : hst.score >= 60 ? "warn" : "danger", size: "sm" }, hst.score, "%"))))));
 }
 window.HomeScreen = HomeScreen;
 })();

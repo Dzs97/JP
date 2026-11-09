@@ -5,8 +5,8 @@ function App() {
     /*EDITMODE-BEGIN*/
     {
       "darkMode": false,
-      "accent": "crimson",
-      "fonts": "sans",
+      "accent": "shu",
+      "fonts": "brush",
       "romanjiPosition": "below",
       "density": "comfortable",
       "showKeyboardHints": true
@@ -58,12 +58,12 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await window.storage.get("jp-study-progress");
+        const r = await window.storage.get(window.userKey("jp-study-progress"));
         if (r?.value) setProgress(window.migrateProgress(JSON.parse(r.value)));
       } catch (_) {
       }
       try {
-        const p = await window.storage.get("jp-study-prefs");
+        const p = await window.storage.get(window.userKey("jp-study-prefs"));
         if (p?.value) {
           const parsed = JSON.parse(p.value);
           if (typeof parsed.darkMode === "boolean") setDarkMode(parsed.darkMode);
@@ -81,7 +81,7 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        await window.storage.set("jp-study-prefs", JSON.stringify({
+        await window.storage.set(window.userKey("jp-study-prefs"), JSON.stringify({
           darkMode,
           showRomanji,
           voiceOn,
@@ -96,7 +96,7 @@ function App() {
   }, [darkMode, showRomanji, voiceOn, categories, mode, sessionGoal, levelFocus]);
   const saveProgress = useCallback(async (p) => {
     try {
-      await window.storage.set("jp-study-progress", JSON.stringify(p));
+      await window.storage.set(window.userKey("jp-study-progress"), JSON.stringify(p));
     } catch (_) {
     }
     setProgress(p);
@@ -431,7 +431,9 @@ function App() {
       if (up.history.length > 50) up.history = up.history.slice(-50);
       const todayStr = (/* @__PURE__ */ new Date()).toDateString();
       if (up.lastStudied !== todayStr) {
-        const y = new Date(Date.now() - window.DAY_MS).toDateString();
+        const yd = /* @__PURE__ */ new Date();
+        yd.setDate(yd.getDate() - 1);
+        const y = yd.toDateString();
         up.streakDays = up.lastStudied === y ? (up.streakDays || 0) + 1 : 1;
         up.lastStudied = todayStr;
       }
@@ -582,7 +584,7 @@ function App() {
     fontFamily: t.fontBody,
     transition: "background 0.3s ease, color 0.3s ease"
   } }, /* @__PURE__ */ React.createElement(window.GlobalStyles, { t }), /* @__PURE__ */ React.createElement(
-    window.TopBar,
+    window.AppShell,
     {
       t,
       screen,
@@ -595,46 +597,48 @@ function App() {
       idx,
       deck,
       finished,
-      exitTo: courseCtx ? "course" : "home"
-    }
-  ), /* @__PURE__ */ React.createElement("main", { className: "resp-main-pad" }, voiceState.ready && !voiceState.hasJapanese && !voiceState.warnDismissed && /* @__PURE__ */ React.createElement("div", { style: {
-    maxWidth: 1080,
-    margin: "16px auto 0",
-    padding: "12px 16px",
-    background: t.dangerBg,
-    border: `1px solid ${t.dangerBorder}`,
-    borderRadius: 12,
-    display: "flex",
-    alignItems: "center",
-    gap: 12
-  } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontSize: 22, color: t.danger } }, "\u97F3"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, fontSize: 13, color: t.danger } }, /* @__PURE__ */ React.createElement("strong", null, "No Japanese voice installed."), " Your browser can't pronounce cards. On macOS/iOS: System Settings \u2192 Accessibility \u2192 Spoken Content \u2192 add Kyoko or Otoya. On Windows: Settings \u2192 Time & Language \u2192 Language \u2192 add Japanese. Firefox on desktop has no built-in voices \u2014 try Chrome or Safari."), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      className: "btn",
-      onClick: () => setVoiceState((s) => ({ ...s, warnDismissed: true })),
-      style: { padding: "6px 10px", background: "transparent", color: t.danger, fontSize: 12, fontFamily: t.fontUi }
+      exitTo: courseCtx ? "course" : "home",
+      utilities: /* @__PURE__ */ React.createElement(React.Fragment, null, window.UserChip && /* @__PURE__ */ React.createElement(window.UserChip, { t }), window.SyncChip && /* @__PURE__ */ React.createElement(window.SyncChip, { t }), window.FuriganaToggle && /* @__PURE__ */ React.createElement(window.FuriganaToggle, { t }), /* @__PURE__ */ React.createElement(window.AudioDebug, { t, voiceState, voiceRef, speechLog, doSpeak }))
     },
-    "Dismiss"
-  )), voiceState.needsUnlock && voiceState.hasJapanese && /* @__PURE__ */ React.createElement("div", { style: {
-    position: "fixed",
-    left: "50%",
-    bottom: 64,
-    transform: "translateX(-50%)",
-    width: "calc(100% - 32px)",
-    maxWidth: 420,
-    zIndex: 40,
-    pointerEvents: "none",
-    padding: "10px 14px",
-    background: t.surfaceBg,
-    boxShadow: t.shadowFloating,
-    border: `1px solid ${t.accent}40`,
-    borderRadius: 12,
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    fontSize: 12,
-    color: t.text
-  } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontSize: 18, color: t.accent } }, "\u266A"), /* @__PURE__ */ React.createElement("span", null, "Tap anywhere to enable audio playback.")), screen === "course" && !finished && window.CourseScreen && /* @__PURE__ */ React.createElement(window.CourseScreen, { ...screenProps }), screen === "home" && !finished && /* @__PURE__ */ React.createElement(window.HomeScreen, { ...screenProps }), screen === "study" && !finished && /* @__PURE__ */ React.createElement(window.StudyScreen, { ...screenProps }), screen === "progress" && /* @__PURE__ */ React.createElement(window.ProgressScreen, { ...screenProps }), screen === "kana" && /* @__PURE__ */ React.createElement(window.KanaScreen, { ...screenProps }), screen === "kanji" && /* @__PURE__ */ React.createElement(window.KanjiScreen, { ...screenProps }), screen === "grammar" && /* @__PURE__ */ React.createElement(window.GrammarScreen, { ...screenProps }), finished && /* @__PURE__ */ React.createElement(window.FinishScreen, { ...screenProps })), tweaksAvailable && tweaksOpen && /* @__PURE__ */ React.createElement(
+    /* @__PURE__ */ React.createElement("main", { className: "resp-main-pad" }, voiceState.ready && !voiceState.hasJapanese && !voiceState.warnDismissed && /* @__PURE__ */ React.createElement("div", { style: {
+      maxWidth: 1080,
+      margin: "16px auto 0",
+      padding: "12px 16px",
+      background: t.dangerBg,
+      border: `1px solid ${t.dangerBorder}`,
+      borderRadius: 12,
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontSize: 22, color: t.danger } }, "\u97F3"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, fontSize: 13, color: t.danger } }, /* @__PURE__ */ React.createElement("strong", null, "No Japanese voice installed."), " Your browser can't pronounce cards. On macOS/iOS: System Settings \u2192 Accessibility \u2192 Spoken Content \u2192 add Kyoko or Otoya. On Windows: Settings \u2192 Time & Language \u2192 Language \u2192 add Japanese. Firefox on desktop has no built-in voices \u2014 try Chrome or Safari."), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        className: "btn",
+        onClick: () => setVoiceState((s) => ({ ...s, warnDismissed: true })),
+        style: { padding: "6px 10px", background: "transparent", color: t.danger, fontSize: 12, fontFamily: t.fontUi }
+      },
+      "Dismiss"
+    )), voiceState.needsUnlock && voiceState.hasJapanese && /* @__PURE__ */ React.createElement("div", { style: {
+      position: "fixed",
+      left: "50%",
+      bottom: "calc(84px + env(safe-area-inset-bottom, 0px))",
+      transform: "translateX(-50%)",
+      width: "calc(100% - 32px)",
+      maxWidth: 420,
+      zIndex: 40,
+      pointerEvents: "none",
+      padding: "10px 14px",
+      background: t.surfaceBg,
+      boxShadow: t.shadowFloating,
+      border: `1px solid ${t.accent}40`,
+      borderRadius: 12,
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      fontSize: 12,
+      color: t.text
+    } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontSize: 18, color: t.accent } }, "\u266A"), /* @__PURE__ */ React.createElement("span", null, "Tap anywhere to enable audio playback.")), screen === "course" && !finished && window.CourseScreen && /* @__PURE__ */ React.createElement(window.CourseScreen, { ...screenProps }), screen === "home" && !finished && /* @__PURE__ */ React.createElement(window.HomeScreen, { ...screenProps }), screen === "study" && !finished && /* @__PURE__ */ React.createElement(window.StudyScreen, { ...screenProps }), screen === "progress" && /* @__PURE__ */ React.createElement(window.ProgressScreen, { ...screenProps }), screen === "kana" && /* @__PURE__ */ React.createElement(window.KanaScreen, { ...screenProps }), screen === "kanji" && /* @__PURE__ */ React.createElement(window.KanjiScreen, { ...screenProps }), screen === "grammar" && /* @__PURE__ */ React.createElement(window.GrammarScreen, { ...screenProps }), finished && /* @__PURE__ */ React.createElement(window.FinishScreen, { ...screenProps }))
+  ), tweaksAvailable && tweaksOpen && /* @__PURE__ */ React.createElement(
     window.TweaksPanel,
     {
       t,
@@ -670,16 +674,7 @@ function App() {
       },
       onClose: () => setTweaksOpen(false)
     }
-  ), /* @__PURE__ */ React.createElement(
-    window.AudioDebug,
-    {
-      t,
-      voiceState,
-      voiceRef,
-      speechLog,
-      doSpeak
-    }
-  ), window.FuriganaToggle && /* @__PURE__ */ React.createElement(window.FuriganaToggle, { t }), window.SyncChip && /* @__PURE__ */ React.createElement(window.SyncChip, { t }), window.SearchOverlay && /* @__PURE__ */ React.createElement(window.SearchOverlay, { t, setScreen }), window.OnboardingModal && !progress.onboardingDone && /* @__PURE__ */ React.createElement(
+  ), window.SearchOverlay && /* @__PURE__ */ React.createElement(window.SearchOverlay, { t, setScreen }), window.OnboardingModal && !progress.onboardingDone && /* @__PURE__ */ React.createElement(
     window.OnboardingModal,
     {
       t,

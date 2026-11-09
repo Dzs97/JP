@@ -1,15 +1,17 @@
 // Nihongo Study — minimal service worker
-// Strategy: cache-first for app shell + same-origin assets; network-first for
-// navigations (so deploys appear without users having to clear the cache).
-const VERSION = "v5";
-const SHELL = `nihongo-shell-${VERSION}`;
-const RUNTIME = `nihongo-runtime-${VERSION}`;
+// Strategy: stale-while-revalidate for same-origin assets (instant from cache,
+// refreshed in the background so deploys land on the next load); network-first
+// for navigations.
+const VERSION = "v6"; // above main's v5, so old cache-first caches are cleared on activate
+const SHELL = `nihongo-shell-${VERSION}`; // single cache: background refreshes overwrite precached copies
 
 const PRECACHE = [
   "/",
   "/index.html",
   "/manifest.webmanifest",
   "/icon.svg",
+  "/vendor/react.js",
+  "/vendor/react-dom.js",
   "/src/data.js",
   "/src/vocab-n5.js",
   "/src/kanji-data.js",
@@ -41,7 +43,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((k) => k !== SHELL && k !== RUNTIME)
+          .filter((k) => k !== SHELL)
           .map((k) => caches.delete(k))
       )
     ).then(() => self.clients.claim())
@@ -61,7 +63,7 @@ self.addEventListener("fetch", (event) => {
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(RUNTIME).then((c) => c.put(req, copy));
+          caches.open(SHELL).then((c) => c.put(req, copy));
           return res;
         })
         .catch(() => caches.match(req).then((r) => r || caches.match("/index.html")))
@@ -69,18 +71,21 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for everything else.
+  // Stale-while-revalidate for everything else.
   event.respondWith(
-    caches.match(req).then(
-      (cached) =>
-        cached ||
-        fetch(req).then((res) => {
-          if (res.ok && res.type === "basic") {
-            const copy = res.clone();
-            caches.open(RUNTIME).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-    )
+    caches.match(req).then((cached) => {
+      const fresh = fetch(req).then((res) => {
+        if (res.ok && res.type === "basic") {
+          const copy = res.clone();
+          caches.open(SHELL).then((c) => c.put(req, copy));
+        }
+        return res;
+      });
+      if (cached) {
+        fresh.catch(() => {}); // offline: keep serving the cached copy
+        return cached;
+      }
+      return fresh;
+    })
   );
 });

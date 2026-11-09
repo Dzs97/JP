@@ -1,6 +1,6 @@
 // Vercel serverless function — read/write a single user's progress JSON
 // keyed by their sync ID. Anyone with the ID can read/write that record,
-// so treat IDs as bearer secrets (we generate 22-char random ones client-side).
+// IDs are per-user names ("nihongo-diego"), so this is public by design: see src/extras-sync.js.
 //
 // GET  /api/sync?id=<syncId>
 //   → 200 { value: "<json-string>" | null, updatedAt: number }
@@ -16,6 +16,9 @@
 // Hard cap to keep KV usage sane:
 const MAX_VALUE_BYTES = 256 * 1024;     // 256 KB — way more than any realistic progress.json
 const ID_REGEX = /^[A-Za-z0-9_-]{8,64}$/;
+// Records expire if untouched for 180 days, so junk writes to random IDs don't pile up.
+// Every push refreshes the expiry, so active users are never affected.
+const TTL_SECONDS = 60 * 60 * 24 * 180;
 
 import { kv } from "@vercel/kv";
 
@@ -49,7 +52,7 @@ export default async function handler(req, res) {
         return res.status(413).json({ error: "value too large" });
       }
       const ts = Number(updatedAt) > 0 ? Number(updatedAt) : Date.now();
-      await kv.set(`jp:progress:${id}`, { value, updatedAt: ts });
+      await kv.set(`jp:progress:${id}`, { value, updatedAt: ts }, { ex: TTL_SECONDS });
       return res.status(200).json({ ok: true, updatedAt: ts });
     }
 

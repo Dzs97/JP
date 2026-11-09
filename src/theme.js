@@ -1,140 +1,143 @@
 // ═══════════════════════════════════════════════════════════════════════
-//  THEME — Need DS base + Japanese crimson accent
-//  Semantic tokens: white/gray surfaces, near-black ink, blue-gray halo
-//  shadows, 12/16/24 radii. Crimson accent kept for the JP study vibe.
+//  THEME — Washi & Sumi
+//  Warm paper surfaces, sumi-ink text, vermilion (shu) hanko accent.
+//  Dark mode is "sumi night": ink-black paper, warm off-white text.
+//  Muted/faint text tokens are tuned for ≥4.5:1 contrast on appBg.
 // ═══════════════════════════════════════════════════════════════════════
 
 const THEME_TOKENS = {
   light: {
-    // Surfaces
-    appBg: "#F9F9FA",          // --base-secondary
-    surfaceBg: "#FFFFFF",       // --base-primary, cards
-    surfaceSunken: "#F2F2F5",   // --base-tertiary
-    raisedBg: "#FFFFFF",
-    surfaceBorder: "#EAEAEB",   // --gray-150
-    surfaceBorderStrong: "#DDDDDF", // --gray-200
-    // Text
-    text: "#111212",            // --contents-strong
-    textPrimary: "#2A2B2D",     // --contents-primary
-    textMuted: "#5B5D62",       // --contents-secondary
-    textFaint: "#8E8F95",       // --contents-tertiary
-    textDisabled: "#C2C3C6",    // --contents-disabled
+    // Surfaces — washi paper
+    appBg: "#F4EEE3",
+    surfaceBg: "#FBF8F2",
+    surfaceSunken: "#EDE5D6",
+    raisedBg: "#FFFDF8",
+    surfaceBorder: "#E0D6C4",
+    surfaceBorderStrong: "#CDBFA8",
+    // Text — sumi ink
+    text: "#1C1A17",
+    textPrimary: "#2B2723",
+    textMuted: "#5E564C",
+    textFaint: "#756B5C",
+    textDisabled: "#B5AA98",
     // Buttons
-    btnGhost: "#F2F2F5",
-    btnGhostText: "#5B5D62",
-    btnGhostBorder: "#EAEAEB",
+    btnGhost: "#EDE5D6",
+    btnGhostText: "#5E564C",
+    btnGhostBorder: "#E0D6C4",
     // Inputs
-    inputBg: "#F9F9FA",
-    inputBorder: "#DDDDDF",
+    inputBg: "#FBF8F2",
+    inputBorder: "#CDBFA8",
     // Progress
-    progressTrack: "#EAEAEB",
-    tabInactive: "#F2F2F5",
-    tabInactiveText: "#74767C",
-    separatorText: "#C2C3C6",
+    progressTrack: "#E6DCCB",
+    tabInactive: "#EDE5D6",
+    tabInactiveText: "#6E6456",
+    separatorText: "#B5AA98",
     // Card faces
-    cardFront: "#FFFFFF",
-    cardFrontBorder: "#EAEAEB",
-    cardFrontChar: "#111212",
+    cardFront: "#FFFDF8",
+    cardFrontBorder: "#E0D6C4",
+    cardFrontChar: "#1C1A17",
     // Streak tag
-    streakBg: "#FFF5F0",
-    streakBorder: "#FFC4A4",
-    streakText: "#B85B31",
-    // Shadows — blue-gray halo
-    shadowCard: "0 0 8px 0 rgba(34, 62, 119, 0.08)",
-    shadowElevated: "0 0 8px 0 rgba(34, 62, 119, 0.14)",
-    shadowFloating: "0 0 16px 0 rgba(34, 62, 119, 0.12)",
-    // Heatmap (crimson ramp tuned for light)
-    heatmap: ["#F2F2F5", "#F5CFC9", "#E89084", "#D05040", "#8B1810"],
+    streakBg: "#FBE9DF",
+    streakBorder: "#EDB69C",
+    streakText: "#A2401F",
+    // Shadows — warm, low, paper-like
+    shadowCard: "0 1px 0 rgba(60, 40, 20, 0.04), 0 2px 10px rgba(60, 40, 20, 0.06)",
+    shadowElevated: "0 1px 0 rgba(60, 40, 20, 0.05), 0 6px 18px rgba(60, 40, 20, 0.10)",
+    shadowFloating: "0 12px 32px rgba(40, 25, 10, 0.16)",
+    // Heatmap — vermilion ramp on paper
+    heatmap: ["#EDE5D6", "#F2C9B8", "#E3907A", "#C8553D", "#8E2A17"],
     // Semantic colors
-    success: "#12BF6E",         // leaf-1100
-    successBg: "rgba(18, 191, 110, 0.10)",
-    successBorder: "rgba(18, 191, 110, 0.30)",
-    danger: "#F50000",
-    dangerBg: "rgba(245, 0, 0, 0.08)",
-    dangerBorder: "rgba(245, 0, 0, 0.25)",
-    warn: "#E17949",
-    warnBg: "rgba(225, 121, 73, 0.10)",
-    warnBorder: "rgba(225, 121, 73, 0.30)",
-    info: "#47CBFF",
+    success: "#2F7D4F",        // moss
+    successBg: "rgba(47, 125, 79, 0.10)",
+    successBorder: "rgba(47, 125, 79, 0.30)",
+    danger: "#B3261E",
+    dangerBg: "rgba(179, 38, 30, 0.08)",
+    dangerBorder: "rgba(179, 38, 30, 0.28)",
+    warn: "#B7621B",
+    warnBg: "rgba(183, 98, 27, 0.10)",
+    warnBorder: "rgba(183, 98, 27, 0.30)",
+    info: "#2E6F9E",           // ai (indigo dye)
   },
   dark: {
-    appBg: "#0B0B0D",
-    surfaceBg: "#151517",
-    surfaceSunken: "#1E1E22",
-    raisedBg: "#1E1E22",
-    surfaceBorder: "#2A2B2D",
-    surfaceBorderStrong: "#3A3B3F",
-    text: "#F9F9FA",
-    textPrimary: "#EAEAEB",
-    textMuted: "#A8A9AE",
-    textFaint: "#74767C",
-    textDisabled: "#5B5D62",
-    btnGhost: "#1E1E22",
-    btnGhostText: "#A8A9AE",
-    btnGhostBorder: "#2A2B2D",
-    inputBg: "#1E1E22",
-    inputBorder: "#3A3B3F",
-    progressTrack: "#2A2B2D",
-    tabInactive: "#1E1E22",
-    tabInactiveText: "#8E8F95",
-    separatorText: "#5B5D62",
-    cardFront: "#1E1E22",
-    cardFrontBorder: "#2A2B2D",
-    cardFrontChar: "#F9F9FA",
-    streakBg: "rgba(255, 157, 104, 0.12)",
-    streakBorder: "rgba(255, 157, 104, 0.30)",
-    streakText: "#FFC4A4",
-    shadowCard: "0 0 8px 0 rgba(0, 0, 0, 0.35)",
-    shadowElevated: "0 0 8px 0 rgba(0, 0, 0, 0.45)",
-    shadowFloating: "0 0 16px 0 rgba(0, 0, 0, 0.5)",
-    heatmap: ["#1E1E22", "#4A1F1B", "#7A2A24", "#B03A2E", "#E74C3C"],
-    success: "#38E094",
-    successBg: "rgba(56, 224, 148, 0.14)",
-    successBorder: "rgba(56, 224, 148, 0.40)",
-    danger: "#FF6B6B",
-    dangerBg: "rgba(255, 107, 107, 0.14)",
-    dangerBorder: "rgba(255, 107, 107, 0.40)",
-    warn: "#FFC4A4",
-    warnBg: "rgba(255, 196, 164, 0.14)",
-    warnBorder: "rgba(255, 196, 164, 0.40)",
-    info: "#91E0FF",
+    appBg: "#14120F",
+    surfaceBg: "#1C1915",
+    surfaceSunken: "#24201B",
+    raisedBg: "#24201B",
+    surfaceBorder: "#332D26",
+    surfaceBorderStrong: "#463E34",
+    text: "#F3ECE0",
+    textPrimary: "#E6DDCE",
+    textMuted: "#B4A895",
+    textFaint: "#968A77",
+    textDisabled: "#5E5547",
+    btnGhost: "#24201B",
+    btnGhostText: "#B4A895",
+    btnGhostBorder: "#332D26",
+    inputBg: "#24201B",
+    inputBorder: "#463E34",
+    progressTrack: "#332D26",
+    tabInactive: "#24201B",
+    tabInactiveText: "#9A8E7B",
+    separatorText: "#5E5547",
+    cardFront: "#24201B",
+    cardFrontBorder: "#332D26",
+    cardFrontChar: "#F3ECE0",
+    streakBg: "rgba(232, 112, 90, 0.14)",
+    streakBorder: "rgba(232, 112, 90, 0.35)",
+    streakText: "#F2B49C",
+    shadowCard: "0 1px 0 rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.3)",
+    shadowElevated: "0 6px 18px rgba(0, 0, 0, 0.45)",
+    shadowFloating: "0 12px 32px rgba(0, 0, 0, 0.55)",
+    heatmap: ["#24201B", "#4A2519", "#7A3623", "#B84A30", "#E8705A"],
+    success: "#7FCF9C",
+    successBg: "rgba(127, 207, 156, 0.14)",
+    successBorder: "rgba(127, 207, 156, 0.38)",
+    danger: "#FF8A80",
+    dangerBg: "rgba(255, 138, 128, 0.14)",
+    dangerBorder: "rgba(255, 138, 128, 0.38)",
+    warn: "#F2B26B",
+    warnBg: "rgba(242, 178, 107, 0.14)",
+    warnBorder: "rgba(242, 178, 107, 0.38)",
+    info: "#8CC4EA",
   },
 };
 
-// Accent presets — crimson by default (Japanese-feeling),
-// plus the Need leaf and a couple extras.
+// Accent presets. `dark` is used in dark mode where the base color would be
+// too dim to read as text (accent doubles as a text color across the app).
 const ACCENT_PRESETS = {
-  crimson: { name: "Crimson", color: "#C0392B", onAccent: "#FFFFFF" },
-  sumi:    { name: "Sumi",    color: "#2A2B2D", onAccent: "#FFFFFF" },
-  leaf:    { name: "Leaf",    color: "#12BF6E", onAccent: "#FFFFFF" },
-  indigo:  { name: "Indigo",  color: "#4F46E5", onAccent: "#FFFFFF" },
-  sakura:  { name: "Sakura",  color: "#E879A4", onAccent: "#FFFFFF" },
+  shu:     { name: "Shu",     color: "#C8402A", onAccent: "#FFFFFF", dark: "#E8705A", onAccentDark: "#1C1A17" },
+  crimson: { name: "Crimson", color: "#C0392B", onAccent: "#FFFFFF", dark: "#E86A5C", onAccentDark: "#1C1A17" },
+  sumi:    { name: "Sumi",    color: "#2B2723", onAccent: "#FFFFFF", dark: "#E6DDCE", onAccentDark: "#1C1A17" },
+  matcha:  { name: "Matcha",  color: "#4E7A3A", onAccent: "#FFFFFF", dark: "#9CC985", onAccentDark: "#1C1A17" },
+  ai:      { name: "Ai",      color: "#2E5C8A", onAccent: "#FFFFFF", dark: "#8CB8E6", onAccentDark: "#1C1A17" },
+  sakura:  { name: "Sakura",  color: "#B4466F", onAccent: "#FFFFFF", dark: "#F09AB8", onAccentDark: "#1C1A17" },
 };
 
-// Font presets — Noto Sans JP default (balanced, readable),
-// Noto Serif JP for editorial, Shippori Mincho for brush/display.
+// Font presets — Mincho for Japanese by default (brush-like, calm),
+// Sans for maximum legibility, Serif as a middle ground.
 const FONT_PRESETS = {
-  sans:  { name: "Sans",   body: "'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif",
-                            jp:   "'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif",
+  brush: { name: "Mincho", body: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
+                            jp:   "'Shippori Mincho', 'Noto Serif JP', 'Hiragino Mincho ProN', serif",
                             ui:   "'Inter', 'Noto Sans JP', system-ui, sans-serif" },
   serif: { name: "Serif",  body: "'Noto Sans JP', sans-serif",
                             jp:   "'Noto Serif JP', 'Hiragino Mincho ProN', serif",
                             ui:   "'Inter', system-ui, sans-serif" },
-  brush: { name: "Brush",  body: "'Noto Sans JP', sans-serif",
-                            jp:   "'Shippori Mincho', 'Noto Serif JP', serif",
-                            ui:   "'Inter', system-ui, sans-serif" },
+  sans:  { name: "Sans",   body: "'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif",
+                            jp:   "'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif",
+                            ui:   "'Inter', 'Noto Sans JP', system-ui, sans-serif" },
 };
 
 const buildTheme = (opts) => {
   const { darkMode, accent, fonts } = opts;
   const base = darkMode ? THEME_TOKENS.dark : THEME_TOKENS.light;
-  const a = ACCENT_PRESETS[accent] || ACCENT_PRESETS.crimson;
-  const f = FONT_PRESETS[fonts] || FONT_PRESETS.sans;
+  const a = ACCENT_PRESETS[accent] || ACCENT_PRESETS.shu;
+  const f = FONT_PRESETS[fonts] || FONT_PRESETS.brush;
+  const color = darkMode ? a.dark : a.color;
   return {
     ...base,
-    color: a.color,       // brand accent
-    accent: a.color,
-    onAccent: a.onAccent,
+    color,       // brand accent
+    accent: color,
+    onAccent: darkMode ? a.onAccentDark : a.onAccent,
     fontUi: f.ui,
     fontBody: f.body,
     fontJp: f.jp,

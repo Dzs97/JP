@@ -4,17 +4,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Nihongo Study · 日本語学習</title>
-<meta name="theme-color" content="#C0392B" />
+<meta name="theme-color" content="#F4EEE3" />
 <meta name="description" content="Japanese study — flashcards, kana, kanji, grammar, SRS." />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="icon" type="image/svg+xml" href="/icon.svg" />
 <link rel="apple-touch-icon" href="/icon.svg" />
 
-<template id="__bundler_thumbnail" data-bg-color="#F9F9FA">
+<template id="__bundler_thumbnail" data-bg-color="#F4EEE3">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
-    <rect width="1200" height="800" fill="#F9F9FA"/>
+    <rect width="1200" height="800" fill="#F4EEE3"/>
     <rect x="380" y="200" width="440" height="400" rx="40" fill="#FFFFFF" stroke="#EAEAEB" stroke-width="2"/>
-    <text x="600" y="470" font-family="'Noto Serif JP', serif" font-size="280" font-weight="700" fill="#C0392B" text-anchor="middle">日</text>
+    <text x="600" y="470" font-family="'Noto Serif JP', serif" font-size="280" font-weight="700" fill="#C8402A" text-anchor="middle">日</text>
   </svg>
 </template>
 
@@ -23,13 +23,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  html, body { margin: 0; padding: 0; min-height: 100%; background: #F9F9FA; }
+  html, body { margin: 0; padding: 0; min-height: 100%; background: #F4EEE3; }
   body { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif; }
 </style>
 
-<!-- Production React (smaller and faster than .development.js) -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<!-- Production React 18.3.1, served locally so the service worker can cache it for offline use -->
+<script src="/vendor/react.js"></script>
+<script src="/vendor/react-dom.js"></script>
 </head>
 <body>
   <div id="root"></div>

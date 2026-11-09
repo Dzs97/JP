@@ -49,238 +49,161 @@ function HomeScreen(p) {
       sum + applyLevel(window.CARD_DATA[c] || []).filter(isDueCard).length, 0);
   }, [categories, mode, progress, levelFocus]);
 
+  const user = window.getUser ? window.getUser() : null;
+  const goalHit = todayCards >= dailyGoal;
+  const activeMode = modes.find(m => m.id === mode);
+  const deckSize = sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection;
+  const stat = (label, jp, value, sub, color) => (
+    <div className="stat-row">
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi }}>
+          {label} <span style={{ fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 }}>{jp}</span>
+        </div>
+        <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>{sub}</div>
+      </div>
+      <div style={{ fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color }}>{value}</div>
+    </div>
+  );
+
   return (
     <div className="fade-up" style={{ maxWidth: 1080, margin: "0 auto", paddingTop: 32 }}>
 
-      {/* Mistake queue banner */}
       <window.MistakeBanner t={t} progress={progress} onDrill={startMistakeDrill} />
 
-      {/* Hero row: greeting + quick stats */}
-      <section className="resp-grid-12" style={{ marginBottom: 32 }}>
-        <div className="surface-raised" style={{ padding: "28px 32px", position: "relative", overflow: "hidden" }}>
-          <window.Eyebrow t={t} accent>{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</window.Eyebrow>
-          <h1 className="resp-hero-title" style={{
-            margin: "10px 0 6px",
-            fontFamily: t.fontUi, fontWeight: 800,
-            letterSpacing: -1.2, color: t.text, lineHeight: 1.05,
-          }}>
-            今日の学習 <span style={{ color: t.textFaint, fontWeight: 400, fontFamily: t.fontUi }}>/ Today's study</span>
-          </h1>
-          <p style={{ fontSize: 14, color: t.textMuted, margin: 0, maxWidth: 420 }}>
-            {stats.dueCount > 0
-              ? <>You have <b style={{ color: t.accent }}>{stats.dueCount}</b> cards due for review. Spaced repetition keeps recall strong.</>
-              : "No reviews due right now. A short new-card session keeps momentum."}
-          </p>
+      {/* Page heading */}
+      <header style={{ marginBottom: 24 }}>
+        <window.Eyebrow t={t} accent>{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</window.Eyebrow>
+        <h1 className="resp-hero-title" style={{
+          margin: "8px 0 4px", fontFamily: t.fontJp, fontWeight: 700,
+          letterSpacing: -0.5, color: t.text, lineHeight: 1.1,
+        }}>
+          今日の学習
+        </h1>
+        <p style={{ margin: 0, fontSize: 15, color: t.textMuted }}>
+          {user ? <>Welcome back, <b style={{ color: t.text }}>{user}</b>. </> : null}
+          {stats.dueCount > 0
+            ? <><b style={{ color: t.accent }}>{stats.dueCount}</b> cards are due for review.</>
+            : "Nothing due right now. A few new cards keeps the streak alive."}
+        </p>
+      </header>
 
-          {/* Daily goal ring */}
-          {window.DailyGoalRing && (
-            <div className="jq-goal-ring" style={{ position: "absolute", top: 24, right: 24, display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ textAlign: "right" }}>
-                <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", color: t.textFaint }}>
-                  today
-                </div>
-                <div style={{ fontSize: 11, color: todayCards >= dailyGoal ? t.success : t.textMuted, fontFamily: t.fontUi, fontWeight: 600 }}>
-                  {todayCards >= dailyGoal ? "goal hit ✓" : `${dailyGoal - todayCards} to go`}
-                </div>
-              </div>
-              <window.DailyGoalRing t={t} today={todayCards} goal={dailyGoal} />
+      {/* Today + stats */}
+      <section className="resp-grid-12" style={{ marginBottom: 24 }}>
+        <div className="surface-raised" style={{ padding: "26px 28px", position: "relative", overflow: "hidden",
+          display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+          {window.DailyGoalRing && <window.DailyGoalRing t={t} today={todayCards} goal={dailyGoal} size={112} />}
+          <div style={{ flex: 1, minWidth: 200, position: "relative", zIndex: 1 }}>
+            <window.Eyebrow t={t}>Daily goal · 目標</window.Eyebrow>
+            <div style={{ margin: "6px 0 16px", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, color: goalHit ? t.success : t.text, letterSpacing: -0.3 }}>
+              {goalHit ? "Goal reached. お疲れさま！" : `${dailyGoal - todayCards} cards to go today`}
             </div>
-          )}
-
-          <div style={{ display: "flex", gap: 10, marginTop: 22, flexWrap: "wrap" }}>
-            <window.PrimaryButton t={t} onClick={startStudy}>
-              Start session →
-            </window.PrimaryButton>
-            {stats.dueCount > 0 && (
-              <window.SecondaryButton t={t} onClick={() => { setDueOnly(true); setSessionGoal({ kind: "due", value: 0 }); startStudy(); }}>
-                Review {stats.dueCount} due
-              </window.SecondaryButton>
-            )}
-            {stats.weakCount > 0 && (
-              <window.SecondaryButton t={t} onClick={startWeakReview}>
-                Weak-spot drill ({stats.weakCount})
-              </window.SecondaryButton>
-            )}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <window.PrimaryButton t={t} onClick={startStudy}>Start session →</window.PrimaryButton>
+              {stats.dueCount > 0 && (
+                <window.SecondaryButton t={t} onClick={() => { setDueOnly(true); setSessionGoal({ kind: "due", value: 0 }); startStudy(); }}>
+                  Review {stats.dueCount} due
+                </window.SecondaryButton>
+              )}
+              {stats.weakCount > 0 && (
+                <window.SecondaryButton t={t} onClick={startWeakReview}>
+                  Weak spots ({stats.weakCount})
+                </window.SecondaryButton>
+              )}
+            </div>
           </div>
-
-          {/* decorative kanji */}
           <div aria-hidden className="resp-hero-kanji" style={{
-            position: "absolute",
-            fontFamily: t.fontJp, fontWeight: 900,
-            color: `${t.accent}0D`, letterSpacing: -10, lineHeight: 1, pointerEvents: "none",
+            position: "absolute", fontFamily: t.fontJp, fontWeight: 700,
+            color: `${t.accent}0F`, lineHeight: 1, pointerEvents: "none",
           }}>学</div>
         </div>
 
-        <div className="resp-stats-22">
-          <window.StatTile t={t} label="Streak" value={progress.streakDays || 0} sub="consecutive days" tone="warn" />
-          <window.StatTile t={t} label="Accuracy" value={`${stats.acc}%`} sub={`${progress.totalAnswered} answers`} />
-          <window.StatTile t={t} label="Mastered" value={stats.mastered} sub={`of ${stats.total} cards`} tone="success" />
-          <window.StatTile t={t} label="Due" value={stats.dueCount} sub="ready to review" />
+        <div className="surface-raised" style={{ padding: "22px 24px" }}>
+          {stat("Streak", "連続", progress.streakDays || 0, "days in a row", t.warn)}
+          {stat("Accuracy", "正答", `${stats.acc}%`, `${progress.totalAnswered} answers`, t.accent)}
+          {stat("Mastered", "習得", stats.mastered, `of ${stats.total} cards`, t.success)}
+          {stat("Due", "復習", stats.dueCount, "ready to review", t.text)}
         </div>
       </section>
 
-      {/* Mode picker */}
-      <section style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
-          <div>
-            <window.Eyebrow t={t}>01 · Mode</window.Eyebrow>
-            <h2 style={{ margin: "4px 0 0", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text }}>
-              How do you want to practice?
-            </h2>
-          </div>
-          <span style={{ fontSize: 12, color: t.textFaint, fontFamily: t.fontMono }}>
-            {modes.find(m => m.id === mode)?.hint}
+      {/* Session builder */}
+      <section className="surface-raised" style={{ padding: "8px 28px 22px" }} aria-labelledby="builder-title">
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, padding: "18px 0 4px", flexWrap: "wrap" }}>
+          <h2 id="builder-title" style={{ margin: 0, fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text }}>
+            Build a session <span style={{ fontFamily: t.fontJp, fontWeight: 500, color: t.textFaint, fontSize: 16, marginLeft: 6 }}>練習</span>
+          </h2>
+          <span className="mono" style={{ fontSize: 12, color: t.textMuted }}>
+            {totalInSelection} cards · {dueInSelection} due
           </span>
         </div>
-        <div className="resp-modes-5">
-          {modes.map(m => {
-            const active = mode === m.id;
-            return (
-              <button key={m.id} className="btn" onClick={() => setMode(m.id)}
-                style={{
-                  padding: "18px 14px",
-                  background: active ? t.surfaceBg : t.surfaceSunken,
-                  border: `1px solid ${active ? t.accent : t.surfaceBorder}`,
-                  borderRadius: 16,
-                  textAlign: "left",
-                  boxShadow: active ? `0 0 0 3px ${t.accent}14, ${t.shadowCard}` : "none",
-                  position: "relative",
-                }}>
-                <div style={{
-                  fontFamily: t.fontJp, fontSize: 22, color: active ? t.accent : t.textMuted, marginBottom: 10,
-                  fontWeight: 500,
-                }}>
-                  {m.glyph}
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: t.text, fontFamily: t.fontUi }}>{m.label}</div>
-                <div style={{ fontSize: 11, color: t.textFaint, marginTop: 2 }}>{m.hint}</div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
 
-      {/* Categories + session length in 2-col */}
-      <section className="resp-grid-21">
-
-        {/* Categories */}
-        <div>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
-            <div>
-              <window.Eyebrow t={t}>02 · Content</window.Eyebrow>
-              <h2 style={{ margin: "4px 0 0", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text }}>
-                {mode === "build" ? "Sentence bank" : "Categories"}
-              </h2>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {setLevelFocus && (
-                <div style={{ display: "flex", gap: 2, background: t.surfaceSunken, padding: 3, borderRadius: 8 }}>
-                  {[{ id: "all", label: "All" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => {
-                    const on = levelFocus === o.id;
-                    return (
-                      <button key={String(o.id)} className="btn" onClick={() => setLevelFocus(o.id)}
-                        style={{
-                          padding: "4px 10px", borderRadius: 6,
-                          background: on ? t.surfaceBg : "transparent",
-                          color: on ? t.text : t.textMuted,
-                          fontSize: 11, fontWeight: 600, fontFamily: t.fontUi,
-                          boxShadow: on ? t.shadowCard : "none",
-                        }}>{o.label}</button>
-                    );
-                  })}
-                </div>
-              )}
-              <span style={{ fontSize: 12, color: t.textFaint, fontFamily: t.fontMono }}>
-                {totalInSelection} cards · {dueInSelection} due
-              </span>
-            </div>
-          </div>
-
-          {fixedPoolFor(mode) ? (
-            <div className="surface" style={{ padding: 18, fontSize: 13, color: t.textMuted }}>
-              {mode === "build" && <>Build mode drills the <b style={{ color: t.text }}>sentence bank</b> — arrange tokens (words + particles) in order.</>}
-              {mode === "cloze" && <>Cloze drills the <b style={{ color: t.text }}>sentence bank</b> — fill the blank with the right particle, ending, or word.</>}
-              {mode === "conjugate" && <>Conjugate drills the <b style={{ color: t.text }}>verb bank</b> — type the ます form of each dictionary-form verb.</>}
-              <div style={{ marginTop: 6, fontSize: 12, color: t.textFaint }}>Categories don't apply here.</div>
-            </div>
-          ) : (
-            <div className="resp-cats-2">
-              {window.CATEGORY_META.map(c => {
-                const on = categories.includes(c.id);
-                const dueN = window.CARD_DATA[c.id].filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length;
-                return (
-                  <button key={c.id} className="btn" onClick={() => toggleCat(c.id)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: 12,
-                      padding: "12px 14px",
-                      background: on ? t.surfaceBg : t.surfaceSunken,
-                      border: `1px solid ${on ? t.accent : t.surfaceBorder}`,
-                      borderRadius: 12, textAlign: "left",
-                      boxShadow: on ? `0 0 0 2px ${t.accent}14` : "none",
-                    }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10,
-                      background: on ? t.accent : t.btnGhost,
-                      color: on ? t.onAccent : t.textMuted,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: t.fontJp, fontSize: 17, fontWeight: 700,
-                    }}>
-                      {c.icon}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: t.text, fontFamily: t.fontUi }}>{c.label}</div>
-                      <div className="mono" style={{ fontSize: 10, color: t.textFaint, marginTop: 1 }}>
-                        {c.count} cards {dueN > 0 && <span style={{ color: t.accent }}>· {dueN} due</span>}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Session length */}
-        <div>
-          <window.Eyebrow t={t}>03 · Session</window.Eyebrow>
-          <h2 style={{ margin: "4px 0 14px", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text }}>
-            Length
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }} className="resp-cats-2">
-            {goals.map(g => {
-              const active = sessionGoal.kind === g.kind && sessionGoal.value === g.value;
-              return (
-                <button key={g.label} className="btn" onClick={() => setSessionGoal(g)}
-                  style={{
-                    padding: "14px 12px",
-                    background: active ? t.accent : t.surfaceSunken,
-                    color: active ? t.onAccent : t.text,
-                    border: `1px solid ${active ? t.accent : t.surfaceBorder}`,
-                    borderRadius: 12,
-                    fontSize: 14, fontWeight: 700, fontFamily: t.fontUi,
-                  }}>
-                  {g.label}
+        <div className="builder-row">
+          <div className="builder-label">Mode<small>方法</small></div>
+          <div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {modes.map(m => (
+                <button key={m.id} className={"btn chip" + (mode === m.id ? " on" : "")}
+                  aria-pressed={mode === m.id} onClick={() => setMode(m.id)}>
+                  <span className="chip-glyph" aria-hidden="true">{m.glyph}</span>{m.label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+            <div style={{ fontSize: 12, color: t.textMuted, marginTop: 8 }}>{activeMode?.hint}</div>
           </div>
+        </div>
 
-          <div className="surface" style={{ padding: 14, fontSize: 12, color: t.textMuted }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <span>Mode</span>
-              <b style={{ color: t.text, fontFamily: t.fontUi }}>{modes.find(m => m.id === mode)?.label}</b>
+        <div className="builder-row">
+          <div className="builder-label">{mode === "build" ? "Sentences" : "Content"}<small>内容</small></div>
+          <div>
+            {setLevelFocus && (
+              <div className="seg" role="group" aria-label="JLPT level" style={{ marginBottom: 10 }}>
+                {[{ id: "all", label: "All levels" }, { id: 5, label: "N5" }, { id: 4, label: "N4" }].map(o => (
+                  <button key={String(o.id)} className="btn" aria-pressed={levelFocus === o.id} onClick={() => setLevelFocus(o.id)}>
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {fixedPoolFor(mode) ? (
+              <div style={{ fontSize: 13, color: t.textMuted, lineHeight: 1.5 }}>
+                {mode === "build" && <>Build mode drills the <b style={{ color: t.text }}>sentence bank</b>: arrange words and particles in order.</>}
+                {mode === "cloze" && <>Cloze drills the <b style={{ color: t.text }}>sentence bank</b>: fill the blank with the right particle, ending, or word.</>}
+                {mode === "conjugate" && <>Conjugate drills the <b style={{ color: t.text }}>verb bank</b>: type the ます form of each verb.</>}
+                {" "}Categories don't apply here.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {window.CATEGORY_META.map(c => {
+                  const on = categories.includes(c.id);
+                  const dueN = window.CARD_DATA[c.id].filter(card => window.isDue(progress.cardStats[window.cardKey(card)])).length;
+                  return (
+                    <button key={c.id} className={"btn chip" + (on ? " on" : "")} aria-pressed={on} onClick={() => toggleCat(c.id)}>
+                      <span className="chip-glyph" aria-hidden="true">{c.icon}</span>
+                      {c.label}
+                      <span className="chip-meta">{window.CARD_DATA[c.id].length}{dueN > 0 ? ` · ${dueN} due` : ""}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="builder-row">
+          <div className="builder-label">Length<small>長さ</small></div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+            <div className="seg" role="group" aria-label="Session length">
+              {goals.map(g => (
+                <button key={g.label} className="btn" aria-pressed={sessionGoal.kind === g.kind && sessionGoal.value === g.value}
+                  onClick={() => setSessionGoal(g)}>{g.label}</button>
+              ))}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-              <span>Deck size</span>
-              <b className="mono" style={{ color: t.text }}>
-                {sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection}
-              </b>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Est. time</span>
-              <b className="mono" style={{ color: t.text }}>
-                ~{Math.max(1, Math.round((sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection) * 0.25))} min
-              </b>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <span className="mono" style={{ fontSize: 12, color: t.textMuted }}>
+                {deckSize} cards · ~{Math.max(1, Math.round(deckSize * 0.25))} min
+              </span>
+              <window.PrimaryButton t={t} onClick={startStudy} disabled={deckSize === 0} style={{ padding: "11px 22px" }}>
+                Start {activeMode?.label?.toLowerCase()} →
+              </window.PrimaryButton>
             </div>
           </div>
         </div>
@@ -288,18 +211,18 @@ function HomeScreen(p) {
 
       {/* Recent sessions */}
       {progress.history?.length > 0 && (
-        <section style={{ marginTop: 32 }}>
-          <window.Eyebrow t={t}>Recent sessions</window.Eyebrow>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 10, marginTop: 10 }}>
-            {progress.history.slice().reverse().slice(0, 4).map((h, i) => (
-              <div key={i} className="surface" style={{ padding: "12px 14px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-                  <span style={{ fontSize: 12, color: t.textMuted, fontFamily: t.fontUi, textTransform: "capitalize" }}>{h.mode}</span>
-                  <window.Pill t={t} tone={h.score >= 80 ? "success" : h.score >= 60 ? "warn" : "danger"} size="sm">{h.score}%</window.Pill>
+        <section style={{ marginTop: 28 }}>
+          <window.Eyebrow t={t}>Recent sessions · 履歴</window.Eyebrow>
+          <div className="surface" style={{ marginTop: 10, padding: "4px 20px" }}>
+            {progress.history.slice().reverse().slice(0, 4).map((hst, i) => (
+              <div key={i} className="stat-row" style={{ alignItems: "center", padding: "12px 0" }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi, textTransform: "capitalize" }}>{hst.mode}</div>
+                  <div className="mono" style={{ fontSize: 11, color: t.textMuted, marginTop: 2 }}>
+                    {hst.date} · {hst.cards} cards · {Math.max(1, Math.round(hst.duration / 60))} min
+                  </div>
                 </div>
-                <div style={{ fontSize: 11, color: t.textFaint, fontFamily: t.fontMono }}>
-                  {h.date} · {h.cards}c · {Math.round(h.duration / 60)}m
-                </div>
+                <window.Pill t={t} tone={hst.score >= 80 ? "success" : hst.score >= 60 ? "warn" : "danger"} size="sm">{hst.score}%</window.Pill>
               </div>
             ))}
           </div>
