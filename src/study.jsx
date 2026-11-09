@@ -147,7 +147,7 @@ function QuizMode(p) {
         </div>
         <button className="btn" onClick={() => speakForce(card.front)}
           style={{ marginTop: 14, padding: "6px 14px", background: `${t.accent}14`, color: t.accent, borderRadius: 999, fontSize: 12, fontFamily: t.fontMono }}>
-          ♪ {card.romanji}
+          {card.kind === "kana" ? "♪" : `♪ ${card.romanji}`}
         </button>
       </div>
       <div style={{ display: "grid", gap: 8 }}>
@@ -382,7 +382,7 @@ function BuildMode(p) {
 
 // ── Finish ──────────────────────────────────────────────────────────────
 function FinishScreen(p) {
-  const { t, score, deck, startStudy, setScreen, sessionStart } = p;
+  const { t, score, deck, startStudy, setScreen, sessionStart, courseCtx, backToCourse } = p;
   const pct = deck.length ? Math.round((score.correct / deck.length) * 100) : 0;
   const duration = sessionStart ? Math.round((Date.now() - sessionStart) / 1000) : 0;
   const msg = pct >= 90 ? "素晴らしい — Outstanding!"
@@ -414,11 +414,30 @@ function FinishScreen(p) {
         </div>
       </div>
 
+      {courseCtx && courseCtx.kind === "quiz" && (() => {
+        const pass = window.COURSE_PASS_PCT || 70;
+        return pct >= pass ? (
+          <div style={{ marginBottom: 18, fontSize: 18, fontWeight: 700, color: t.success, fontFamily: t.fontUi }}>
+            Lección aprobada ✓
+          </div>
+        ) : (
+          <div style={{ marginBottom: 18, fontSize: 15, color: t.warn, fontFamily: t.fontUi }}>
+            Te faltan {pass - pct} puntos para el {pass}%. ¡Repasa las tarjetas e inténtalo otra vez!
+          </div>
+        );
+      })()}
+
+      {courseCtx ? (
+        <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+          <window.PrimaryButton t={t} onClick={backToCourse}>Volver al curso →</window.PrimaryButton>
+        </div>
+      ) : (
       <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
         <window.PrimaryButton t={t} onClick={startStudy}>Another round →</window.PrimaryButton>
         <window.SecondaryButton t={t} onClick={() => setScreen("home")}>Home</window.SecondaryButton>
         <window.SecondaryButton t={t} onClick={() => setScreen("progress")}>View progress</window.SecondaryButton>
       </div>
+      )}
     </div>
   );
 }

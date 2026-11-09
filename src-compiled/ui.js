@@ -1,16 +1,6 @@
 (function(){
-// ═══════════════════════════════════════════════════════════════════════
-//  Shared UI primitives — GlobalStyles, TopBar, Card, Pill, Chip, Badge
-// ═══════════════════════════════════════════════════════════════════════
-const {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo
-} = React;
-function GlobalStyles({
-  t
-}) {
+const { useState, useEffect, useCallback, useMemo } = React;
+function GlobalStyles({ t }) {
   const css = `
     *, *::before, *::after { box-sizing: border-box; }
     html, body, #root { margin: 0; padding: 0; min-height: 100%; background: ${t.appBg}; }
@@ -87,7 +77,7 @@ function GlobalStyles({
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: ${t.surfaceBorderStrong}; border-radius: 4px; }
 
-    /* ───────── Responsive helpers ───────── */
+    /* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Responsive helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
     .resp-grid-12 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
     .resp-grid-21 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
     .resp-grid-11 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -180,67 +170,34 @@ function GlobalStyles({
       .resp-modes-5 { grid-template-columns: 1fr; }
     }
   `;
-  return /*#__PURE__*/React.createElement("style", {
-    dangerouslySetInnerHTML: {
-      __html: css
-    }
-  });
+  return /* @__PURE__ */ React.createElement("style", { dangerouslySetInnerHTML: { __html: css } });
 }
-
-// ── Top bar ─────────────────────────────────────────────────────────────
-function TopBar({
-  t,
-  screen,
-  setScreen,
-  darkMode,
-  setDarkMode,
-  voiceOn,
-  setVoiceOn,
-  score,
-  idx,
-  deck,
-  finished
-}) {
+function TopBar({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoiceOn, score, idx, deck, finished, exitTo = "home" }) {
   const inStudy = screen === "study" && !finished && deck?.length > 0;
-  const tabs = [{
-    id: "home",
-    label: "Study"
-  }, {
-    id: "kana",
-    label: "Kana"
-  }, {
-    id: "kanji",
-    label: "Kanji"
-  }, {
-    id: "grammar",
-    label: "Grammar"
-  }, {
-    id: "progress",
-    label: "Progress"
-  }];
-  return /*#__PURE__*/React.createElement("header", {
-    style: {
-      position: "sticky",
-      top: 0,
-      zIndex: 50,
-      background: `${t.appBg}F0`,
-      backdropFilter: "saturate(1.1) blur(10px)",
-      WebkitBackdropFilter: "saturate(1.1) blur(10px)",
-      borderBottom: `1px solid ${t.surfaceBorder}`
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "resp-topbar-inner"
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setScreen("home"),
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      flexShrink: 0
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
+  const tabs = [
+    { id: "course", label: "Curso" },
+    { id: "home", label: "Study" },
+    { id: "kana", label: "Kana" },
+    { id: "kanji", label: "Kanji" },
+    { id: "grammar", label: "Grammar" },
+    { id: "progress", label: "Progress" }
+  ];
+  return /* @__PURE__ */ React.createElement("header", { style: {
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+    background: `${t.appBg}F0`,
+    backdropFilter: "saturate(1.1) blur(10px)",
+    WebkitBackdropFilter: "saturate(1.1) blur(10px)",
+    borderBottom: `1px solid ${t.surfaceBorder}`
+  } }, /* @__PURE__ */ React.createElement("div", { className: "resp-topbar-inner" }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick: () => setScreen("course"),
+      style: { display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: {
       width: 32,
       height: 32,
       borderRadius: 10,
@@ -253,330 +210,194 @@ function TopBar({
       fontWeight: 700,
       fontSize: 17,
       boxShadow: t.shadowCard
-    }
-  }, "\u65E5"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "left",
-      lineHeight: 1.1
-    },
-    className: "resp-hide-mobile"
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: t.fontUi,
-      fontWeight: 700,
-      fontSize: 15,
-      color: t.text,
-      letterSpacing: -0.2
-    }
-  }, "Nihongo"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 10,
-      color: t.textFaint,
-      letterSpacing: 1
-    }
-  }, "STUDY \xB7 \u5B66\u7FD2"))), !inStudy && /*#__PURE__*/React.createElement("nav", {
-    className: "resp-tabs"
-  }, tabs.map(tab => {
+    } }, "\u65E5"),
+    /* @__PURE__ */ React.createElement("div", { style: { textAlign: "left", lineHeight: 1.1 }, className: "resp-hide-mobile" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: t.fontUi, fontWeight: 700, fontSize: 15, color: t.text, letterSpacing: -0.2 } }, "Nihongo"), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 10, color: t.textFaint, letterSpacing: 1 } }, "STUDY \xB7 \u5B66\u7FD2"))
+  ), !inStudy && /* @__PURE__ */ React.createElement("nav", { className: "resp-tabs" }, tabs.map((tab) => {
     const active = screen === tab.id || tab.id === "home" && screen === "study";
-    return /*#__PURE__*/React.createElement("button", {
-      key: tab.id,
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: tab.id,
+        className: "btn",
+        onClick: () => setScreen(tab.id),
+        style: {
+          padding: "7px 14px",
+          borderRadius: 8,
+          fontSize: 13,
+          fontWeight: 600,
+          fontFamily: t.fontUi,
+          background: active ? t.surfaceBg : "transparent",
+          color: active ? t.text : t.textMuted,
+          boxShadow: active ? t.shadowCard : "none"
+        }
+      },
+      tab.label
+    );
+  })), inStudy && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
       className: "btn",
-      onClick: () => setScreen(tab.id),
+      onClick: () => setScreen(exitTo),
+      style: { padding: "7px 12px", borderRadius: 10, background: t.btnGhost, color: t.textMuted, fontSize: 13, fontWeight: 600, fontFamily: t.fontUi }
+    },
+    "\u2190 Exit"
+  ), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 13, color: t.textMuted } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.accent, fontWeight: 700 } }, idx + 1), /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, " / ", deck.length)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, fontFamily: t.fontMono, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.success } }, "\u2713 ", score.correct), /* @__PURE__ */ React.createElement("span", { style: { color: t.danger } }, "\u2717 ", score.incorrect))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick: () => window.openSearch && window.openSearch(),
+      title: "Search cards & kanji (press /)",
+      "aria-label": "Search",
       style: {
-        padding: "7px 14px",
-        borderRadius: 8,
-        fontSize: 13,
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        background: t.btnGhost,
+        color: t.textMuted,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 15
+      }
+    },
+    "\u{1F50D}"
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick: () => setVoiceOn(!voiceOn),
+      title: voiceOn ? "Mute" : "Unmute",
+      style: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        background: voiceOn ? `${t.accent}14` : t.btnGhost,
+        color: voiceOn ? t.accent : t.textFaint,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 15
+      }
+    },
+    voiceOn ? "\u{1F50A}" : "\u{1F507}"
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick: () => setDarkMode(!darkMode),
+      title: darkMode ? "Light mode" : "Dark mode",
+      style: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        background: t.btnGhost,
+        color: t.textMuted,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 15
+      }
+    },
+    darkMode ? "\u2600" : "\u263E"
+  ))));
+}
+function Eyebrow({ t, children, accent }) {
+  return /* @__PURE__ */ React.createElement("div", { className: "mono", style: {
+    fontSize: 10,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: accent ? t.accent : t.textFaint,
+    fontWeight: 600
+  } }, children);
+}
+function Pill({ t, children, tone = "default", size = "md", style }) {
+  const tones = {
+    default: { bg: t.btnGhost, fg: t.textMuted, bd: t.btnGhostBorder },
+    accent: { bg: `${t.accent}14`, fg: t.accent, bd: `${t.accent}40` },
+    success: { bg: t.successBg, fg: t.success, bd: t.successBorder },
+    warn: { bg: t.warnBg, fg: t.warn, bd: t.warnBorder },
+    danger: { bg: t.dangerBg, fg: t.danger, bd: t.dangerBorder }
+  }[tone];
+  const sizes = { sm: { p: "3px 8px", fs: 10 }, md: { p: "4px 10px", fs: 11 } }[size];
+  return /* @__PURE__ */ React.createElement("span", { className: "mono", style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 4,
+    padding: sizes.p,
+    borderRadius: 999,
+    background: tones.bg,
+    color: tones.fg,
+    border: `1px solid ${tones.bd}`,
+    fontSize: sizes.fs,
+    fontWeight: 600,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    ...style
+  } }, children);
+}
+function StatTile({ t, label, value, sub, tone = "accent" }) {
+  const toneColor = tone === "success" ? t.success : tone === "warn" ? t.warn : t.accent;
+  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "16px 18px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8, fontWeight: 600 } }, label), /* @__PURE__ */ React.createElement("div", { style: {
+    fontFamily: "'Inter', system-ui, sans-serif",
+    fontSize: 30,
+    fontWeight: 800,
+    lineHeight: 1,
+    color: toneColor,
+    letterSpacing: -1
+  } }, value), sub && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: t.textMuted, marginTop: 6 } }, sub));
+}
+function PrimaryButton({ t, onClick, disabled, children, style }) {
+  return /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick,
+      disabled,
+      style: {
+        background: t.accent,
+        color: t.onAccent,
+        padding: "14px 28px",
+        borderRadius: 16,
+        fontSize: 15,
+        fontWeight: 700,
+        fontFamily: t.fontUi,
+        letterSpacing: -0.2,
+        boxShadow: `0 4px 20px ${t.accent}33`,
+        ...style
+      }
+    },
+    children
+  );
+}
+function SecondaryButton({ t, onClick, children, style }) {
+  return /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn",
+      onClick,
+      style: {
+        background: t.btnGhost,
+        color: t.text,
+        padding: "13px 22px",
+        borderRadius: 16,
+        fontSize: 14,
         fontWeight: 600,
         fontFamily: t.fontUi,
-        background: active ? t.surfaceBg : "transparent",
-        color: active ? t.text : t.textMuted,
-        boxShadow: active ? t.shadowCard : "none"
+        border: `1px solid ${t.btnGhostBorder}`,
+        ...style
       }
-    }, tab.label);
-  })), inStudy && /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      flexWrap: "wrap"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setScreen("home"),
-    style: {
-      padding: "7px 12px",
-      borderRadius: 10,
-      background: t.btnGhost,
-      color: t.textMuted,
-      fontSize: 13,
-      fontWeight: 600,
-      fontFamily: t.fontUi
-    }
-  }, "\u2190 Exit"), /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 13,
-      color: t.textMuted
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.accent,
-      fontWeight: 700
-    }
-  }, idx + 1), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.textFaint
-    }
-  }, " / ", deck.length)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      fontFamily: t.fontMono,
-      fontSize: 13
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.success
-    }
-  }, "\u2713 ", score.correct), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: t.danger
-    }
-  }, "\u2717 ", score.incorrect))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 6
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => window.openSearch && window.openSearch(),
-    title: "Search cards & kanji (press /)",
-    "aria-label": "Search",
-    style: {
-      width: 36, height: 36, borderRadius: 10,
-      background: t.btnGhost, color: t.textMuted,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: 15
-    }
-  }, "🔍"), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setVoiceOn(!voiceOn),
-    title: voiceOn ? "Mute" : "Unmute",
-    style: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      background: voiceOn ? `${t.accent}14` : t.btnGhost,
-      color: voiceOn ? t.accent : t.textFaint,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 15
-    }
-  }, voiceOn ? "🔊" : "🔇"), /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: () => setDarkMode(!darkMode),
-    title: darkMode ? "Light mode" : "Dark mode",
-    style: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      background: t.btnGhost,
-      color: t.textMuted,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 15
-    }
-  }, darkMode ? "☀" : "☾"))));
-}
-
-// ── Small reusable bits ─────────────────────────────────────────────────
-function Eyebrow({
-  t,
-  children,
-  accent
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 10,
-      letterSpacing: 2,
-      textTransform: "uppercase",
-      color: accent ? t.accent : t.textFaint,
-      fontWeight: 600
-    }
-  }, children);
-}
-function Pill({
-  t,
-  children,
-  tone = "default",
-  size = "md",
-  style
-}) {
-  const tones = {
-    default: {
-      bg: t.btnGhost,
-      fg: t.textMuted,
-      bd: t.btnGhostBorder
     },
-    accent: {
-      bg: `${t.accent}14`,
-      fg: t.accent,
-      bd: `${t.accent}40`
-    },
-    success: {
-      bg: t.successBg,
-      fg: t.success,
-      bd: t.successBorder
-    },
-    warn: {
-      bg: t.warnBg,
-      fg: t.warn,
-      bd: t.warnBorder
-    },
-    danger: {
-      bg: t.dangerBg,
-      fg: t.danger,
-      bd: t.dangerBorder
-    }
-  }[tone];
-  const sizes = {
-    sm: {
-      p: "3px 8px",
-      fs: 10
-    },
-    md: {
-      p: "4px 10px",
-      fs: 11
-    }
-  }[size];
-  return /*#__PURE__*/React.createElement("span", {
-    className: "mono",
-    style: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 4,
-      padding: sizes.p,
-      borderRadius: 999,
-      background: tones.bg,
-      color: tones.fg,
-      border: `1px solid ${tones.bd}`,
-      fontSize: sizes.fs,
-      fontWeight: 600,
-      letterSpacing: 0.5,
-      textTransform: "uppercase",
-      ...style
-    }
-  }, children);
+    children
+  );
 }
-function StatTile({
-  t,
-  label,
-  value,
-  sub,
-  tone = "accent"
-}) {
-  const toneColor = tone === "success" ? t.success : tone === "warn" ? t.warn : t.accent;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "surface-raised",
-    style: {
-      padding: "16px 18px"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    style: {
-      fontSize: 9,
-      letterSpacing: 1.5,
-      color: t.textFaint,
-      textTransform: "uppercase",
-      marginBottom: 8,
-      fontWeight: 600
-    }
-  }, label), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "'Inter', system-ui, sans-serif",
-      fontSize: 30,
-      fontWeight: 800,
-      lineHeight: 1,
-      color: toneColor,
-      letterSpacing: -1
-    }
-  }, value), sub && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: t.textMuted,
-      marginTop: 6
-    }
-  }, sub));
-}
-function PrimaryButton({
-  t,
-  onClick,
-  disabled,
-  children,
-  style
-}) {
-  return /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onClick,
-    disabled: disabled,
-    style: {
-      background: t.accent,
-      color: t.onAccent,
-      padding: "14px 28px",
-      borderRadius: 16,
-      fontSize: 15,
-      fontWeight: 700,
-      fontFamily: t.fontUi,
-      letterSpacing: -0.2,
-      boxShadow: `0 4px 20px ${t.accent}33`,
-      ...style
-    }
-  }, children);
-}
-function SecondaryButton({
-  t,
-  onClick,
-  children,
-  style
-}) {
-  return /*#__PURE__*/React.createElement("button", {
-    className: "btn",
-    onClick: onClick,
-    style: {
-      background: t.btnGhost,
-      color: t.text,
-      padding: "13px 22px",
-      borderRadius: 16,
-      fontSize: 14,
-      fontWeight: 600,
-      fontFamily: t.fontUi,
-      border: `1px solid ${t.btnGhostBorder}`,
-      ...style
-    }
-  }, children);
-}
-function RomanjiLabel({
-  t,
-  text,
-  position,
-  onClick
-}) {
+function RomanjiLabel({ t, text, position, onClick }) {
   if (position === "hidden" || !text) return null;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mono",
-    onClick: onClick,
-    style: {
-      fontSize: 13,
-      color: t.textMuted,
-      letterSpacing: 0.5,
-      userSelect: "text"
-    }
-  }, text);
+  return /* @__PURE__ */ React.createElement("div", { className: "mono", onClick, style: {
+    fontSize: 13,
+    color: t.textMuted,
+    letterSpacing: 0.5,
+    userSelect: "text"
+  } }, text);
 }
 Object.assign(window, {
   GlobalStyles,
