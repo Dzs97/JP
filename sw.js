@@ -1,7 +1,7 @@
 // Nihongo Study — minimal service worker
 // Strategy: cache-first for app shell + same-origin assets; network-first for
 // navigations (so deploys appear without users having to clear the cache).
-const VERSION = "v3";
+const VERSION = "v4";
 const SHELL = `nihongo-shell-${VERSION}`;
 const RUNTIME = `nihongo-runtime-${VERSION}`;
 
