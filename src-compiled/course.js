@@ -110,7 +110,7 @@ function CheckDot({ t, done, onClick }) {
       className: "btn",
       onClick,
       disabled: !onClick,
-      "aria-label": done ? "Hecho" : "Pendiente",
+      "aria-label": done ? "Done" : "Pending",
       style: {
         width: 28,
         height: 28,
@@ -137,7 +137,7 @@ function PlayBtn({ t, onClick }) {
     {
       className: "btn",
       onClick,
-      "aria-label": "Escuchar",
+      "aria-label": "Play",
       style: {
         width: 34,
         height: 34,
@@ -224,7 +224,7 @@ function CourseScreen(p) {
     );
   }
   const wrap = { maxWidth: 760, margin: "0 auto", paddingTop: 24, minWidth: 0 };
-  return /* @__PURE__ */ React.createElement("div", { className: "fade-up", style: wrap }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, background: t.surfaceSunken, padding: 4, borderRadius: 12, marginBottom: 20, width: "fit-content", maxWidth: "100%" } }, [{ id: "today", label: "Hoy" }, { id: "all", label: "Todas las lecciones" }].map((x) => /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { className: "fade-up", style: wrap }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, background: t.surfaceSunken, padding: 4, borderRadius: 12, marginBottom: 20, width: "fit-content", maxWidth: "100%" } }, [{ id: "today", label: "Today" }, { id: "all", label: "All lessons" }].map((x) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: x.id,
@@ -256,7 +256,7 @@ function CourseScreen(p) {
   ) : /* @__PURE__ */ React.createElement(AllLessonsView, { t, st, openLesson }));
 }
 function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson }) {
-  const dateStr = (/* @__PURE__ */ new Date()).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+  const dateStr = (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" });
   const phase = (window.COURSE_PHASES || []).find((ph) => ph.id === st.currentPhase);
   const phaseLessons = st.lessons.filter((L) => L.phase === st.currentPhase);
   const phasePassed = phaseLessons.filter((L) => st.lp[L.id]?.passed).length;
@@ -272,7 +272,7 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
     if (!st.seen.length) return;
     startCourseDeck(window.shuffle(st.seen).slice(0, 15), "listen", { kind: "listen" });
   };
-  return /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 14, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 18px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase" } }, dateStr), /* @__PURE__ */ React.createElement("h1", { className: "resp-screen-title", style: { margin: "6px 0 4px", fontWeight: 800, letterSpacing: -1, color: t.text, fontFamily: t.fontUi } }, "Tu plan de hoy"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", fontSize: 14, color: t.textMuted, marginBottom: 16 } }, /* @__PURE__ */ React.createElement("span", null, "\u224860 min \xB7 ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, st.doneCount, " de 4"), " pasos listos"), /* @__PURE__ */ React.createElement("span", { style: {
+  return /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 14, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 18px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase" } }, dateStr), /* @__PURE__ */ React.createElement("h1", { className: "resp-screen-title", style: { margin: "6px 0 4px", fontWeight: 800, letterSpacing: -1, color: t.text, fontFamily: t.fontUi } }, "Your plan for today"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", fontSize: 14, color: t.textMuted, marginBottom: 16 } }, /* @__PURE__ */ React.createElement("span", null, "\u224860 min \xB7 ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, st.doneCount, " of 4"), " steps done"), /* @__PURE__ */ React.createElement("span", { style: {
     padding: "3px 10px",
     borderRadius: 999,
     fontSize: 12,
@@ -280,19 +280,19 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
     background: t.streakBg,
     color: t.streakText,
     border: `1px solid ${t.streakBorder}`
-  } }, "\u{1F525} ", st.streak, " ", st.streak === 1 ? "d\xEDa" : "d\xEDas", " de racha")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 10 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, color: t.textMuted, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, "Fase ", st.currentPhase, " \xB7 ", phase?.title, " ", /* @__PURE__ */ React.createElement("span", { className: "jp" }, phase?.jp)), /* @__PURE__ */ React.createElement("span", { className: "mono" }, phasePassed, "/", phaseLessons.length)), /* @__PURE__ */ React.createElement(Bar, { t, value: phasePassed, max: phaseLessons.length })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, color: t.textMuted, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, "Lecciones aprobadas"), /* @__PURE__ */ React.createElement("span", { className: "mono" }, st.passedIds.length, "/", st.lessons.length)), /* @__PURE__ */ React.createElement(Bar, { t, value: st.passedIds.length, max: st.lessons.length })))), /* @__PURE__ */ React.createElement(StepCard, { t, n: "1", title: M("review", "title", "Repaso"), min: M("review", "min", 15), done: st.steps.review }, st.due.length ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "Tienes ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, st.due.length), " tarjeta", st.due.length === 1 ? "" : "s", " para repasar hoy."), /* @__PURE__ */ React.createElement(SmallBtn, { t, primary: true, onClick: startReview }, "Empezar repaso \u2192")) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted } }, st.seen.length ? "No hay repasos pendientes. \xA1Vas al d\xEDa!" : "A\xFAn no hay tarjetas para repasar. Empieza con la lecci\xF3n de hoy.")), /* @__PURE__ */ React.createElement(StepCard, { t, n: "2", title: M("lesson", "title", "Lecci\xF3n nueva"), min: M("lesson", "min", 20), done: st.steps.lesson }, st.passedToday ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "Hoy aprobaste ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, st.passedToday.id, " \xB7 ", st.passedToday.title), " \u{1F389}", nl && /* @__PURE__ */ React.createElement(React.Fragment, null, " Te sugerimos no adelantar la siguiente: ma\xF1ana el repaso pesar\xE1 m\xE1s.")), nl && /* @__PURE__ */ React.createElement(SmallBtn, { t, onClick: () => openLesson(nl.id) }, "Ver ", nl.id, " de todos modos")) : nl ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, nl.id, " \xB7 ", nl.title), " ", /* @__PURE__ */ React.createElement("span", { className: "jp" }, nl.jp), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 4 } }, "Tarjetas y luego examen. Apruebas con ", window.COURSE_PASS_PCT, "% o m\xE1s.")), /* @__PURE__ */ React.createElement(SmallBtn, { t, primary: true, onClick: () => openLesson(nl.id) }, "Abrir lecci\xF3n \u2192")) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted } }, "\xA1Terminaste las 28 lecciones! Sigue con el repaso diario y la escucha.")), /* @__PURE__ */ React.createElement(
+  } }, "\u{1F525} ", st.streak, "-day streak")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 10 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, color: t.textMuted, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, "Phase ", st.currentPhase, " \xB7 ", phase?.title, " ", /* @__PURE__ */ React.createElement("span", { className: "jp" }, phase?.jp)), /* @__PURE__ */ React.createElement("span", { className: "mono" }, phasePassed, "/", phaseLessons.length)), /* @__PURE__ */ React.createElement(Bar, { t, value: phasePassed, max: phaseLessons.length })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, color: t.textMuted, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, "Lessons passed"), /* @__PURE__ */ React.createElement("span", { className: "mono" }, st.passedIds.length, "/", st.lessons.length)), /* @__PURE__ */ React.createElement(Bar, { t, value: st.passedIds.length, max: st.lessons.length })))), /* @__PURE__ */ React.createElement(StepCard, { t, n: "1", title: M("review", "title", "Review"), min: M("review", "min", 15), done: st.steps.review }, st.due.length ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "You have ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, st.due.length), " card", st.due.length === 1 ? "" : "s", " to review today."), /* @__PURE__ */ React.createElement(SmallBtn, { t, primary: true, onClick: startReview }, "Start review \u2192")) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted } }, st.seen.length ? "No reviews due. You're all caught up!" : "No cards to review yet. Start with today's lesson.")), /* @__PURE__ */ React.createElement(StepCard, { t, n: "2", title: M("lesson", "title", "New lesson"), min: M("lesson", "min", 20), done: st.steps.lesson }, st.passedToday ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "You passed ", /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, st.passedToday.id, " \xB7 ", st.passedToday.title), " today \u{1F389}", nl && /* @__PURE__ */ React.createElement(React.Fragment, null, " We suggest not starting the next one: tomorrow's review will be heavier.")), nl && /* @__PURE__ */ React.createElement(SmallBtn, { t, onClick: () => openLesson(nl.id) }, "Open ", nl.id, " anyway")) : nl ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, /* @__PURE__ */ React.createElement("b", { style: { color: t.text } }, nl.id, " \xB7 ", nl.title), " ", /* @__PURE__ */ React.createElement("span", { className: "jp" }, nl.jp), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 4 } }, "Cards, then the exam. You pass with ", window.COURSE_PASS_PCT, "% or more.")), /* @__PURE__ */ React.createElement(SmallBtn, { t, primary: true, onClick: () => openLesson(nl.id) }, "Open lesson \u2192")) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted } }, "You finished all 28 lessons! Keep up the daily review and listening.")), /* @__PURE__ */ React.createElement(
     StepCard,
     {
       t,
       n: "3",
-      title: M("listen", "title", "Escucha"),
+      title: M("listen", "title", "Listening"),
       min: M("listen", "min", 15),
       done: st.steps.listen,
       onToggle: () => setDayFlag("listen", !st.steps.listen)
     },
-    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "Escucha y elige el significado. Luego sigue con un recurso de la fase."),
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 } }, /* @__PURE__ */ React.createElement(SmallBtn, { t, primary: true, onClick: startListen, disabled: !st.seen.length }, "\u266A Escuchar 15")),
-    !st.seen.length && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textFaint, marginBottom: 10 } }, "Se activa cuando hayas visto tarjetas del curso."),
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "Listen and pick the meaning. Then continue with a resource for this phase."),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 } }, /* @__PURE__ */ React.createElement(SmallBtn, { t, primary: true, onClick: startListen, disabled: !st.seen.length }, "\u266A Listen 15")),
+    !st.seen.length && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textFaint, marginBottom: 10 } }, "Unlocks once you've seen some course cards."),
     /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 6, marginBottom: 10 } }, links.map((l) => /* @__PURE__ */ React.createElement(
       "a",
       {
@@ -305,27 +305,27 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
       "\u2197 ",
       l.label
     ))),
-    /* @__PURE__ */ React.createElement("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: t.textMuted, cursor: "pointer" } }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: st.steps.listen, onChange: (e) => setDayFlag("listen", e.target.checked) }), "Ya escuch\xE9 15 minutos hoy")
+    /* @__PURE__ */ React.createElement("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: t.textMuted, cursor: "pointer" } }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: st.steps.listen, onChange: (e) => setDayFlag("listen", e.target.checked) }), "I listened for 15 minutes today")
   ), /* @__PURE__ */ React.createElement(
     StepCard,
     {
       t,
       n: "4",
-      title: M("speak", "title", "Habla"),
+      title: M("speak", "title", "Speaking"),
       min: M("speak", "min", 10),
       done: st.steps.speak,
       onToggle: () => setDayFlag("speak", !st.steps.speak)
     },
-    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "Shadowing: toca \u25B6, escucha y repite en voz alta al mismo ritmo. 3 veces cada una.", st.speakLesson && /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, " (", st.speakLesson.id, " \xB7 ", st.speakLesson.title, ")")),
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.textMuted, marginBottom: 10 } }, "Shadowing: tap \u25B6, listen and repeat out loud at the same pace. 3 times each.", st.speakLesson && /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, " (", st.speakLesson.id, " \xB7 ", st.speakLesson.title, ")")),
     /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 8, marginBottom: 12 } }, st.speakCards.map((c) => /* @__PURE__ */ React.createElement("div", { key: c.front, style: { display: "flex", gap: 10, alignItems: "center", minWidth: 0 } }, /* @__PURE__ */ React.createElement(PlayBtn, { t, onClick: () => speakForce(c.front) }), /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 17, color: t.text, overflowWrap: "anywhere" } }, c.front), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textMuted } }, c.back, " \xB7 ", /* @__PURE__ */ React.createElement("span", { className: "mono" }, c.romanji)))))),
-    /* @__PURE__ */ React.createElement("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: t.textMuted, cursor: "pointer" } }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: st.steps.speak, onChange: (e) => setDayFlag("speak", e.target.checked) }), "Ya practiqu\xE9 en voz alta hoy")
+    /* @__PURE__ */ React.createElement("label", { style: { display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: t.textMuted, cursor: "pointer" } }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: st.steps.speak, onChange: (e) => setDayFlag("speak", e.target.checked) }), "I practiced out loud today")
   ));
 }
 function AllLessonsView({ t, st, openLesson }) {
   return /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 22, minWidth: 0 } }, (window.COURSE_PHASES || []).map((ph) => {
     const ls = st.lessons.filter((L) => L.phase === ph.id);
     const passed = ls.filter((L) => st.lp[L.id]?.passed).length;
-    return /* @__PURE__ */ React.createElement("div", { key: ph.id }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: t.text, fontFamily: t.fontUi } }, "Fase ", ph.id, " \xB7 ", ph.title, " ", /* @__PURE__ */ React.createElement("span", { className: "jp", style: { fontWeight: 500, color: t.textMuted, fontSize: 15 } }, ph.jp)), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textFaint } }, passed, "/", ls.length)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: t.textMuted, marginBottom: 10 } }, ph.desc), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 8 } }, ls.map((L) => {
+    return /* @__PURE__ */ React.createElement("div", { key: ph.id }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: t.text, fontFamily: t.fontUi } }, "Phase ", ph.id, " \xB7 ", ph.title, " ", /* @__PURE__ */ React.createElement("span", { className: "jp", style: { fontWeight: 500, color: t.textMuted, fontSize: 15 } }, ph.jp)), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textFaint } }, passed, "/", ls.length)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: t.textMuted, marginBottom: 10 } }, ph.desc), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 8 } }, ls.map((L) => {
       const r = st.lp[L.id];
       const isNext = st.nextLesson && st.nextLesson.id === L.id;
       return /* @__PURE__ */ React.createElement(
@@ -347,7 +347,7 @@ function AllLessonsView({ t, st, openLesson }) {
         },
         /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textFaint, width: 30, flexShrink: 0 } }, L.id),
         /* @__PURE__ */ React.createElement("span", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("span", { style: { display: "block", fontSize: 15, fontWeight: 600, color: t.text, fontFamily: t.fontUi } }, L.title), /* @__PURE__ */ React.createElement("span", { className: "jp", style: { display: "block", fontSize: 13, color: t.textMuted, overflowWrap: "anywhere" } }, L.jp)),
-        r?.passed ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "success", size: "sm" }, "\u2713 ", r.best, "%") : isNext ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "accent", size: "sm" }, "Siguiente") : r?.best ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "warn", size: "sm" }, r.best, "%") : null
+        r?.passed ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "success", size: "sm" }, "\u2713 ", r.best, "%") : isNext ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "accent", size: "sm" }, "Next") : r?.best ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "warn", size: "sm" }, r.best, "%") : null
       );
     })));
   }));
@@ -366,8 +366,8 @@ function LessonView({ t, lesson, st, speakForce, startCourseDeck, onBack, openLe
       onClick: onBack,
       style: { padding: "7px 12px", borderRadius: 10, background: t.btnGhost, color: t.textMuted, fontSize: 13, fontWeight: 600, fontFamily: t.fontUi, marginBottom: 16 }
     },
-    "\u2190 Curso"
-  ), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase" } }, lesson.id, " \xB7 Fase ", lesson.phase, " \xB7 ", phase?.title), /* @__PURE__ */ React.createElement("h1", { className: "resp-screen-title", style: { margin: "6px 0 2px", fontWeight: 800, letterSpacing: -1, color: t.text, fontFamily: t.fontUi } }, lesson.title), /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 22, color: t.accent, marginBottom: 14 } }, lesson.jp), r?.passed ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "success", style: { marginBottom: 16 } }, "Aprobada \u2713 \xB7 mejor ", r.best, "%") : r?.best ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "warn", style: { marginBottom: 16 } }, "Mejor intento ", r.best, "% \xB7 necesitas ", pass, "%") : null, /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "18px 18px", marginBottom: 14 } }, lesson.intro.map((para, k) => /* @__PURE__ */ React.createElement("p", { key: k, style: { margin: k ? "12px 0 0" : 0, fontSize: 15, lineHeight: 1.6, color: t.textPrimary } }, para))), lesson.tip && /* @__PURE__ */ React.createElement("div", { style: {
+    "\u2190 Course"
+  ), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase" } }, lesson.id, " \xB7 Phase ", lesson.phase, " \xB7 ", phase?.title), /* @__PURE__ */ React.createElement("h1", { className: "resp-screen-title", style: { margin: "6px 0 2px", fontWeight: 800, letterSpacing: -1, color: t.text, fontFamily: t.fontUi } }, lesson.title), /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 22, color: t.accent, marginBottom: 14 } }, lesson.jp), r?.passed ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "success", style: { marginBottom: 16 } }, "Passed \u2713 \xB7 best ", r.best, "%") : r?.best ? /* @__PURE__ */ React.createElement(window.Pill, { t, tone: "warn", style: { marginBottom: 16 } }, "Best attempt ", r.best, "% \xB7 you need ", pass, "%") : null, /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "18px 18px", marginBottom: 14 } }, lesson.intro.map((para, k) => /* @__PURE__ */ React.createElement("p", { key: k, style: { margin: k ? "12px 0 0" : 0, fontSize: 15, lineHeight: 1.6, color: t.textPrimary } }, para))), lesson.tip && /* @__PURE__ */ React.createElement("div", { style: {
     padding: "12px 16px",
     borderRadius: 12,
     marginBottom: 18,
@@ -376,22 +376,22 @@ function LessonView({ t, lesson, st, speakForce, startCourseDeck, onBack, openLe
     fontSize: 14,
     color: t.text,
     lineHeight: 1.5
-  } }, "\u{1F4A1} ", /* @__PURE__ */ React.createElement("b", null, "Consejo:"), " ", lesson.tip), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 22 } }, /* @__PURE__ */ React.createElement(
+  } }, "\u{1F4A1} ", /* @__PURE__ */ React.createElement("b", null, "Tip:"), " ", lesson.tip), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 22 } }, /* @__PURE__ */ React.createElement(
     window.PrimaryButton,
     {
       t,
       style: { padding: "13px 22px" },
       onClick: () => startCourseDeck(window.shuffle(lesson.cards), "flashcard", { kind: "learn", lesson: lesson.id })
     },
-    "1 \xB7 Tarjetas"
+    "1 \xB7 Cards"
   ), /* @__PURE__ */ React.createElement(
     window.SecondaryButton,
     {
       t,
       onClick: () => startCourseDeck(window.shuffle(lesson.cards), "quiz", { kind: "quiz", lesson: lesson.id })
     },
-    "2 \xB7 Examen"
-  )), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 } }, lesson.cards.length, " tarjetas"), /* @__PURE__ */ React.createElement("div", { className: "surface", style: { marginBottom: 22, overflow: "hidden" } }, lesson.cards.map((c, k) => /* @__PURE__ */ React.createElement("div", { key: c.front, style: {
+    "2 \xB7 Exam"
+  )), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 } }, lesson.cards.length, " cards"), /* @__PURE__ */ React.createElement("div", { className: "surface", style: { marginBottom: 22, overflow: "hidden" } }, lesson.cards.map((c, k) => /* @__PURE__ */ React.createElement("div", { key: c.front, style: {
     display: "flex",
     gap: 12,
     alignItems: "center",

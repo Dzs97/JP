@@ -418,18 +418,18 @@ function FinishScreen(p) {
         const pass = window.COURSE_PASS_PCT || 70;
         return pct >= pass ? (
           <div style={{ marginBottom: 18, fontSize: 18, fontWeight: 700, color: t.success, fontFamily: t.fontUi }}>
-            Lección aprobada ✓
+            Lesson passed ✓
           </div>
         ) : (
           <div style={{ marginBottom: 18, fontSize: 15, color: t.warn, fontFamily: t.fontUi }}>
-            Te faltan {pass - pct} puntos para el {pass}%. ¡Repasa las tarjetas e inténtalo otra vez!
+            {pass - pct} points short of {pass}%. Review the cards and try again!
           </div>
         );
       })()}
 
       {courseCtx ? (
         <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-          <window.PrimaryButton t={t} onClick={backToCourse}>Volver al curso →</window.PrimaryButton>
+          <window.PrimaryButton t={t} onClick={backToCourse}>Back to course →</window.PrimaryButton>
         </div>
       ) : (
       <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>

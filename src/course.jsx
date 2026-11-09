@@ -1,13 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════
-//  Curso guiado — pantalla «Curso» (Hoy / Todas las lecciones / lección)
-//  Progreso en progress.course = { lessons: {...}, days: {...} }
+//  Guided course — "Course" screen (Today / All lessons / lesson view)
+//  Progress lives in progress.course = { lessons: {...}, days: {...} }
 // ═══════════════════════════════════════════════════════════════════════
 const { useState: useStateC, useMemo: useMemoC } = React;
 
 const COURSE_KEEP_DAYS = 120;
 const emptyDay = () => ({ review: false, lesson: false, listen: false, speak: false });
 
-// Remembers which view was open, so «Volver al curso» lands where you left off.
+// Remembers which view was open, so "Back to course" lands where you left off.
 const courseViewMemo = { tab: "today", lessonId: null };
 
 // ── Progress writer (called from app.jsx next() at session end) ─────────
@@ -113,7 +113,7 @@ function courseState(progress) {
 // ── Small UI pieces ──────────────────────────────────────────────────────
 function CheckDot({ t, done, onClick }) {
   return (
-    <button className="btn" onClick={onClick} disabled={!onClick} aria-label={done ? "Hecho" : "Pendiente"}
+    <button className="btn" onClick={onClick} disabled={!onClick} aria-label={done ? "Done" : "Pending"}
       style={{
         width: 28, height: 28, flexShrink: 0, borderRadius: 999,
         background: done ? t.success : "transparent",
@@ -129,7 +129,7 @@ function CheckDot({ t, done, onClick }) {
 
 function PlayBtn({ t, onClick }) {
   return (
-    <button className="btn" onClick={onClick} aria-label="Escuchar"
+    <button className="btn" onClick={onClick} aria-label="Play"
       style={{
         width: 34, height: 34, flexShrink: 0, borderRadius: 999,
         background: `${t.accent}14`, color: t.accent, fontSize: 13,
@@ -211,7 +211,7 @@ function CourseScreen(p) {
     <div className="fade-up" style={wrap}>
       {/* Inner tabs */}
       <div style={{ display: "flex", gap: 4, background: t.surfaceSunken, padding: 4, borderRadius: 12, marginBottom: 20, width: "fit-content", maxWidth: "100%" }}>
-        {[{ id: "today", label: "Hoy" }, { id: "all", label: "Todas las lecciones" }].map(x => (
+        {[{ id: "today", label: "Today" }, { id: "all", label: "All lessons" }].map(x => (
           <button key={x.id} className="btn" onClick={() => setTab(x.id)}
             style={{
               padding: "7px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: t.fontUi,
@@ -230,9 +230,9 @@ function CourseScreen(p) {
   );
 }
 
-// ── «Hoy» ────────────────────────────────────────────────────────────────
+// ── "Today" ────────────────────────────────────────────────────────────────
 function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson }) {
-  const dateStr = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+  const dateStr = new Date().toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" });
   const phase = (window.COURSE_PHASES || []).find(ph => ph.id === st.currentPhase);
   const phaseLessons = st.lessons.filter(L => L.phase === st.currentPhase);
   const phasePassed = phaseLessons.filter(L => st.lp[L.id]?.passed).length;
@@ -256,26 +256,26 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
       <div className="surface-raised" style={{ padding: "20px 18px" }}>
         <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>{dateStr}</div>
         <h1 className="resp-screen-title" style={{ margin: "6px 0 4px", fontWeight: 800, letterSpacing: -1, color: t.text, fontFamily: t.fontUi }}>
-          Tu plan de hoy
+          Your plan for today
         </h1>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", fontSize: 14, color: t.textMuted, marginBottom: 16 }}>
-          <span>≈60 min · <b style={{ color: t.text }}>{st.doneCount} de 4</b> pasos listos</span>
+          <span>≈60 min · <b style={{ color: t.text }}>{st.doneCount} of 4</b> steps done</span>
           <span style={{
             padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 700,
             background: t.streakBg, color: t.streakText, border: `1px solid ${t.streakBorder}`,
-          }}>🔥 {st.streak} {st.streak === 1 ? "día" : "días"} de racha</span>
+          }}>🔥 {st.streak}-day streak</span>
         </div>
         <div style={{ display: "grid", gap: 10 }}>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, color: t.textMuted, marginBottom: 5 }}>
-              <span>Fase {st.currentPhase} · {phase?.title} <span className="jp">{phase?.jp}</span></span>
+              <span>Phase {st.currentPhase} · {phase?.title} <span className="jp">{phase?.jp}</span></span>
               <span className="mono">{phasePassed}/{phaseLessons.length}</span>
             </div>
             <Bar t={t} value={phasePassed} max={phaseLessons.length} />
           </div>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12, color: t.textMuted, marginBottom: 5 }}>
-              <span>Lecciones aprobadas</span>
+              <span>Lessons passed</span>
               <span className="mono">{st.passedIds.length}/{st.lessons.length}</span>
             </div>
             <Bar t={t} value={st.passedIds.length} max={st.lessons.length} />
@@ -283,55 +283,55 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
         </div>
       </div>
 
-      {/* 1 · Repaso */}
-      <StepCard t={t} n="1" title={M("review", "title", "Repaso")} min={M("review", "min", 15)} done={st.steps.review}>
+      {/* 1 · Review */}
+      <StepCard t={t} n="1" title={M("review", "title", "Review")} min={M("review", "min", 15)} done={st.steps.review}>
         {st.due.length ? (
           <>
             <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 10 }}>
-              Tienes <b style={{ color: t.text }}>{st.due.length}</b> tarjeta{st.due.length === 1 ? "" : "s"} para repasar hoy.
+              You have <b style={{ color: t.text }}>{st.due.length}</b> card{st.due.length === 1 ? "" : "s"} to review today.
             </div>
-            <SmallBtn t={t} primary onClick={startReview}>Empezar repaso →</SmallBtn>
+            <SmallBtn t={t} primary onClick={startReview}>Start review →</SmallBtn>
           </>
         ) : (
           <div style={{ fontSize: 14, color: t.textMuted }}>
-            {st.seen.length ? "No hay repasos pendientes. ¡Vas al día!" : "Aún no hay tarjetas para repasar. Empieza con la lección de hoy."}
+            {st.seen.length ? "No reviews due. You're all caught up!" : "No cards to review yet. Start with today's lesson."}
           </div>
         )}
       </StepCard>
 
-      {/* 2 · Lección nueva */}
-      <StepCard t={t} n="2" title={M("lesson", "title", "Lección nueva")} min={M("lesson", "min", 20)} done={st.steps.lesson}>
+      {/* 2 · New lesson */}
+      <StepCard t={t} n="2" title={M("lesson", "title", "New lesson")} min={M("lesson", "min", 20)} done={st.steps.lesson}>
         {st.passedToday ? (
           <>
             <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 10 }}>
-              Hoy aprobaste <b style={{ color: t.text }}>{st.passedToday.id} · {st.passedToday.title}</b> 🎉
-              {nl && <> Te sugerimos no adelantar la siguiente: mañana el repaso pesará más.</>}
+              You passed <b style={{ color: t.text }}>{st.passedToday.id} · {st.passedToday.title}</b> today 🎉
+              {nl && <> We suggest not starting the next one: tomorrow's review will be heavier.</>}
             </div>
-            {nl && <SmallBtn t={t} onClick={() => openLesson(nl.id)}>Ver {nl.id} de todos modos</SmallBtn>}
+            {nl && <SmallBtn t={t} onClick={() => openLesson(nl.id)}>Open {nl.id} anyway</SmallBtn>}
           </>
         ) : nl ? (
           <>
             <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 10 }}>
               <b style={{ color: t.text }}>{nl.id} · {nl.title}</b> <span className="jp">{nl.jp}</span>
-              <div style={{ marginTop: 4 }}>Tarjetas y luego examen. Apruebas con {window.COURSE_PASS_PCT}% o más.</div>
+              <div style={{ marginTop: 4 }}>Cards, then the exam. You pass with {window.COURSE_PASS_PCT}% or more.</div>
             </div>
-            <SmallBtn t={t} primary onClick={() => openLesson(nl.id)}>Abrir lección →</SmallBtn>
+            <SmallBtn t={t} primary onClick={() => openLesson(nl.id)}>Open lesson →</SmallBtn>
           </>
         ) : (
-          <div style={{ fontSize: 14, color: t.textMuted }}>¡Terminaste las 28 lecciones! Sigue con el repaso diario y la escucha.</div>
+          <div style={{ fontSize: 14, color: t.textMuted }}>You finished all 28 lessons! Keep up the daily review and listening.</div>
         )}
       </StepCard>
 
-      {/* 3 · Escucha */}
-      <StepCard t={t} n="3" title={M("listen", "title", "Escucha")} min={M("listen", "min", 15)} done={st.steps.listen}
+      {/* 3 · Listening */}
+      <StepCard t={t} n="3" title={M("listen", "title", "Listening")} min={M("listen", "min", 15)} done={st.steps.listen}
         onToggle={() => setDayFlag("listen", !st.steps.listen)}>
         <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 10 }}>
-          Escucha y elige el significado. Luego sigue con un recurso de la fase.
+          Listen and pick the meaning. Then continue with a resource for this phase.
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
-          <SmallBtn t={t} primary onClick={startListen} disabled={!st.seen.length}>♪ Escuchar 15</SmallBtn>
+          <SmallBtn t={t} primary onClick={startListen} disabled={!st.seen.length}>♪ Listen 15</SmallBtn>
         </div>
-        {!st.seen.length && <div style={{ fontSize: 12, color: t.textFaint, marginBottom: 10 }}>Se activa cuando hayas visto tarjetas del curso.</div>}
+        {!st.seen.length && <div style={{ fontSize: 12, color: t.textFaint, marginBottom: 10 }}>Unlocks once you've seen some course cards.</div>}
         <div style={{ display: "grid", gap: 6, marginBottom: 10 }}>
           {links.map(l => (
             <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer"
@@ -342,15 +342,15 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
         </div>
         <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: t.textMuted, cursor: "pointer" }}>
           <input type="checkbox" checked={st.steps.listen} onChange={e => setDayFlag("listen", e.target.checked)} />
-          Ya escuché 15 minutos hoy
+          I listened for 15 minutes today
         </label>
       </StepCard>
 
-      {/* 4 · Habla */}
-      <StepCard t={t} n="4" title={M("speak", "title", "Habla")} min={M("speak", "min", 10)} done={st.steps.speak}
+      {/* 4 · Speaking */}
+      <StepCard t={t} n="4" title={M("speak", "title", "Speaking")} min={M("speak", "min", 10)} done={st.steps.speak}
         onToggle={() => setDayFlag("speak", !st.steps.speak)}>
         <div style={{ fontSize: 14, color: t.textMuted, marginBottom: 10 }}>
-          Shadowing: toca ▶, escucha y repite en voz alta al mismo ritmo. 3 veces cada una.
+          Shadowing: tap ▶, listen and repeat out loud at the same pace. 3 times each.
           {st.speakLesson && <span style={{ color: t.textFaint }}> ({st.speakLesson.id} · {st.speakLesson.title})</span>}
         </div>
         <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
@@ -366,14 +366,14 @@ function TodayView({ t, st, startCourseDeck, speakForce, setDayFlag, openLesson 
         </div>
         <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: t.textMuted, cursor: "pointer" }}>
           <input type="checkbox" checked={st.steps.speak} onChange={e => setDayFlag("speak", e.target.checked)} />
-          Ya practiqué en voz alta hoy
+          I practiced out loud today
         </label>
       </StepCard>
     </div>
   );
 }
 
-// ── «Todas las lecciones» ───────────────────────────────────────────────
+// ── "All lessons" ───────────────────────────────────────────────
 function AllLessonsView({ t, st, openLesson }) {
   return (
     <div style={{ display: "grid", gap: 22, minWidth: 0 }}>
@@ -384,7 +384,7 @@ function AllLessonsView({ t, st, openLesson }) {
           <div key={ph.id}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
               <div style={{ fontSize: 18, fontWeight: 800, color: t.text, fontFamily: t.fontUi }}>
-                Fase {ph.id} · {ph.title} <span className="jp" style={{ fontWeight: 500, color: t.textMuted, fontSize: 15 }}>{ph.jp}</span>
+                Phase {ph.id} · {ph.title} <span className="jp" style={{ fontWeight: 500, color: t.textMuted, fontSize: 15 }}>{ph.jp}</span>
               </div>
               <span className="mono" style={{ fontSize: 12, color: t.textFaint }}>{passed}/{ls.length}</span>
             </div>
@@ -407,7 +407,7 @@ function AllLessonsView({ t, st, openLesson }) {
                     {r?.passed
                       ? <window.Pill t={t} tone="success" size="sm">✓ {r.best}%</window.Pill>
                       : isNext
-                        ? <window.Pill t={t} tone="accent" size="sm">Siguiente</window.Pill>
+                        ? <window.Pill t={t} tone="accent" size="sm">Next</window.Pill>
                         : r?.best ? <window.Pill t={t} tone="warn" size="sm">{r.best}%</window.Pill> : null}
                   </button>
                 );
@@ -420,7 +420,7 @@ function AllLessonsView({ t, st, openLesson }) {
   );
 }
 
-// ── Vista de lección ────────────────────────────────────────────────────
+// ── Lesson view ────────────────────────────────────────────────────
 function LessonView({ t, lesson, st, speakForce, startCourseDeck, onBack, openLesson }) {
   const r = st.lp[lesson.id];
   const pass = window.COURSE_PASS_PCT || 70;
@@ -433,11 +433,11 @@ function LessonView({ t, lesson, st, speakForce, startCourseDeck, onBack, openLe
     <div className="fade-up" style={{ maxWidth: 760, margin: "0 auto", paddingTop: 24, minWidth: 0 }}>
       <button className="btn" onClick={onBack}
         style={{ padding: "7px 12px", borderRadius: 10, background: t.btnGhost, color: t.textMuted, fontSize: 13, fontWeight: 600, fontFamily: t.fontUi, marginBottom: 16 }}>
-        ← Curso
+        ← Course
       </button>
 
       <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase" }}>
-        {lesson.id} · Fase {lesson.phase} · {phase?.title}
+        {lesson.id} · Phase {lesson.phase} · {phase?.title}
       </div>
       <h1 className="resp-screen-title" style={{ margin: "6px 0 2px", fontWeight: 800, letterSpacing: -1, color: t.text, fontFamily: t.fontUi }}>
         {lesson.title}
@@ -445,8 +445,8 @@ function LessonView({ t, lesson, st, speakForce, startCourseDeck, onBack, openLe
       <div className="jp" style={{ fontSize: 22, color: t.accent, marginBottom: 14 }}>{lesson.jp}</div>
 
       {r?.passed
-        ? <window.Pill t={t} tone="success" style={{ marginBottom: 16 }}>Aprobada ✓ · mejor {r.best}%</window.Pill>
-        : r?.best ? <window.Pill t={t} tone="warn" style={{ marginBottom: 16 }}>Mejor intento {r.best}% · necesitas {pass}%</window.Pill> : null}
+        ? <window.Pill t={t} tone="success" style={{ marginBottom: 16 }}>Passed ✓ · best {r.best}%</window.Pill>
+        : r?.best ? <window.Pill t={t} tone="warn" style={{ marginBottom: 16 }}>Best attempt {r.best}% · you need {pass}%</window.Pill> : null}
 
       <div className="surface-raised" style={{ padding: "18px 18px", marginBottom: 14 }}>
         {lesson.intro.map((para, k) => (
@@ -457,23 +457,23 @@ function LessonView({ t, lesson, st, speakForce, startCourseDeck, onBack, openLe
       {lesson.tip && (
         <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 18,
           background: `${t.accent}10`, border: `1px solid ${t.accent}33`, fontSize: 14, color: t.text, lineHeight: 1.5 }}>
-          💡 <b>Consejo:</b> {lesson.tip}
+          💡 <b>Tip:</b> {lesson.tip}
         </div>
       )}
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 22 }}>
         <window.PrimaryButton t={t} style={{ padding: "13px 22px" }}
           onClick={() => startCourseDeck(window.shuffle(lesson.cards), "flashcard", { kind: "learn", lesson: lesson.id })}>
-          1 · Tarjetas
+          1 · Cards
         </window.PrimaryButton>
         <window.SecondaryButton t={t}
           onClick={() => startCourseDeck(window.shuffle(lesson.cards), "quiz", { kind: "quiz", lesson: lesson.id })}>
-          2 · Examen
+          2 · Exam
         </window.SecondaryButton>
       </div>
 
       <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>
-        {lesson.cards.length} tarjetas
+        {lesson.cards.length} cards
       </div>
       <div className="surface" style={{ marginBottom: 22, overflow: "hidden" }}>
         {lesson.cards.map((c, k) => (

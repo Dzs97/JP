@@ -175,7 +175,7 @@ function GlobalStyles({ t }) {
 function TopBar({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoiceOn, score, idx, deck, finished, exitTo = "home" }) {
   const inStudy = screen === "study" && !finished && deck?.length > 0;
   const tabs = [
-    { id: "course", label: "Curso" },
+    { id: "course", label: "Course" },
     { id: "home", label: "Study" },
     { id: "kana", label: "Kana" },
     { id: "kanji", label: "Kanji" },
