@@ -1,36 +1,21 @@
 // ═══════════════════════════════════════════════════════════════════════
 //  Cross-device sync via Vercel KV (/api/sync).
-//  Strategy: each install gets a "sync ID" stored in localStorage. Progress
-//  is mirrored to KV after every save (debounced) and pulled on startup +
-//  on tab focus. Last-write-wins by updatedAt. Plain-JS, no build step.
+//  Strategy: ONE shared record for every device (fixed GLOBAL_ID — no Sync ID
+//  to create or paste). Progress is mirrored to KV after every save
+//  (debounced) and pulled on startup + on tab focus. Last-write-wins by
+//  updatedAt. Plain-JS, no build step.
 // ═══════════════════════════════════════════════════════════════════════
 (function () {
   const h = React.createElement;
-  const { useState, useEffect, useRef } = React;
+  const { useState, useEffect } = React;
 
-  const SYNC_ID_KEY = "jp-sync-id";
+  // Every device reads/writes this same KV record: jp:progress:<GLOBAL_ID>
+  const GLOBAL_ID = "nihongo-main";
   const LOCAL_TS_KEY = "jp-sync-local-ts";
   const ENDPOINT = "/api/sync";
 
-  // ── Sync ID helpers ─────────────────────────────────────────────────
-  function newId() {
-    // 22-char URL-safe random ID (≈132 bits of entropy)
-    const arr = new Uint8Array(16);
-    crypto.getRandomValues(arr);
-    let s = "";
-    const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-    for (const b of arr) s += alpha[b % alpha.length];
-    return s.slice(0, 22);
-  }
-  function getId() {
-    try { return localStorage.getItem(SYNC_ID_KEY); } catch (_) { return null; }
-  }
-  function setId(id) {
-    try {
-      if (id) localStorage.setItem(SYNC_ID_KEY, id);
-      else localStorage.removeItem(SYNC_ID_KEY);
-    } catch (_) {}
-  }
+  // ── Sync ID: always the shared global record ────────────────────────
+  function getId() { return GLOBAL_ID; }
   function getLocalTs() {
     try { return Number(localStorage.getItem(LOCAL_TS_KEY)) || 0; } catch (_) { return 0; }
   }
@@ -41,7 +26,7 @@
   // ── Status bus (so the UI can react) ───────────────────────────────
   // status: "off" | "idle" | "pushing" | "pulling" | "ok" | "error"
   const bus = new EventTarget();
-  let _status = getId() ? "idle" : "off";
+  let _status = "idle";
   let _lastError = null;
   let _lastSyncedAt = 0;
   function setStatus(s, err) {
@@ -203,40 +188,7 @@
   }
 
   function SyncPanel({ t, status, onClose }) {
-    const [id, setIdState] = useState(getId() || "");
-    const [pasteId, setPasteId] = useState("");
     const [busy, setBusy] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const inputRef = useRef(null);
-
-    const enable = () => {
-      const nid = newId();
-      setId(nid); setIdState(nid); setStatus("idle");
-      // Push current state immediately
-      readLocalProgressString().then((s) => { if (s) schedulePush(s); });
-    };
-
-    const disable = () => {
-      if (!confirm("Disable sync? Your local progress stays. To resync this device later you'll need this Sync ID — copy it now if you might want to come back."))
-        return;
-      setId(null); setIdState(""); setStatus("off");
-    };
-
-    const useExisting = async () => {
-      const v = pasteId.trim();
-      if (!/^[A-Za-z0-9_-]{8,64}$/.test(v)) { alert("That doesn't look like a valid Sync ID."); return; }
-      if (!confirm("Pull progress from that Sync ID? This will OVERWRITE this device's progress.")) return;
-      setBusy(true);
-      try {
-        setId(v); setIdState(v);
-        await doPull({ force: true });
-      } finally { setBusy(false); }
-    };
-
-    const copy = async () => {
-      try { await navigator.clipboard.writeText(id); setCopied(true); setTimeout(() => setCopied(false), 1500); }
-      catch (_) { inputRef.current?.select(); }
-    };
 
     const syncNow = async () => {
       setBusy(true);
@@ -255,7 +207,7 @@
       h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 } },
         h("div", null,
           h("div", { style: { fontSize: 14, fontWeight: 700, color: t.text, fontFamily: t.fontUi, letterSpacing: -0.2 } }, "Cross-device sync"),
-          h("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" } }, "Vercel KV")
+          h("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" } }, "Vercel KV · automatic")
         ),
         h("button", { className: "btn", onClick: onClose,
           style: { width: 24, height: 24, borderRadius: 6, background: t.btnGhost, color: t.textMuted, fontSize: 13 } }, "×")
@@ -274,57 +226,15 @@
         status.error && h("div", { style: { marginTop: 4, color: t.danger } }, status.error)
       ),
 
-      !id && h("div", null,
-        h("p", { style: { fontSize: 12, color: t.textMuted, margin: "0 0 12px", lineHeight: 1.5 } },
-          "Get a Sync ID for this device, or paste an existing one to pull progress from another device."),
-        h("button", { className: "btn", onClick: enable,
-          style: { width: "100%", padding: "11px 16px", background: t.accent, color: t.onAccent,
-            borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: t.fontUi, marginBottom: 10 } },
-          "Create new Sync ID"),
-        h("div", { style: { display: "flex", gap: 6 } },
-          h("input", {
-            placeholder: "paste existing Sync ID…", value: pasteId,
-            onChange: (e) => setPasteId(e.target.value),
-            style: { flex: 1, padding: "10px 12px", background: t.inputBg, color: t.text,
-              border: `1px solid ${t.inputBorder}`, borderRadius: 10, fontSize: 12, fontFamily: t.fontMono, outline: "none" },
-          }),
-          h("button", { className: "btn", onClick: useExisting, disabled: busy,
-            style: { padding: "10px 14px", background: t.btnGhost, color: t.text, border: `1px solid ${t.btnGhostBorder}`,
-              borderRadius: 10, fontSize: 12, fontWeight: 600, fontFamily: t.fontUi } }, "Use")
-        )
-      ),
-
-      id && h("div", null,
-        h("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } },
-          "Your Sync ID — paste on other devices"),
-        h("div", { style: { display: "flex", gap: 6, marginBottom: 12 } },
-          h("input", {
-            ref: inputRef, value: id, readOnly: true,
-            onClick: (e) => e.target.select(),
-            style: { flex: 1, padding: "10px 12px", background: t.inputBg, color: t.text,
-              border: `1px solid ${t.inputBorder}`, borderRadius: 10,
-              fontSize: 12, fontFamily: t.fontMono, outline: "none", letterSpacing: 0.5 },
-          }),
-          h("button", { className: "btn", onClick: copy,
-            style: { padding: "10px 14px", background: copied ? t.success : t.btnGhost, color: copied ? t.onAccent : t.text,
-              border: `1px solid ${copied ? t.success : t.btnGhostBorder}`,
-              borderRadius: 10, fontSize: 11, fontWeight: 600, fontFamily: t.fontMono } },
-            copied ? "✓" : "copy")
-        ),
-        h("div", { style: { display: "flex", gap: 6 } },
-          h("button", { className: "btn", onClick: syncNow, disabled: busy,
-            style: { flex: 1, padding: "10px 12px", background: t.accent, color: t.onAccent,
-              borderRadius: 10, fontSize: 12, fontWeight: 700, fontFamily: t.fontUi } }, "Sync now"),
-          h("button", { className: "btn", onClick: disable,
-            style: { padding: "10px 12px", background: t.dangerBg, color: t.danger, border: `1px solid ${t.dangerBorder}`,
-              borderRadius: 10, fontSize: 12, fontWeight: 600, fontFamily: t.fontUi } }, "Disable")
-        ),
-        h("p", { style: { fontSize: 10, color: t.textFaint, margin: "12px 0 0", lineHeight: 1.5 } },
-          "Treat the Sync ID like a password — anyone with it can read or overwrite your progress.")
-      )
+      h("p", { style: { fontSize: 12, color: t.textMuted, margin: "0 0 12px", lineHeight: 1.5 } },
+        "Your progress saves to the cloud automatically and is the same on all your devices. No code needed."),
+      h("button", { className: "btn", onClick: syncNow, disabled: busy,
+        style: { width: "100%", padding: "11px 16px", background: t.accent, color: t.onAccent,
+          borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: t.fontUi } },
+        busy ? "Syncing…" : "Sync now")
     );
   }
 
   window.SyncChip = SyncChip;
-  window.kvSync = { getId, setId, doPull, doPush, schedulePush, getStatus };
+  window.kvSync = { getId, doPull, doPush, schedulePush, getStatus };
 })();
