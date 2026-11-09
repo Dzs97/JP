@@ -2,7 +2,7 @@
 // Strategy: stale-while-revalidate for same-origin assets (instant from cache,
 // refreshed in the background so deploys land on the next load); network-first
 // for navigations.
-const VERSION = "v3";
+const VERSION = "v6"; // above main's v5, so old cache-first caches are cleared on activate
 const SHELL = `nihongo-shell-${VERSION}`; // single cache: background refreshes overwrite precached copies
 
 const PRECACHE = [
@@ -19,11 +19,13 @@ const PRECACHE = [
   "/src/lang.js",
   "/src/engine.js",
   "/src/theme.js",
+  "/src/course-data.js",
   "/src-compiled/ui.js",
   "/src-compiled/features.js",
   "/src-compiled/home.js",
   "/src-compiled/study.js",
   "/src-compiled/screens.js",
+  "/src-compiled/course.js",
   "/src-compiled/app.js",
   "/src/extra-modes.js",
   "/src/extras-quickwins.js",

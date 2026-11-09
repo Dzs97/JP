@@ -18,7 +18,9 @@
   const JOINED_KEY = window.userKey("jp-sync-joined");
   const ENDPOINT = "/api/sync";
 
-  const getId = () => `nihongo-${window.getUser().toLowerCase()}`;
+  // The first user (Diego) keeps the shared record main already syncs to, so
+  // progress uploaded before users existed stays his; others get their own.
+  const getId = () => window.getUser() === window.USERS[0] ? "nihongo-main" : `nihongo-${window.getUser().toLowerCase()}`;
   const isJoined = () => { try { return localStorage.getItem(JOINED_KEY) === "1"; } catch (_) { return false; } };
   const setJoined = () => { try { localStorage.setItem(JOINED_KEY, "1"); } catch (_) {} };
   function getLocalTs() {

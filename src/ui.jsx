@@ -306,10 +306,11 @@ function Icon({ name, size = 18, strokeWidth = 2 }) {
 // `utilities` (user, sync, furigana, audio) live in the sidebar footer, or
 // in the "more" sheet on phones, instead of floating over the content.
 function AppShell({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoiceOn,
-                    score, idx, deck, finished, utilities, children }) {
+                    score, idx, deck, finished, exitTo = "home", utilities, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const inStudy = screen === "study" && !finished && deck?.length > 0;
   const tabs = [
+    { id: "course",   label: "Course",   glyph: "道" },
     { id: "home",     label: "Study",    glyph: "学" },
     { id: "kana",     label: "Kana",     glyph: "あ" },
     { id: "kanji",    label: "Kanji",    glyph: "漢" },
@@ -323,7 +324,7 @@ function AppShell({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoi
   return (
     <div className="shell">
       <aside className="rail">
-        <button className="btn rail-brand" onClick={() => go("home")} aria-label="Nihongo Study, home">
+        <button className="btn rail-brand" onClick={() => go("course")} aria-label="Nihongo Study, course">
           <span className="hanko" aria-hidden="true">日</span>
           <span className="rail-brand-text">
             <b>Nihongo</b>
@@ -333,7 +334,7 @@ function AppShell({ t, screen, setScreen, darkMode, setDarkMode, voiceOn, setVoi
 
         {inStudy ? (
           <div className="rail-hud">
-            <button className="btn" onClick={() => go("home")}
+            <button className="btn" onClick={() => go(exitTo)}
               style={{ display: "inline-flex", alignItems: "center", gap: 4, minHeight: 40, padding: "0 12px",
                 borderRadius: 10, background: t.surfaceBg, border: `1px solid ${t.surfaceBorder}`,
                 color: t.textMuted, fontSize: 13, fontWeight: 600, fontFamily: t.fontUi, alignSelf: "flex-start" }}>

@@ -20,7 +20,7 @@ function App() {
   const [showKeyboardHints, setShowKeyboardHints] = useState(TWEAKS.showKeyboardHints);
   const [tweaksOpen, setTweaksOpen] = useState(false);
   const [tweaksAvailable, setTweaksAvailable] = useState(false);
-  const [screen, setScreen] = useState("home");
+  const [screen, setScreen] = useState("course");
   const [kanaSection, setKanaSection] = useState("hiragana");
   const [kanaQuizPool, setKanaQuizPool] = useState([]);
   const [kanaQuizIdx, setKanaQuizIdx] = useState(0);
@@ -48,6 +48,8 @@ function App() {
   const [buildResult, setBuildResult] = useState(null);
   const [sessionStart, setSessionStart] = useState(null);
   const [finished, setFinished] = useState(false);
+  const [courseCtx, setCourseCtx] = useState(null);
+  const activeMode = courseCtx ? courseCtx.mode : mode;
   const [showRomanji, setShowRomanji] = useState(true);
   const [voiceOn, setVoiceOn] = useState(true);
   const [progress, setProgress] = useState(window.emptyProgress());
@@ -182,10 +184,10 @@ function App() {
       setVoiceState((s) => ({ ...s, needsUnlock: false }));
     };
     const opts = { once: true, passive: true };
-    window.addEventListener("pointerdown", unlock, opts);
+    window.addEventListener("click", unlock, opts);
     window.addEventListener("keydown", unlock, opts);
     return () => {
-      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("click", unlock);
       window.removeEventListener("keydown", unlock);
     };
   }, [voiceState.needsUnlock]);
@@ -289,6 +291,7 @@ function App() {
     setBuildSelected([]);
     setBuildResult(null);
     setFinished(false);
+    setCourseCtx(null);
     setSessionStart(Date.now());
     setScreen("study");
   }, [buildSessionDeck]);
@@ -313,6 +316,7 @@ function App() {
     setBuildSelected([]);
     setBuildResult(null);
     setFinished(false);
+    setCourseCtx(null);
     setSessionStart(Date.now());
     setScreen("study");
   }, [progress]);
@@ -331,32 +335,64 @@ function App() {
     setBuildSelected([]);
     setBuildResult(null);
     setFinished(false);
+    setCourseCtx(null);
     setSessionStart(Date.now());
     setScreen("study");
   }, [progress]);
+  const startCourseDeck = useCallback((cards, deckMode, ctx) => {
+    if (!cards || cards.length === 0) return;
+    setDeck(cards);
+    setIdx(0);
+    setFlipped(false);
+    setScore({ correct: 0, incorrect: 0 });
+    setQuizSelected(null);
+    setWriteInput("");
+    setWriteResult(null);
+    setListenRevealed(false);
+    setListenSelected(null);
+    setBuildSelected([]);
+    setBuildResult(null);
+    setFinished(false);
+    setCourseCtx({ ...ctx || {}, mode: deckMode });
+    setSessionStart(Date.now());
+    setScreen("study");
+  }, []);
+  const backToCourse = useCallback(() => {
+    setFinished(false);
+    setCourseCtx(null);
+    setScreen("course");
+  }, []);
+  useEffect(() => {
+    if (screen !== "study") {
+      setFinished(false);
+      setCourseCtx(null);
+    }
+  }, [screen]);
   useEffect(() => {
     if (!card || screen !== "study") return;
-    if (mode === "quiz" || mode === "speed") {
-      setQuizOptions(window.shuffle([card.back, ...window.getWrongChoices(card, window.ALL_CARDS)]));
+    const pool = window.distractorPoolFor ? window.distractorPoolFor(card) : window.ALL_CARDS;
+    if (activeMode === "quiz" || activeMode === "speed") {
+      setQuizOptions(window.shuffle([card.back, ...window.getWrongChoices(card, pool)]));
       setQuizSelected(null);
     }
-    if (mode === "listen") {
-      setListenOptions(window.shuffle([card.back, ...window.getWrongChoices(card, window.ALL_CARDS)]));
+    if (activeMode === "listen") {
+      setListenOptions(window.shuffle([card.back, ...window.getWrongChoices(card, pool)]));
       setListenSelected(null);
       setListenRevealed(false);
     }
-    if (mode === "build") {
+    if (activeMode === "build") {
       const chunks = window.tokenizeSentence(card.front);
       setBuildTokens(window.shuffle(chunks.map((text, i) => ({ id: i, text }))));
       setBuildSelected([]);
       setBuildResult(null);
     }
-  }, [idx, mode, deck, screen]);
+  }, [idx, activeMode, deck, screen]);
   useEffect(() => {
     if (!card || screen !== "study" || !voiceOn) return;
+    if (activeMode === "quiz" && card.kind === "kana") return;
     const timer = setTimeout(() => speak(card.front), 300);
     return () => clearTimeout(timer);
-  }, [idx, screen, voiceOn, card, speak]);
+  }, [idx, screen, voiceOn, card, speak, activeMode]);
   const next = useCallback((rating) => {
     let r = rating;
     if (typeof rating === "boolean") r = rating ? "good" : "again";
@@ -389,7 +425,7 @@ function App() {
         date: (/* @__PURE__ */ new Date()).toLocaleDateString(),
         score: pct,
         cards: deck.length,
-        mode,
+        mode: activeMode,
         duration
       });
       if (up.history.length > 50) up.history = up.history.slice(-50);
@@ -401,6 +437,7 @@ function App() {
         up.streakDays = up.lastStudied === y ? (up.streakDays || 0) + 1 : 1;
         up.lastStudied = todayStr;
       }
+      if (courseCtx && window.courseRecord) window.courseRecord(up, courseCtx, pct);
       saveProgress(up);
       setFinished(true);
     } else {
@@ -415,12 +452,12 @@ function App() {
       setBuildSelected([]);
       setBuildResult(null);
     }
-  }, [idx, deck, card, score, progress, mode, sessionStart, saveProgress]);
+  }, [idx, deck, card, score, progress, activeMode, courseCtx, sessionStart, saveProgress]);
   useEffect(() => {
     if (screen !== "study" || finished) return;
     const h = (e) => {
       if (e.target.tagName === "INPUT") return;
-      if (mode === "flashcard") {
+      if (activeMode === "flashcard") {
         if (e.key === " ") {
           e.preventDefault();
           setFlipped((f) => !f);
@@ -469,8 +506,11 @@ function App() {
     showKeyboardHints,
     screen,
     setScreen,
-    mode,
+    mode: activeMode,
     setMode,
+    startCourseDeck,
+    backToCourse,
+    courseCtx,
     categories,
     setCategories,
     toggleCat,
@@ -557,6 +597,7 @@ function App() {
       idx,
       deck,
       finished,
+      exitTo: courseCtx ? "course" : "home",
       utilities: /* @__PURE__ */ React.createElement(React.Fragment, null, window.UserChip && /* @__PURE__ */ React.createElement(window.UserChip, { t }), window.SyncChip && /* @__PURE__ */ React.createElement(window.SyncChip, { t }), window.FuriganaToggle && /* @__PURE__ */ React.createElement(window.FuriganaToggle, { t }), /* @__PURE__ */ React.createElement(window.AudioDebug, { t, voiceState, voiceRef, speechLog, doSpeak }))
     },
     /* @__PURE__ */ React.createElement("main", { className: "resp-main-pad" }, voiceState.ready && !voiceState.hasJapanese && !voiceState.warnDismissed && /* @__PURE__ */ React.createElement("div", { style: {
@@ -578,10 +619,17 @@ function App() {
       },
       "Dismiss"
     )), voiceState.needsUnlock && voiceState.hasJapanese && /* @__PURE__ */ React.createElement("div", { style: {
-      maxWidth: 1080,
-      margin: "16px auto 0",
+      position: "fixed",
+      left: "50%",
+      bottom: "calc(84px + env(safe-area-inset-bottom, 0px))",
+      transform: "translateX(-50%)",
+      width: "calc(100% - 32px)",
+      maxWidth: 420,
+      zIndex: 40,
+      pointerEvents: "none",
       padding: "10px 14px",
-      background: `${t.accent}14`,
+      background: t.surfaceBg,
+      boxShadow: t.shadowFloating,
       border: `1px solid ${t.accent}40`,
       borderRadius: 12,
       display: "flex",
@@ -589,7 +637,7 @@ function App() {
       gap: 10,
       fontSize: 12,
       color: t.text
-    } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontSize: 18, color: t.accent } }, "\u266A"), /* @__PURE__ */ React.createElement("span", null, "Tap anywhere to enable audio playback.")), screen === "home" && !finished && /* @__PURE__ */ React.createElement(window.HomeScreen, { ...screenProps }), screen === "study" && !finished && /* @__PURE__ */ React.createElement(window.StudyScreen, { ...screenProps }), screen === "progress" && /* @__PURE__ */ React.createElement(window.ProgressScreen, { ...screenProps }), screen === "kana" && /* @__PURE__ */ React.createElement(window.KanaScreen, { ...screenProps }), screen === "kanji" && /* @__PURE__ */ React.createElement(window.KanjiScreen, { ...screenProps }), screen === "grammar" && /* @__PURE__ */ React.createElement(window.GrammarScreen, { ...screenProps }), finished && /* @__PURE__ */ React.createElement(window.FinishScreen, { ...screenProps }))
+    } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontSize: 18, color: t.accent } }, "\u266A"), /* @__PURE__ */ React.createElement("span", null, "Tap anywhere to enable audio playback.")), screen === "course" && !finished && window.CourseScreen && /* @__PURE__ */ React.createElement(window.CourseScreen, { ...screenProps }), screen === "home" && !finished && /* @__PURE__ */ React.createElement(window.HomeScreen, { ...screenProps }), screen === "study" && !finished && /* @__PURE__ */ React.createElement(window.StudyScreen, { ...screenProps }), screen === "progress" && /* @__PURE__ */ React.createElement(window.ProgressScreen, { ...screenProps }), screen === "kana" && /* @__PURE__ */ React.createElement(window.KanaScreen, { ...screenProps }), screen === "kanji" && /* @__PURE__ */ React.createElement(window.KanjiScreen, { ...screenProps }), screen === "grammar" && /* @__PURE__ */ React.createElement(window.GrammarScreen, { ...screenProps }), finished && /* @__PURE__ */ React.createElement(window.FinishScreen, { ...screenProps }))
   ), tweaksAvailable && tweaksOpen && /* @__PURE__ */ React.createElement(
     window.TweaksPanel,
     {

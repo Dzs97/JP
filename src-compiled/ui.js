@@ -317,12 +317,14 @@ function AppShell({
   idx,
   deck,
   finished,
+  exitTo = "home",
   utilities,
   children
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const inStudy = screen === "study" && !finished && deck?.length > 0;
   const tabs = [
+    { id: "course", label: "Course", glyph: "\u9053" },
     { id: "home", label: "Study", glyph: "\u5B66" },
     { id: "kana", label: "Kana", glyph: "\u3042" },
     { id: "kanji", label: "Kanji", glyph: "\u6F22" },
@@ -335,11 +337,11 @@ function AppShell({
   };
   const voiceLabel = voiceOn ? "Mute audio" : "Unmute audio";
   const themeLabel = darkMode ? "Light mode" : "Dark mode";
-  return /* @__PURE__ */ React.createElement("div", { className: "shell" }, /* @__PURE__ */ React.createElement("aside", { className: "rail" }, /* @__PURE__ */ React.createElement("button", { className: "btn rail-brand", onClick: () => go("home"), "aria-label": "Nihongo Study, home" }, /* @__PURE__ */ React.createElement("span", { className: "hanko", "aria-hidden": "true" }, "\u65E5"), /* @__PURE__ */ React.createElement("span", { className: "rail-brand-text" }, /* @__PURE__ */ React.createElement("b", null, "Nihongo"), /* @__PURE__ */ React.createElement("small", null, window.getUser ? window.getUser() : "study", " \xB7 \u5B66\u7FD2"))), inStudy ? /* @__PURE__ */ React.createElement("div", { className: "rail-hud" }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { className: "shell" }, /* @__PURE__ */ React.createElement("aside", { className: "rail" }, /* @__PURE__ */ React.createElement("button", { className: "btn rail-brand", onClick: () => go("course"), "aria-label": "Nihongo Study, course" }, /* @__PURE__ */ React.createElement("span", { className: "hanko", "aria-hidden": "true" }, "\u65E5"), /* @__PURE__ */ React.createElement("span", { className: "rail-brand-text" }, /* @__PURE__ */ React.createElement("b", null, "Nihongo"), /* @__PURE__ */ React.createElement("small", null, window.getUser ? window.getUser() : "study", " \xB7 \u5B66\u7FD2"))), inStudy ? /* @__PURE__ */ React.createElement("div", { className: "rail-hud" }, /* @__PURE__ */ React.createElement(
     "button",
     {
       className: "btn",
-      onClick: () => go("home"),
+      onClick: () => go(exitTo),
       style: {
         display: "inline-flex",
         alignItems: "center",

@@ -129,6 +129,7 @@ const emptyProgress = () => ({
   mistakeQueue: [],   // card fronts that were missed, FIFO
   dailyGoal: 20,
   onboardingDone: false,
+  course: { lessons: {}, days: {} }, // guided course (course.jsx)
 });
 
 // Backfill missing fields onto loaded progress so older save shapes still work.
@@ -148,6 +149,10 @@ function migrateProgress(p) {
     dayLog: { ...base.dayLog, ...(p.dayLog || {}) },
     history: Array.isArray(p.history) ? p.history : [],
     mistakeQueue: Array.isArray(p.mistakeQueue) ? p.mistakeQueue : [],
+    course: {
+      lessons: { ...((p.course && p.course.lessons) || {}) },
+      days: { ...((p.course && p.course.days) || {}) },
+    },
   };
 }
 

@@ -59,7 +59,7 @@ assert.equal(win.kvSync.getId(), "nihongo-mariana");
 store["jp-user"] = "Someone";
 assert.equal(win.getUser(), "Diego");
 delete store["jp-user"];
-assert.equal(win.kvSync.getId(), "nihongo-diego");
+assert.equal(win.kvSync.getId(), "nihongo-main"); // the record main already syncs to
 assert.match(win.kvSync.getId(), /^[A-Za-z0-9_-]{8,64}$/); // must pass the server's ID check
 
 console.log("✓ sync + migration + user checks passed");
