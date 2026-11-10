@@ -57,17 +57,7 @@ function courseState(progress) {
   });
   const seen = [...seenMap.values()];
   const due = seen.filter((c) => window.isDue(progress.cardStats[window.cardKey(c)])).sort((a, b) => (progress.cardStats[window.cardKey(a)]?.due || 0) - (progress.cardStats[window.cardKey(b)]?.due || 0)).slice(0, 60);
-  const anyDone = (d) => d && (d.review || d.lesson || d.listen || d.speak);
-  let streak = 0;
-  const cur = /* @__PURE__ */ new Date();
-  cur.setHours(12, 0, 0, 0);
-  if (!anyDone(days[today])) cur.setDate(cur.getDate() - 1);
-  for (let i = 0; i < COURSE_KEEP_DAYS; i++) {
-    const k = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, "0")}-${String(cur.getDate()).padStart(2, "0")}`;
-    if (!anyDone(days[k])) break;
-    streak += 1;
-    cur.setDate(cur.getDate() - 1);
-  }
+  const streak = window.currentStreak(progress);
   const speakLesson = passedToday || lastPassed || nextLesson || lessons[0];
   let speakCards = [];
   if (speakLesson) {
@@ -206,6 +196,7 @@ function CourseScreen(p) {
     up.course.days = up.course.days || {};
     const k = window.todayKey();
     up.course.days[k] = { ...emptyDay(), ...up.course.days[k] || {}, [field]: value };
+    if (value) window.markStudied(up);
     setProgress(up);
   };
   const lesson = lessonId ? st.lessons.find((L) => L.id === lessonId) : null;

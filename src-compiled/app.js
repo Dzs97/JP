@@ -415,14 +415,7 @@ function App() {
     if (!up.dayLog[today]) up.dayLog[today] = { cards: 0, correct: 0 };
     up.dayLog[today].cards += 1;
     up.dayLog[today].correct += wasCorrect ? 1 : 0;
-    const todayStr = (/* @__PURE__ */ new Date()).toDateString();
-    if (up.lastStudied !== todayStr) {
-      const yd = /* @__PURE__ */ new Date();
-      yd.setDate(yd.getDate() - 1);
-      up.streakDays = up.lastStudied === yd.toDateString() ? (up.streakDays || 0) + 1 : 1;
-      up.lastStudied = todayStr;
-      up.bestStreak = Math.max(up.bestStreak || 0, up.streakDays);
-    }
+    window.markStudied(up);
     if (!wasCorrect) {
       const q = up.mistakeQueue || [];
       up.mistakeQueue = [card.front, ...q.filter((x) => x !== card.front)].slice(0, 50);

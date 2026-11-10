@@ -75,17 +75,7 @@ function courseState(progress) {
     .sort((a, b) => (progress.cardStats[window.cardKey(a)]?.due || 0) - (progress.cardStats[window.cardKey(b)]?.due || 0))
     .slice(0, 60);
 
-  // Streak: consecutive days with at least one step done (today counts if any).
-  const anyDone = (d) => d && (d.review || d.lesson || d.listen || d.speak);
-  let streak = 0;
-  const cur = new Date(); cur.setHours(12, 0, 0, 0);
-  if (!anyDone(days[today])) cur.setDate(cur.getDate() - 1);
-  for (let i = 0; i < COURSE_KEEP_DAYS; i++) {
-    const k = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, "0")}-${String(cur.getDate()).padStart(2, "0")}`;
-    if (!anyDone(days[k])) break;
-    streak += 1;
-    cur.setDate(cur.getDate() - 1);
-  }
+  const streak = window.currentStreak(progress); // one shared streak with the rest of the app
 
   const speakLesson = passedToday || lastPassed || nextLesson || lessons[0];
   let speakCards = [];
@@ -196,6 +186,7 @@ function CourseScreen(p) {
     up.course.days = up.course.days || {};
     const k = window.todayKey();
     up.course.days[k] = { ...emptyDay(), ...(up.course.days[k] || {}), [field]: value };
+    if (value) window.markStudied(up);
     setProgress(up);
   };
 

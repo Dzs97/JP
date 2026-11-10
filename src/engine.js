@@ -169,6 +169,16 @@ function currentStreak(p) {
   return alive ? (p.streakDays || 0) : 0;
 }
 
+// Any study today (a card answer or a course step) keeps the streak going. Mutates p.
+function markStudied(p) {
+  const todayStr = new Date().toDateString();
+  if (p.lastStudied === todayStr) return;
+  const yd = new Date(); yd.setDate(yd.getDate() - 1); // calendar day, safe across DST changes
+  p.streakDays = p.lastStudied === yd.toDateString() ? (p.streakDays || 0) + 1 : 1;
+  p.lastStudied = todayStr;
+  p.bestStreak = Math.max(p.bestStreak || 0, p.streakDays);
+}
+
 // ── SRS forecast: count of cards due on each of the next N days ────────
 function forecastDueByDay(cardStats, days = 14) {
   const now = Date.now();
@@ -297,6 +307,6 @@ Object.assign(window, {
   DAY_MS,
   forecastDueByDay, pushMistake, clearMistake,
   conjugateMasu, makeClozeFromSentence,
-  migrateProgress, isMastered, currentStreak,
+  migrateProgress, isMastered, currentStreak, markStudied,
   USERS, getUser, userKey, switchUser,
 });

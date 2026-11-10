@@ -75,6 +75,12 @@ assert.equal(win.currentStreak({ streakDays: 4, lastStudied: dayStr(0) }), 4);
 assert.equal(win.currentStreak({ streakDays: 4, lastStudied: dayStr(1) }), 4);
 assert.equal(win.currentStreak({ streakDays: 4, lastStudied: dayStr(2) }), 0);
 assert.equal(win.migrateProgress({ streakDays: 6 }).bestStreak, 6);
+const sp = { streakDays: 4, lastStudied: dayStr(1), bestStreak: 4 };
+win.markStudied(sp); win.markStudied(sp);           // a course step or answer today extends once
+assert.equal(sp.streakDays, 5); assert.equal(sp.bestStreak, 5);
+const broken = { streakDays: 9, lastStudied: dayStr(3), bestStreak: 9 };
+win.markStudied(broken);
+assert.equal(broken.streakDays, 1); assert.equal(broken.bestStreak, 9);
 
 // Badges: awarded once, kept forever, returned only when new.
 const p = win.migrateProgress({ totalAnswered: 120, bestStreak: 3,

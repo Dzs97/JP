@@ -420,14 +420,7 @@ function App() {
     up.dayLog[today].cards += 1;
     up.dayLog[today].correct += wasCorrect ? 1 : 0;
 
-    // Streak: any answer today keeps it going (not only finishing a session)
-    const todayStr = new Date().toDateString();
-    if (up.lastStudied !== todayStr) {
-      const yd = new Date(); yd.setDate(yd.getDate() - 1); // calendar day, safe across DST changes
-      up.streakDays = up.lastStudied === yd.toDateString() ? (up.streakDays || 0) + 1 : 1;
-      up.lastStudied = todayStr;
-      up.bestStreak = Math.max(up.bestStreak || 0, up.streakDays);
-    }
+    window.markStudied(up);
 
     // Mistake queue bookkeeping
     if (!wasCorrect) {
