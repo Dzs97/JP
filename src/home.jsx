@@ -51,6 +51,9 @@ function HomeScreen(p) {
 
   const user = window.getUser ? window.getUser() : null;
   const goalHit = todayCards >= dailyGoal;
+  const daru = window.mascotState ? window.mascotState(progress, todayCards, dailyGoal) : null;
+  const streak = window.currentStreak(progress);
+  const badgeCount = Object.keys(progress.badges || {}).length;
   const activeMode = modes.find(m => m.id === mode);
   const deckSize = sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection;
   const stat = (label, jp, value, sub, color) => (
@@ -91,11 +94,20 @@ function HomeScreen(p) {
       <section className="resp-grid-12" style={{ marginBottom: 24 }}>
         <div className="surface-raised" style={{ padding: "26px 28px", position: "relative", overflow: "hidden",
           display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
-          {window.DailyGoalRing && <window.DailyGoalRing t={t} today={todayCards} goal={dailyGoal} size={112} />}
-          <div style={{ flex: 1, minWidth: 200, position: "relative", zIndex: 1 }}>
-            <window.Eyebrow t={t}>Daily goal · 目標</window.Eyebrow>
-            <div style={{ margin: "6px 0 16px", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, color: goalHit ? t.success : t.text, letterSpacing: -0.3 }}>
-              {goalHit ? "Goal reached. お疲れさま！" : `${dailyGoal - todayCards} cards to go today`}
+          <div style={{ flex: 1, minWidth: 240, position: "relative", zIndex: 1 }}>
+            {daru && window.Mascot
+              ? <window.Mascot t={t} mood={daru.mood} message={daru.msg} size={96} bounce={goalHit} />
+              : null}
+            <div style={{ margin: "18px 0 16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: t.textMuted, marginBottom: 6 }}>
+                <span>Daily goal · 目標</span>
+                <span className="mono" style={{ color: goalHit ? t.success : t.text, fontWeight: 700 }}>{todayCards} / {dailyGoal}</span>
+              </div>
+              <div role="progressbar" aria-label="Daily goal" aria-valuemin={0} aria-valuemax={dailyGoal} aria-valuenow={Math.min(todayCards, dailyGoal)}
+                style={{ height: 8, borderRadius: 999, background: t.progressTrack, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${Math.min(100, (todayCards / dailyGoal) * 100)}%`,
+                  background: goalHit ? t.success : t.accent, borderRadius: 999, transition: "width 0.6s cubic-bezier(.2,.7,.2,1)" }} />
+              </div>
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <window.PrimaryButton t={t} onClick={startStudy}>Start session →</window.PrimaryButton>
@@ -118,10 +130,34 @@ function HomeScreen(p) {
         </div>
 
         <div className="surface-raised" style={{ padding: "22px 24px" }}>
-          {stat("Streak", "連続", progress.streakDays || 0, "days in a row", t.warn)}
+          <div className="stat-row" style={{ flexDirection: "column", alignItems: "stretch", gap: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi }}>
+                  Streak <span style={{ fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 }}>連続</span>
+                </div>
+                <div style={{ fontSize: 12, color: t.textMuted, marginTop: 2 }}>best {progress.bestStreak || 0} days</div>
+              </div>
+              <div style={{ fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color: t.warn }}>
+                {streak}<span style={{ fontSize: 13, fontWeight: 600, color: t.textMuted, letterSpacing: 0, marginLeft: 4 }}>{streak === 1 ? "day" : "days"}</span>
+              </div>
+            </div>
+            {window.WeekStrip && <window.WeekStrip t={t} progress={progress} />}
+          </div>
           {stat("Accuracy", "正答", `${stats.acc}%`, `${progress.totalAnswered} answers`, t.accent)}
           {stat("Mastered", "習得", stats.mastered, `of ${stats.total} cards`, t.success)}
-          {stat("Due", "復習", stats.dueCount, "ready to review", t.text)}
+          <button className="btn stat-row" onClick={() => setScreen("progress")} style={{ width: "100%", textAlign: "left" }}
+            aria-label={`Badges: ${badgeCount} of ${(window.BADGES || []).length} earned. Open progress`}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi }}>
+                Badges <span style={{ fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 }}>印</span>
+              </div>
+              <div style={{ fontSize: 12, color: t.accent, marginTop: 2, fontWeight: 600 }}>See all →</div>
+            </div>
+            <div style={{ fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color: t.text }}>
+              {badgeCount}<span style={{ fontSize: 14, color: t.textFaint, fontWeight: 600 }}>/{(window.BADGES || []).length}</span>
+            </div>
+          </button>
         </div>
       </section>
 

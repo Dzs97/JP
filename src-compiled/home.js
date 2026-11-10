@@ -54,6 +54,9 @@ function HomeScreen(p) {
   }, [categories, mode, progress, levelFocus]);
   const user = window.getUser ? window.getUser() : null;
   const goalHit = todayCards >= dailyGoal;
+  const daru = window.mascotState ? window.mascotState(progress, todayCards, dailyGoal) : null;
+  const streak = window.currentStreak(progress);
+  const badgeCount = Object.keys(progress.badges || {}).length;
   const activeMode = modes.find((m) => m.id === mode);
   const deckSize = sessionGoal.kind === "cards" ? Math.min(sessionGoal.value, totalInSelection) : dueInSelection;
   const stat = (label, jp, value, sub, color) => /* @__PURE__ */ React.createElement("div", { className: "stat-row" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi } }, label, " ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 } }, jp)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textMuted, marginTop: 2 } }, sub)), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color } }, value));
@@ -72,7 +75,24 @@ function HomeScreen(p) {
     gap: 24,
     alignItems: "center",
     flexWrap: "wrap"
-  } }, window.DailyGoalRing && /* @__PURE__ */ React.createElement(window.DailyGoalRing, { t, today: todayCards, goal: dailyGoal, size: 112 }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 200, position: "relative", zIndex: 1 } }, /* @__PURE__ */ React.createElement(window.Eyebrow, { t }, "Daily goal \xB7 \u76EE\u6A19"), /* @__PURE__ */ React.createElement("div", { style: { margin: "6px 0 16px", fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, color: goalHit ? t.success : t.text, letterSpacing: -0.3 } }, goalHit ? "Goal reached. \u304A\u75B2\u308C\u3055\u307E\uFF01" : `${dailyGoal - todayCards} cards to go today`), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(window.PrimaryButton, { t, onClick: startStudy }, "Start session \u2192"), stats.dueCount > 0 && /* @__PURE__ */ React.createElement(window.SecondaryButton, { t, onClick: () => {
+  } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 240, position: "relative", zIndex: 1 } }, daru && window.Mascot ? /* @__PURE__ */ React.createElement(window.Mascot, { t, mood: daru.mood, message: daru.msg, size: 96, bounce: goalHit }) : null, /* @__PURE__ */ React.createElement("div", { style: { margin: "18px 0 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 12, color: t.textMuted, marginBottom: 6 } }, /* @__PURE__ */ React.createElement("span", null, "Daily goal \xB7 \u76EE\u6A19"), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { color: goalHit ? t.success : t.text, fontWeight: 700 } }, todayCards, " / ", dailyGoal)), /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      role: "progressbar",
+      "aria-label": "Daily goal",
+      "aria-valuemin": 0,
+      "aria-valuemax": dailyGoal,
+      "aria-valuenow": Math.min(todayCards, dailyGoal),
+      style: { height: 8, borderRadius: 999, background: t.progressTrack, overflow: "hidden" }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: {
+      height: "100%",
+      width: `${Math.min(100, todayCards / dailyGoal * 100)}%`,
+      background: goalHit ? t.success : t.accent,
+      borderRadius: 999,
+      transition: "width 0.6s cubic-bezier(.2,.7,.2,1)"
+    } })
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(window.PrimaryButton, { t, onClick: startStudy }, "Start session \u2192"), stats.dueCount > 0 && /* @__PURE__ */ React.createElement(window.SecondaryButton, { t, onClick: () => {
     setDueOnly(true);
     setSessionGoal({ kind: "due", value: 0 });
     startStudy();
@@ -83,7 +103,17 @@ function HomeScreen(p) {
     color: `${t.accent}0F`,
     lineHeight: 1,
     pointerEvents: "none"
-  } }, "\u5B66")), /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "22px 24px" } }, stat("Streak", "\u9023\u7D9A", progress.streakDays || 0, "days in a row", t.warn), stat("Accuracy", "\u6B63\u7B54", `${stats.acc}%`, `${progress.totalAnswered} answers`, t.accent), stat("Mastered", "\u7FD2\u5F97", stats.mastered, `of ${stats.total} cards`, t.success), stat("Due", "\u5FA9\u7FD2", stats.dueCount, "ready to review", t.text))), /* @__PURE__ */ React.createElement("section", { className: "surface-raised", style: { padding: "8px 28px 22px" }, "aria-labelledby": "builder-title" }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, padding: "18px 0 4px", flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("h2", { id: "builder-title", style: { margin: 0, fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text } }, "Build a session ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontWeight: 500, color: t.textFaint, fontSize: 16, marginLeft: 6 } }, "\u7DF4\u7FD2")), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textMuted } }, totalInSelection, " cards \xB7 ", dueInSelection, " due")), /* @__PURE__ */ React.createElement("div", { className: "builder-row" }, /* @__PURE__ */ React.createElement("div", { className: "builder-label" }, "Mode", /* @__PURE__ */ React.createElement("small", null, "\u65B9\u6CD5")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } }, modes.map((m) => /* @__PURE__ */ React.createElement(
+  } }, "\u5B66")), /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "22px 24px" } }, /* @__PURE__ */ React.createElement("div", { className: "stat-row", style: { flexDirection: "column", alignItems: "stretch", gap: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline" } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi } }, "Streak ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 } }, "\u9023\u7D9A")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.textMuted, marginTop: 2 } }, "best ", progress.bestStreak || 0, " days")), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color: t.warn } }, streak, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: t.textMuted, letterSpacing: 0, marginLeft: 4 } }, streak === 1 ? "day" : "days"))), window.WeekStrip && /* @__PURE__ */ React.createElement(window.WeekStrip, { t, progress })), stat("Accuracy", "\u6B63\u7B54", `${stats.acc}%`, `${progress.totalAnswered} answers`, t.accent), stat("Mastered", "\u7FD2\u5F97", stats.mastered, `of ${stats.total} cards`, t.success), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      className: "btn stat-row",
+      onClick: () => setScreen("progress"),
+      style: { width: "100%", textAlign: "left" },
+      "aria-label": `Badges: ${badgeCount} of ${(window.BADGES || []).length} earned. Open progress`
+    },
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: t.text, fontFamily: t.fontUi } }, "Badges ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, color: t.textFaint, fontWeight: 500, marginLeft: 4 } }, "\u5370")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: t.accent, marginTop: 2, fontWeight: 600 } }, "See all \u2192")),
+    /* @__PURE__ */ React.createElement("div", { style: { fontFamily: t.fontUi, fontSize: 28, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color: t.text } }, badgeCount, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, color: t.textFaint, fontWeight: 600 } }, "/", (window.BADGES || []).length))
+  ))), /* @__PURE__ */ React.createElement("section", { className: "surface-raised", style: { padding: "8px 28px 22px" }, "aria-labelledby": "builder-title" }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, padding: "18px 0 4px", flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("h2", { id: "builder-title", style: { margin: 0, fontSize: 20, fontWeight: 700, fontFamily: t.fontUi, letterSpacing: -0.4, color: t.text } }, "Build a session ", /* @__PURE__ */ React.createElement("span", { style: { fontFamily: t.fontJp, fontWeight: 500, color: t.textFaint, fontSize: 16, marginLeft: 6 } }, "\u7DF4\u7FD2")), /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 12, color: t.textMuted } }, totalInSelection, " cards \xB7 ", dueInSelection, " due")), /* @__PURE__ */ React.createElement("div", { className: "builder-row" }, /* @__PURE__ */ React.createElement("div", { className: "builder-label" }, "Mode", /* @__PURE__ */ React.createElement("small", null, "\u65B9\u6CD5")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } }, modes.map((m) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: m.id,

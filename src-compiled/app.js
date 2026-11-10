@@ -50,6 +50,10 @@ function App() {
   const [finished, setFinished] = useState(false);
   const [courseCtx, setCourseCtx] = useState(null);
   const activeMode = courseCtx ? courseCtx.mode : mode;
+  const [sessionBadges, setSessionBadges] = useState([]);
+  useEffect(() => {
+    setSessionBadges([]);
+  }, [deck]);
   const [showRomanji, setShowRomanji] = useState(true);
   const [voiceOn, setVoiceOn] = useState(true);
   const [progress, setProgress] = useState(window.emptyProgress());
@@ -411,6 +415,14 @@ function App() {
     if (!up.dayLog[today]) up.dayLog[today] = { cards: 0, correct: 0 };
     up.dayLog[today].cards += 1;
     up.dayLog[today].correct += wasCorrect ? 1 : 0;
+    const todayStr = (/* @__PURE__ */ new Date()).toDateString();
+    if (up.lastStudied !== todayStr) {
+      const yd = /* @__PURE__ */ new Date();
+      yd.setDate(yd.getDate() - 1);
+      up.streakDays = up.lastStudied === yd.toDateString() ? (up.streakDays || 0) + 1 : 1;
+      up.lastStudied = todayStr;
+      up.bestStreak = Math.max(up.bestStreak || 0, up.streakDays);
+    }
     if (!wasCorrect) {
       const q = up.mistakeQueue || [];
       up.mistakeQueue = [card.front, ...q.filter((x) => x !== card.front)].slice(0, 50);
@@ -429,18 +441,14 @@ function App() {
         duration
       });
       if (up.history.length > 50) up.history = up.history.slice(-50);
-      const todayStr = (/* @__PURE__ */ new Date()).toDateString();
-      if (up.lastStudied !== todayStr) {
-        const yd = /* @__PURE__ */ new Date();
-        yd.setDate(yd.getDate() - 1);
-        const y = yd.toDateString();
-        up.streakDays = up.lastStudied === y ? (up.streakDays || 0) + 1 : 1;
-        up.lastStudied = todayStr;
-      }
       if (courseCtx && window.courseRecord) window.courseRecord(up, courseCtx, pct);
+      const fresh = window.awardBadges ? window.awardBadges(up) : [];
+      if (fresh.length) setSessionBadges((b) => [...b, ...fresh]);
       saveProgress(up);
       setFinished(true);
     } else {
+      const fresh = window.awardBadges ? window.awardBadges(up) : [];
+      if (fresh.length) setSessionBadges((b) => [...b, ...fresh]);
       saveProgress(up);
       setIdx((i) => i + 1);
       setFlipped(false);
@@ -474,10 +482,7 @@ function App() {
   });
   const stats = useMemo(() => {
     const acc = progress.totalAnswered > 0 ? Math.round(progress.totalCorrect / progress.totalAnswered * 100) : 0;
-    const mastered = window.ALL_CARDS.filter((c) => {
-      const s = progress.cardStats[window.cardKey(c)];
-      return s && s.attempts >= 2 && s.correct / s.attempts >= 0.8;
-    }).length;
+    const mastered = window.ALL_CARDS.filter((c) => window.isMastered(progress.cardStats[window.cardKey(c)])).length;
     const dueCount = window.ALL_CARDS.filter((c) => {
       const s = progress.cardStats[window.cardKey(c)];
       return s && window.isDue(s);
@@ -511,6 +516,7 @@ function App() {
     startCourseDeck,
     backToCourse,
     courseCtx,
+    sessionBadges,
     categories,
     setCategories,
     toggleCat,

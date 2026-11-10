@@ -62,11 +62,27 @@ function ProgressScreen(p) {
 
       {/* Stats row */}
       <div className="resp-stats-4" style={{ marginBottom: 28 }}>
-        <window.StatTile t={t} label="Streak" value={`${progress.streakDays || 0} days`} sub="longest active" tone="warn" />
+        <window.StatTile t={t} label="Streak" value={`${window.currentStreak(progress)} days`} sub={`best ${progress.bestStreak || 0} days`} tone="warn" />
         <window.StatTile t={t} label="Accuracy" value={`${stats.acc}%`} sub={`${progress.totalCorrect} / ${progress.totalAnswered}`} />
         <window.StatTile t={t} label="Mastered" value={`${stats.mastered}`} sub={`of ${stats.total} (${Math.round(stats.mastered/stats.total*100)}%)`} tone="success" />
         <window.StatTile t={t} label="Sessions" value={progress.sessions} sub="all-time" />
       </div>
+
+      {/* Badges */}
+      {window.BadgeGrid && (
+        <section className="surface-raised" style={{ padding: "20px 22px", marginBottom: 20 }} aria-labelledby="badges-title">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
+            <div>
+              <window.Eyebrow t={t}>Badges · 印</window.Eyebrow>
+              <h2 id="badges-title" style={{ margin: "4px 0 0", fontSize: 18, fontWeight: 700, fontFamily: t.fontUi, color: t.text }}>
+                {Object.keys(progress.badges || {}).length} of {window.BADGES.length} earned
+              </h2>
+            </div>
+            <window.WeekStrip t={t} progress={progress} />
+          </div>
+          <window.BadgeGrid t={t} progress={progress} />
+        </section>
+      )}
 
       {/* Heatmap */}
       <window.ForecastStrip t={t} progress={progress} />
