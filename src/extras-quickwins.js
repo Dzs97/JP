@@ -84,7 +84,7 @@
         ),
 
         step === 0 && h("div", null,
-          h("div", { className: "mono", style: { fontSize: 10, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 } }, "Daily goal"),
+          h("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 } }, "Daily goal"),
           h("div", { style: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6, marginBottom: 18 } },
             [10, 20, 30, 50].map((g) =>
               h("button", {
@@ -99,7 +99,7 @@
               }, g)
             )
           ),
-          h("div", { className: "mono", style: { fontSize: 10, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 } }, "Level focus"),
+          h("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 } }, "Level focus"),
           h("div", { style: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6, marginBottom: 24 } },
             [{ id: "all", label: "Both" }, { id: 5, label: "N5 only" }, { id: 4, label: "N4 only" }].map((o) =>
               h("button", {
@@ -329,7 +329,7 @@
         h("div", { style: { overflowY: "auto", padding: q.trim() ? 0 : "32px 20px" } },
           !q.trim() && h("div", { style: { textAlign: "center", color: t.textFaint, fontSize: 12 } },
             "Type to search across ", h("b", { style: { color: t.textMuted } }, (window.ALL_CARDS || []).length), " cards and ", h("b", { style: { color: t.textMuted } }, (window.KANJI_DATA || []).length), " kanji.",
-            h("div", { style: { marginTop: 8, fontFamily: t.fontMono, fontSize: 10 } }, "Tip: press / anywhere to open this.")
+            h("div", { style: { marginTop: 8, fontFamily: t.fontMono, fontSize: 11 } }, "Tip: press / anywhere to open this.")
           ),
           q.trim() && results.length === 0 && h("div", { style: { padding: "32px 20px", textAlign: "center", color: t.textFaint, fontSize: 13 } }, "No matches."),
           results.map((r, i) =>
@@ -346,7 +346,7 @@
                   h("span", { className: "jp", style: { fontSize: 22, color: t.text, fontWeight: 500, minWidth: 90 } }, r.front),
                   h("span", { className: "mono", style: { fontSize: 11, color: t.textFaint, minWidth: 90 } }, r.romanji),
                   h("span", { style: { fontSize: 13, color: t.textMuted, flex: 1 } }, r.back),
-                  h("span", { style: { fontSize: 10, color: t.accent, fontFamily: t.fontMono } }, r.type)
+                  h("span", { style: { fontSize: 11, color: t.accent, fontFamily: t.fontMono } }, r.type)
                 )
               : h("button", {
                   key: "k" + i, className: "btn",
@@ -359,11 +359,11 @@
                 },
                   h("span", { className: "jp", style: { fontSize: 26, color: t.accent, fontWeight: 500, minWidth: 50 } }, r.char),
                   h("span", { style: { fontSize: 13, color: t.text, flex: 1, textTransform: "capitalize" } }, r.meaning),
-                  h("span", { style: { fontSize: 10, color: t.success, fontFamily: t.fontMono } }, "N" + r.jlpt, " · kanji")
+                  h("span", { style: { fontSize: 11, color: t.success, fontFamily: t.fontMono } }, "N" + r.jlpt, " · kanji")
                 )
           )
         ),
-        h("div", { style: { padding: "8px 14px", borderTop: `1px solid ${t.surfaceBorder}`, display: "flex", justifyContent: "space-between", fontSize: 10, color: t.textFaint, fontFamily: t.fontMono } },
+        h("div", { style: { padding: "8px 14px", borderTop: `1px solid ${t.surfaceBorder}`, display: "flex", justifyContent: "space-between", fontSize: 11, color: t.textFaint, fontFamily: t.fontMono } },
           h("span", null, results.length, " result", results.length === 1 ? "" : "s"),
           h("span", null, "esc to close")
         )
@@ -407,7 +407,7 @@
         fontSize: 12, fontFamily: t.fontJp, fontWeight: 600,
         boxShadow: on ? `0 4px 14px ${t.accent}40` : "none",
       },
-    }, "ふ ", h("span", { style: { fontSize: 10, marginLeft: 4, fontFamily: t.fontMono, opacity: 0.8 } }, on ? "on" : "off"));
+    }, "ふ ", h("span", { style: { fontSize: 11, marginLeft: 4, fontFamily: t.fontMono, opacity: 0.8 } }, on ? "on" : "off"));
   }
   window.FuriganaToggle = FuriganaToggle;
 })();

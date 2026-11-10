@@ -67,7 +67,7 @@ function KanjiScreen(p) {
                   display: "flex", alignItems: "center", gap: 6,
                 }}>
                 {o.label}
-                <span className="mono" style={{ fontSize: 10, color: on ? t.accent : t.textFaint }}>{count}</span>
+                <span className="mono" style={{ fontSize: 11, color: on ? t.accent : t.textFaint }}>{count}</span>
               </button>
             );
           })}
@@ -128,13 +128,13 @@ function KanjiScreen(p) {
 
             <div className="resp-kanji-readings">
               <div style={{ padding: "10px 14px", background: t.surfaceSunken, borderRadius: 10 }}>
-                <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>On'yomi (音読み)</div>
+                <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>On'yomi (音読み)</div>
                 <div className="jp" style={{ fontSize: 17, color: t.text, fontWeight: 500 }}>
                   {cur.on.length ? cur.on.join("・") : <span style={{ color: t.textFaint }}>—</span>}
                 </div>
               </div>
               <div style={{ padding: "10px 14px", background: t.surfaceSunken, borderRadius: 10 }}>
-                <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>Kun'yomi (訓読み)</div>
+                <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>Kun'yomi (訓読み)</div>
                 <div className="jp" style={{ fontSize: 17, color: t.text, fontWeight: 500 }}>
                   {cur.kun.length ? cur.kun.join("・") : <span style={{ color: t.textFaint }}>—</span>}
                 </div>
@@ -142,7 +142,7 @@ function KanjiScreen(p) {
             </div>
 
             <div>
-              <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 }}>Examples</div>
+              <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 }}>Examples</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {cur.examples.map((ex, i) => (
                   <button key={i} className="btn" onClick={() => speakForce(ex.w)}
@@ -173,7 +173,7 @@ function ForecastStrip({ t, progress }) {
     <div className="surface-raised" style={{ padding: "20px 22px", marginBottom: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
         <div>
-          <div className="mono" style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600 }}>SRS forecast · next 14 days</div>
+          <div className="mono" style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600 }}>SRS forecast · next 14 days</div>
           <div style={{ fontSize: 14, color: t.text, marginTop: 4, fontFamily: t.fontUi, fontWeight: 600 }}>
             {forecast.reduce((s, f) => s + f.count, 0)} reviews scheduled
           </div>
@@ -194,7 +194,7 @@ function ForecastStrip({ t, progress }) {
                   transition: "height 0.4s",
                 }} />
               </div>
-              <div className="mono" style={{ fontSize: 9, color: isToday ? t.accent : t.textFaint, fontWeight: isToday ? 700 : 400 }}>
+              <div className="mono" style={{ fontSize: 11, color: isToday ? t.accent : t.textFaint, fontWeight: isToday ? 700 : 400 }}>
                 {isToday ? "TODAY" : f.date.getDate()}
               </div>
             </div>
@@ -238,7 +238,7 @@ function DataPanel({ t, progress, setProgress }) {
   };
   return (
     <div className="surface-raised" style={{ padding: "20px 22px" }}>
-      <div className="mono" style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600, marginBottom: 10 }}>
+      <div className="mono" style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600, marginBottom: 10 }}>
         Data
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -407,7 +407,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: t.text, fontFamily: t.fontUi, letterSpacing: -0.3 }}>Audio debug</div>
-          <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" }}>
+          <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" }}>
             Test speech synthesis
           </div>
         </div>
@@ -441,7 +441,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
 
       {/* Picked voice */}
       <div style={{ padding: "10px 12px", background: t.surfaceSunken, borderRadius: 8, marginBottom: 12 }}>
-        <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 4 }}>
+        <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 4 }}>
           Current voice
         </div>
         <div style={{ fontSize: 12, color: curVoice ? t.text : t.textFaint, fontFamily: t.fontMono }}>
@@ -452,7 +452,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
       {/* Voice picker */}
       {jaVoices.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>
+          <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>
             Pick JP voice
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -476,7 +476,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
       )}
 
       {/* Test buttons */}
-      <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>
+      <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>
         Test speech
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
@@ -493,12 +493,12 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
       </div>
 
       {/* Log */}
-      <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>
+      <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 }}>
         Log
       </div>
       <div style={{
         padding: "8px 10px", background: "#0a0a0a", color: "#9ae6b4",
-        borderRadius: 6, fontSize: 10, fontFamily: "'JetBrains Mono', monospace",
+        borderRadius: 6, fontSize: 11, fontFamily: "'JetBrains Mono', monospace",
         maxHeight: 140, overflow: "auto", lineHeight: 1.6,
       }}>
         {speechLog.length === 0 ? (

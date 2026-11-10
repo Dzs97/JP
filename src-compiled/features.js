@@ -57,7 +57,7 @@ function KanjiScreen(p) {
         }
       },
       o.label,
-      /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 10, color: on ? t.accent : t.textFaint } }, count)
+      /* @__PURE__ */ React.createElement("span", { className: "mono", style: { fontSize: 11, color: on ? t.accent : t.textFaint } }, count)
     );
   }))), /* @__PURE__ */ React.createElement("div", { className: "resp-grid-kanji" }, /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: 14, maxHeight: 560, overflow: "auto" } }, /* @__PURE__ */ React.createElement("div", { className: "resp-kanji-grid-6" }, list.map((k) => {
     const on = cur?.char === k.char;
@@ -99,7 +99,7 @@ function KanjiScreen(p) {
       style: { marginTop: 10, padding: "6px 12px", background: `${t.accent}14`, color: t.accent, borderRadius: 999, fontSize: 12, fontFamily: t.fontMono }
     },
     "\u266A Play"
-  ))), /* @__PURE__ */ React.createElement("div", { className: "resp-kanji-readings" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", background: t.surfaceSunken, borderRadius: 10 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "On'yomi (\u97F3\u8AAD\u307F)"), /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 17, color: t.text, fontWeight: 500 } }, cur.on.length ? cur.on.join("\u30FB") : /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "\u2014"))), /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", background: t.surfaceSunken, borderRadius: 10 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Kun'yomi (\u8A13\u8AAD\u307F)"), /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 17, color: t.text, fontWeight: 500 } }, cur.kun.length ? cur.kun.join("\u30FB") : /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "\u2014")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 } }, "Examples"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } }, cur.examples.map((ex, i) => /* @__PURE__ */ React.createElement(
+  ))), /* @__PURE__ */ React.createElement("div", { className: "resp-kanji-readings" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", background: t.surfaceSunken, borderRadius: 10 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "On'yomi (\u97F3\u8AAD\u307F)"), /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 17, color: t.text, fontWeight: 500 } }, cur.on.length ? cur.on.join("\u30FB") : /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "\u2014"))), /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", background: t.surfaceSunken, borderRadius: 10 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Kun'yomi (\u8A13\u8AAD\u307F)"), /* @__PURE__ */ React.createElement("div", { className: "jp", style: { fontSize: 17, color: t.text, fontWeight: 500 } }, cur.kun.length ? cur.kun.join("\u30FB") : /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "\u2014")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8 } }, "Examples"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } }, cur.examples.map((ex, i) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: i,
@@ -124,7 +124,7 @@ function KanjiScreen(p) {
 function ForecastStrip({ t, progress }) {
   const forecast = useM2(() => window.forecastDueByDay(progress.cardStats, 14), [progress]);
   const max = Math.max(1, ...forecast.map((f) => f.count));
-  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 22px", marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600 } }, "SRS forecast \xB7 next 14 days"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.text, marginTop: 4, fontFamily: t.fontUi, fontWeight: 600 } }, forecast.reduce((s, f) => s + f.count, 0), " reviews scheduled"))), /* @__PURE__ */ React.createElement("div", { className: "resp-forecast-14" }, forecast.map((f, i) => {
+  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 22px", marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600 } }, "SRS forecast \xB7 next 14 days"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: t.text, marginTop: 4, fontFamily: t.fontUi, fontWeight: 600 } }, forecast.reduce((s, f) => s + f.count, 0), " reviews scheduled"))), /* @__PURE__ */ React.createElement("div", { className: "resp-forecast-14" }, forecast.map((f, i) => {
     const h = f.count / max * 100;
     const isToday = i === 0;
     return /* @__PURE__ */ React.createElement(
@@ -141,7 +141,7 @@ function ForecastStrip({ t, progress }) {
         borderRadius: 4,
         transition: "height 0.4s"
       } })),
-      /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, color: isToday ? t.accent : t.textFaint, fontWeight: isToday ? 700 : 400 } }, isToday ? "TODAY" : f.date.getDate())
+      /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, color: isToday ? t.accent : t.textFaint, fontWeight: isToday ? 700 : 400 } }, isToday ? "TODAY" : f.date.getDate())
     );
   })));
 }
@@ -175,7 +175,7 @@ function DataPanel({ t, progress, setProgress }) {
     setProgress({ ...window.emptyProgress(), resetAt: Date.now() });
     setStatus({ ok: true, msg: "Progress reset." });
   };
-  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 22px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600, marginBottom: 10 } }, "Data"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 22px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600, marginBottom: 10 } }, "Data"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       className: "btn",
@@ -350,7 +350,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
     boxShadow: t.shadowFloating,
     maxHeight: "70vh",
     overflow: "auto"
-  }, className: "resp-audio-debug" }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: t.text, fontFamily: t.fontUi, letterSpacing: -0.3 } }, "Audio debug"), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" } }, "Test speech synthesis")), /* @__PURE__ */ React.createElement(
+  }, className: "resp-audio-debug" }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: t.text, fontFamily: t.fontUi, letterSpacing: -0.3 } }, "Audio debug"), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" } }, "Test speech synthesis")), /* @__PURE__ */ React.createElement(
     "button",
     {
       className: "btn",
@@ -358,7 +358,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
       style: { width: 26, height: 26, borderRadius: 6, background: t.btnGhost, color: t.textMuted, fontSize: 14 }
     },
     "\xD7"
-  )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 12, fontSize: 11, fontFamily: t.fontMono } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "synth:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: window.speechSynthesis ? t.success : t.danger, fontWeight: 600 } }, window.speechSynthesis ? "available" : "MISSING")), /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "voices:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: t.text, fontWeight: 600 } }, allVoices.length)), /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "JP voices:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: jaVoices.length ? t.success : t.danger, fontWeight: 600 } }, jaVoices.length)), /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "unlocked:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: voiceState.needsUnlock ? t.warn : t.success, fontWeight: 600 } }, voiceState.needsUnlock ? "no" : "yes"))), /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 12px", background: t.surfaceSunken, borderRadius: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 4 } }, "Current voice"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: curVoice ? t.text : t.textFaint, fontFamily: t.fontMono } }, curVoice ? `${curVoice.name} (${curVoice.lang})` : "\u2014 none picked \u2014")), jaVoices.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Pick JP voice"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4 } }, jaVoices.map((v) => {
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 12, fontSize: 11, fontFamily: t.fontMono } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "synth:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: window.speechSynthesis ? t.success : t.danger, fontWeight: 600 } }, window.speechSynthesis ? "available" : "MISSING")), /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "voices:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: t.text, fontWeight: 600 } }, allVoices.length)), /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "JP voices:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: jaVoices.length ? t.success : t.danger, fontWeight: 600 } }, jaVoices.length)), /* @__PURE__ */ React.createElement("div", { style: { padding: "6px 10px", background: t.surfaceSunken, borderRadius: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { color: t.textFaint } }, "unlocked:"), " ", /* @__PURE__ */ React.createElement("span", { style: { color: voiceState.needsUnlock ? t.warn : t.success, fontWeight: 600 } }, voiceState.needsUnlock ? "no" : "yes"))), /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 12px", background: t.surfaceSunken, borderRadius: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 4 } }, "Current voice"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: curVoice ? t.text : t.textFaint, fontFamily: t.fontMono } }, curVoice ? `${curVoice.name} (${curVoice.lang})` : "\u2014 none picked \u2014")), jaVoices.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Pick JP voice"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4 } }, jaVoices.map((v) => {
     const on = curVoice?.name === v.name;
     return /* @__PURE__ */ React.createElement(
       "button",
@@ -381,7 +381,7 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
       " ",
       /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.7 } }, "\xB7 ", v.lang)
     );
-  }))), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Test speech"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 } }, ["\u3053\u3093\u306B\u3061\u306F", "\u3042\u308A\u304C\u3068\u3046", "\u6C34", "hello"].map((txt) => /* @__PURE__ */ React.createElement(
+  }))), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Test speech"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 } }, ["\u3053\u3093\u306B\u3061\u306F", "\u3042\u308A\u304C\u3068\u3046", "\u6C34", "hello"].map((txt) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: txt,
@@ -399,12 +399,12 @@ function AudioDebug({ t, voiceState, voiceRef, speechLog, doSpeak }) {
     },
     "\u266A ",
     txt
-  ))), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Log"), /* @__PURE__ */ React.createElement("div", { style: {
+  ))), /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 6 } }, "Log"), /* @__PURE__ */ React.createElement("div", { style: {
     padding: "8px 10px",
     background: "#0a0a0a",
     color: "#9ae6b4",
     borderRadius: 6,
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: "'JetBrains Mono', monospace",
     maxHeight: 140,
     overflow: "auto",

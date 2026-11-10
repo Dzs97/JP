@@ -137,7 +137,7 @@
           display: "flex", alignItems: "center", justifyContent: "center",
           color: t.onAccent, fontSize: 11, fontWeight: 800,
         } }, d.done ? "✓" : ""),
-        h("span", { style: { fontSize: 10, color: d.today ? t.text : t.textFaint, fontFamily: t.fontMono, fontWeight: d.today ? 700 : 400 } }, d.label)
+        h("span", { style: { fontSize: 11, color: d.today ? t.text : t.textFaint, fontFamily: t.fontMono, fontWeight: d.today ? 700 : 400 } }, d.label)
       ))
     );
   }

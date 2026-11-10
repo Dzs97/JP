@@ -2,7 +2,7 @@
 //  THEME — Washi & Sumi
 //  Warm paper surfaces, sumi-ink text, vermilion (shu) hanko accent.
 //  Dark mode is "sumi night": ink-black paper, warm off-white text.
-//  Muted/faint text tokens are tuned for ≥4.5:1 contrast on appBg.
+//  Muted/faint text, accent and warn are tuned for ≥4.5:1 on appBg and sunken panels.
 // ═══════════════════════════════════════════════════════════════════════
 
 const THEME_TOKENS = {
@@ -18,7 +18,7 @@ const THEME_TOKENS = {
     text: "#1C1A17",
     textPrimary: "#2B2723",
     textMuted: "#5E564C",
-    textFaint: "#756B5C",
+    textFaint: "#685E50",
     textDisabled: "#B5AA98",
     // Buttons
     btnGhost: "#EDE5D6",
@@ -53,7 +53,7 @@ const THEME_TOKENS = {
     danger: "#B3261E",
     dangerBg: "rgba(179, 38, 30, 0.08)",
     dangerBorder: "rgba(179, 38, 30, 0.28)",
-    warn: "#B7621B",
+    warn: "#9C5418",
     warnBg: "rgba(183, 98, 27, 0.10)",
     warnBorder: "rgba(183, 98, 27, 0.30)",
     info: "#2E6F9E",           // ai (indigo dye)
@@ -105,7 +105,7 @@ const THEME_TOKENS = {
 // Accent presets. `dark` is used in dark mode where the base color would be
 // too dim to read as text (accent doubles as a text color across the app).
 const ACCENT_PRESETS = {
-  shu:     { name: "Shu",     color: "#C8402A", onAccent: "#FFFFFF", dark: "#E8705A", onAccentDark: "#1C1A17" },
+  shu:     { name: "Shu",     color: "#B53923", onAccent: "#FFFFFF", dark: "#E8705A", onAccentDark: "#1C1A17" },
   crimson: { name: "Crimson", color: "#C0392B", onAccent: "#FFFFFF", dark: "#E86A5C", onAccentDark: "#1C1A17" },
   sumi:    { name: "Sumi",    color: "#2B2723", onAccent: "#FFFFFF", dark: "#E6DDCE", onAccentDark: "#1C1A17" },
   matcha:  { name: "Matcha",  color: "#4E7A3A", onAccent: "#FFFFFF", dark: "#9CC985", onAccentDark: "#1C1A17" },

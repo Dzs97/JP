@@ -106,7 +106,7 @@ function GlobalStyles({ t }) {
     .rail-brand { display: flex; align-items: center; gap: 12px; padding: 2px 6px; text-align: left; }
     .rail-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
     .rail-brand-text b { font-family: ${t.fontUi}; font-size: 15px; font-weight: 700; color: ${t.text}; letter-spacing: -0.2px; }
-    .rail-brand-text small { font-family: ${t.fontMono}; font-size: 10px; color: ${t.textFaint}; letter-spacing: 1px; text-transform: uppercase; }
+    .rail-brand-text small { font-family: ${t.fontMono}; font-size: 11px; color: ${t.textFaint}; letter-spacing: 1px; text-transform: uppercase; }
     .hanko {
       width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
@@ -157,7 +157,7 @@ function GlobalStyles({ t }) {
     .chip:hover:not(:disabled) { border-color: ${t.surfaceBorderStrong}; }
     .chip.on { background: ${t.accent}; color: ${t.onAccent}; border-color: ${t.accent}; }
     .chip .chip-glyph { font-family: ${t.fontJp}; font-size: 16px; }
-    .chip .chip-meta { font-family: ${t.fontMono}; font-size: 10px; opacity: 0.75; }
+    .chip .chip-meta { font-family: ${t.fontMono}; font-size: 11px; opacity: 0.75; }
     .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: ${t.surfaceSunken}; border: 1px solid ${t.surfaceBorder}; }
     .seg button { min-height: 34px; padding: 4px 12px; border-radius: 8px; font-family: ${t.fontUi}; font-size: 12px; font-weight: 600; color: ${t.textMuted}; }
     .seg button[aria-pressed="true"] { background: ${t.surfaceBg}; color: ${t.text}; box-shadow: ${t.shadowCard}; }
@@ -425,7 +425,7 @@ function AppShell({
 }
 function Eyebrow({ t, children, accent }) {
   return /* @__PURE__ */ React.createElement("div", { className: "mono", style: {
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: 2,
     textTransform: "uppercase",
     color: accent ? t.accent : t.textFaint,
@@ -459,7 +459,7 @@ function Pill({ t, children, tone = "default", size = "md", style }) {
 }
 function StatTile({ t, label, value, sub, tone = "accent" }) {
   const toneColor = tone === "success" ? t.success : tone === "warn" ? t.warn : t.accent;
-  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "16px 18px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8, fontWeight: 600 } }, label), /* @__PURE__ */ React.createElement("div", { style: {
+  return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "16px 18px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", marginBottom: 8, fontWeight: 600 } }, label), /* @__PURE__ */ React.createElement("div", { style: {
     fontFamily: "'Inter', system-ui, sans-serif",
     fontSize: 30,
     fontWeight: 800,

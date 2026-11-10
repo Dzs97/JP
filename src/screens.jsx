@@ -95,7 +95,7 @@ function ProgressScreen(p) {
               {heatmap.reduce((s, d) => s + d.count, 0)} cards studied
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: t.textFaint, fontFamily: t.fontMono }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: t.textFaint, fontFamily: t.fontMono }}>
             less
             {t.heatmap.map((c, i) => (
               <div key={i} style={{ width: 11, height: 11, borderRadius: 3, background: c }} />
@@ -175,7 +175,7 @@ function ProgressScreen(p) {
                       <div style={{ fontSize: 12, color: t.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {c.back}
                       </div>
-                      <div className="mono" style={{ fontSize: 10, color: t.textFaint }}>
+                      <div className="mono" style={{ fontSize: 11, color: t.textFaint }}>
                         {c.romanji} · {s.attempts} tries
                       </div>
                     </div>
@@ -199,7 +199,7 @@ function ProgressScreen(p) {
                   <span style={{ fontSize: 11, color: t.textMuted, textTransform: "capitalize", fontFamily: t.fontUi, fontWeight: 600 }}>{h.mode}</span>
                   <window.Pill t={t} tone={h.score >= 80 ? "success" : h.score >= 60 ? "warn" : "danger"} size="sm">{h.score}%</window.Pill>
                 </div>
-                <div className="mono" style={{ fontSize: 10, color: t.textFaint, marginTop: 4 }}>
+                <div className="mono" style={{ fontSize: 11, color: t.textFaint, marginTop: 4 }}>
                   {h.date} · {h.cards}c · {Math.round(h.duration / 60)}m
                 </div>
               </div>
@@ -311,7 +311,7 @@ function KanaScreen(p) {
                     ch ? (
                       <button key={ci} className="btn kcell" onClick={() => speakForce(ch)}>
                         <div className="jp" style={{ fontSize: 28, color: t.text, fontWeight: 500, lineHeight: 1.2 }}>{ch}</div>
-                        <div className="mono" style={{ fontSize: 10, color: t.textFaint, marginTop: 1, letterSpacing: 0.5 }}>{row.sounds[ci]}</div>
+                        <div className="mono" style={{ fontSize: 11, color: t.textFaint, marginTop: 1, letterSpacing: 0.5 }}>{row.sounds[ci]}</div>
                       </button>
                     ) : <div key={ci} />
                   ))}
@@ -427,7 +427,7 @@ function TweaksPanel({ t, darkMode, setDarkMode, accent, setAccent, fonts, setFo
 
   const Section = ({ label, children }) => (
     <div style={{ marginBottom: 16 }}>
-      <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", fontWeight: 600, marginBottom: 8 }}>{label}</div>
+      <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase", fontWeight: 600, marginBottom: 8 }}>{label}</div>
       {children}
     </div>
   );
@@ -462,7 +462,7 @@ function TweaksPanel({ t, darkMode, setDarkMode, accent, setAccent, fonts, setFo
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 700, color: t.text, fontFamily: t.fontUi, letterSpacing: -0.3 }}>Tweaks</div>
-          <div className="mono" style={{ fontSize: 9, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" }}>Live preview</div>
+          <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: t.textFaint, textTransform: "uppercase" }}>Live preview</div>
         </div>
         <button className="btn" onClick={onClose}
           style={{ width: 26, height: 26, borderRadius: 6, background: t.btnGhost, color: t.textMuted, fontSize: 14 }}>×</button>

@@ -36,7 +36,7 @@
     return h("div", { className: "fade-up", key: card.front },
       h(window.Pill, { t, tone: "accent", style: { marginBottom: 14 } }, "Conjugate · ます form"),
       h("div", { className: "surface-raised", style: { padding: "36px 20px", textAlign: "center", marginBottom: 20 } },
-        h("div", { className: "mono", style: { fontSize: 10, color: t.textFaint, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" } }, "Dictionary form"),
+        h("div", { className: "mono", style: { fontSize: 11, color: t.textFaint, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" } }, "Dictionary form"),
         h("div", { className: "jp", style: { fontSize: "clamp(36px, 11vw, 64px)", fontWeight: 500, color: t.text, letterSpacing: -1.2, lineHeight: 1.1 } }, card.front),
         h("div", { className: "mono", style: { fontSize: 13, color: t.textMuted, marginTop: 8 } }, card.romanji, " · ", card.back),
         h("div", { style: { marginTop: 18, fontSize: 13, color: t.textMuted } },

@@ -73,15 +73,15 @@ function FlashcardMode(p) {
             background: t.accent, color: t.onAccent,
             boxShadow: `${t.shadowElevated}, 0 0 0 1px ${t.accent}`,
           }}>
-            <div className="jp" style={{ fontSize: "clamp(22px, 6vw, 34px)", fontWeight: 500, opacity: 0.7, marginBottom: 14 }}>{card.front}</div>
+            <div className="jp" style={{ fontSize: "clamp(28px, 8vw, 44px)", fontWeight: 500, opacity: 0.95, marginBottom: 14 }}>{card.front}</div>
             <div style={{ fontSize: "clamp(22px, 6vw, 34px)", fontWeight: 700, letterSpacing: -0.8, fontFamily: t.fontUi, lineHeight: 1.2 }}>
               {card.back}
             </div>
-            <div className="mono" style={{ fontSize: 15, marginTop: 18, opacity: 0.85, letterSpacing: 0.5 }}>
+            <div className="mono" style={{ fontSize: 16, marginTop: 18, opacity: 0.95, letterSpacing: 0.5 }}>
               {card.romanji}
             </div>
             {card.note && <div style={{
-              fontSize: 12, opacity: 0.8, marginTop: 14, padding: "8px 14px", maxWidth: 380,
+              fontSize: 13, opacity: 0.92, marginTop: 14, padding: "8px 14px", maxWidth: 380,
               background: "rgba(255,255,255,0.1)", borderRadius: 8,
             }}>{card.note}</div>}
           </div>
@@ -106,7 +106,7 @@ function FlashcardMode(p) {
                   display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
                 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, fontFamily: t.fontUi }}>{b.label}</div>
-                <div className="mono" style={{ fontSize: 10, opacity: 0.7 }}>{b.hint}</div>
+                <div className="mono" style={{ fontSize: 12, opacity: 0.85 }}>{b.hint}</div>
                 {showKeyboardHints && <kbd>{i + 1}</kbd>}
               </button>
             ))}
@@ -321,7 +321,7 @@ function BuildMode(p) {
     <div className="fade-up" key={card.front}>
       <window.Pill t={t} tone="accent" style={{ marginBottom: 14 }}>Build the sentence</window.Pill>
       <div className="surface-raised" style={{ padding: "20px 22px", marginBottom: 16 }}>
-        <div className="mono" style={{ fontSize: 10, color: t.textFaint, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>Target</div>
+        <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1.5, marginBottom: 8, textTransform: "uppercase" }}>Target</div>
         <div style={{ fontSize: 20, fontWeight: 700, color: t.text, fontFamily: t.fontUi }}>{card.back}</div>
         <div className="mono" style={{ fontSize: 12, color: t.textMuted, marginTop: 4 }}>{card.romanji}</div>
       </div>
@@ -404,15 +404,15 @@ function FinishScreen(p) {
 
       <div className="surface-raised" style={{ padding: 28, margin: "28px 0", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
         <div>
-          <div className="mono" style={{ fontSize: 10, color: t.textFaint, letterSpacing: 1.5, textTransform: "uppercase" }}>Accuracy</div>
+          <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1.5, textTransform: "uppercase" }}>Accuracy</div>
           <div style={{ fontSize: 40, fontWeight: 800, color: t.accent, fontFamily: t.fontUi, letterSpacing: -1, lineHeight: 1, marginTop: 6 }}>{pct}%</div>
         </div>
         <div>
-          <div className="mono" style={{ fontSize: 10, color: t.textFaint, letterSpacing: 1.5, textTransform: "uppercase" }}>Correct</div>
+          <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1.5, textTransform: "uppercase" }}>Correct</div>
           <div style={{ fontSize: 40, fontWeight: 800, color: t.success, fontFamily: t.fontUi, letterSpacing: -1, lineHeight: 1, marginTop: 6 }}>{score.correct}<span style={{ color: t.textFaint, fontSize: 20 }}>/{deck.length}</span></div>
         </div>
         <div>
-          <div className="mono" style={{ fontSize: 10, color: t.textFaint, letterSpacing: 1.5, textTransform: "uppercase" }}>Time</div>
+          <div className="mono" style={{ fontSize: 11, color: t.textFaint, letterSpacing: 1.5, textTransform: "uppercase" }}>Time</div>
           <div style={{ fontSize: 40, fontWeight: 800, color: t.text, fontFamily: t.fontUi, letterSpacing: -1, lineHeight: 1, marginTop: 6 }}>
             {Math.floor(duration / 60)}<span style={{ color: t.textFaint, fontSize: 20 }}>:{String(duration % 60).padStart(2, "0")}</span>
           </div>
