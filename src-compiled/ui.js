@@ -131,7 +131,7 @@ function GlobalStyles({ t }) {
     .rail-glyph { width: 24px; text-align: center; font-family: ${t.fontJp}; font-size: 18px; font-weight: 600; }
     .rail-link.active .rail-glyph { color: ${t.accent}; }
     .rail-hud { display: flex; flex-direction: column; gap: 10px; padding: 0 6px; }
-    .rail-hud-count { font-family: ${t.fontMono}; font-size: 13px; color: ${t.textMuted}; display: flex; gap: 10px; }
+    .rail-hud-count { font-family: ${t.fontMono}; font-size: 13px; color: ${t.textMuted}; display: flex; gap: 10px; white-space: nowrap; }
     .rail-utils { order: 3; margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
     .rail-utils > .btn { width: 100%; text-align: left; }
     .rail-utils .jq-user-btn, .rail-utils .jq-sync-btn, .rail-utils .jq-furigana-btn,

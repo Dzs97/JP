@@ -63,7 +63,8 @@ function App() {
   const activeMode = courseCtx ? courseCtx.mode : mode;
   // Badges earned during the current session, shown on the finish screen.
   const [sessionBadges, setSessionBadges] = useState([]);
-  useEffect(() => { setSessionBadges([]); }, [deck]); // every session start sets a new deck
+  const [combo, setCombo] = useState(0); // correct answers in a row this session (Daru cheers)
+  useEffect(() => { setSessionBadges([]); setCombo(0); }, [deck]); // every session start sets a new deck
 
   // ── UI prefs (always on) ──────────────────────────────────────────
   const [showRomanji, setShowRomanji] = useState(true);
@@ -410,6 +411,7 @@ function App() {
       incorrect: score.incorrect + (wasCorrect ? 0 : 1),
     };
     setScore(ns);
+    setCombo(c => (wasCorrect ? c + 1 : 0));
     const up = JSON.parse(JSON.stringify(progress));
     const key = window.cardKey(card);
     up.cardStats[key] = window.srsReview(up.cardStats[key], r);
@@ -501,7 +503,7 @@ function App() {
     t, density, romanjiPosition, showKeyboardHints,
     screen, setScreen,
     mode: activeMode, setMode,
-    startCourseDeck, backToCourse, courseCtx, sessionBadges, categories, setCategories, toggleCat,
+    startCourseDeck, backToCourse, courseCtx, sessionBadges, combo, categories, setCategories, toggleCat,
     sessionGoal, setSessionGoal, dueOnly, setDueOnly,
     deck, setDeck, idx, setIdx, flipped, setFlipped,
     score, setScore, quizOptions, quizSelected, setQuizSelected,

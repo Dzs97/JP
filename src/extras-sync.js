@@ -4,9 +4,9 @@
 //  shortcut: IDs are public, so anyone with the site URL can read or overwrite
 //  a user's progress; add a shared passphrase if the URL ever spreads. Progress
 //  is mirrored to KV after every save (debounced) and pulled on startup +
-//  on tab focus. Last-write-wins by updatedAt, where the local timestamp is
-//  the time of the last local *save* (not upload), so unsynced offline study
-//  is never overwritten by an older remote copy. Plain-JS, no build step.
+//  on tab focus. When both copies differ they are merged (mergeProgress in
+//  engine.js), so two devices studying offline both keep their work; the copy
+//  with the newer local save supplies settings. Plain-JS, no build step.
 // ═══════════════════════════════════════════════════════════════════════
 (function () {
   const h = React.createElement;
@@ -107,6 +107,19 @@
       const cur = await readLocalProgressString();
       const action = pick(getLocalTs(), remote, force, firstContact, cur);
       setJoined();
+      // Both sides have progress and they differ: merge instead of letting one overwrite the other.
+      const merged = !force && action !== "none" && cur && remote && remote.value && cur !== remote.value
+        ? mergeStrings(cur, remote.value, action === "push") : null;
+      if (merged) {
+        if (merged !== cur) {
+          try { localStorage.setItem(PROGRESS_KEY, merged); } catch (_) {}
+          window.dispatchEvent(new CustomEvent("jp-progress-pulled", { detail: merged }));
+        }
+        if (merged !== remote.value) { setLocalTs(Date.now()); schedulePush(merged); }
+        else setLocalTs(remote.updatedAt);
+        setStatus("ok");
+        return merged;
+      }
       if (action === "push") {
         // Remote empty, older, or (first contact) has less study — push local state.
         // Stamp now so other devices see this upload as newer than what they have.
@@ -130,6 +143,10 @@
       setStatus("error", e.message);
       return null;
     }
+  }
+  function mergeStrings(local, remote, localIsNewer) {
+    try { return JSON.stringify(window.mergeProgress(JSON.parse(local), JSON.parse(remote), localIsNewer)); }
+    catch (_) { return null; } // unparseable copy: fall back to last-write-wins
   }
   async function readLocalProgressString() {
     try { return localStorage.getItem(PROGRESS_KEY); } catch (_) { return null; }

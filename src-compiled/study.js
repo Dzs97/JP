@@ -1,7 +1,7 @@
 (function(){
 const { useEffect: useEffectS } = React;
 function StudyScreen(p) {
-  const { t, mode, card, deck, idx } = p;
+  const { t, mode, card, deck, idx, combo } = p;
   if (!card) return null;
   const progressPct = (idx + 1) / deck.length * 100;
   return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", paddingTop: 24 }, className: "resp-main-pad-inner" }, /* @__PURE__ */ React.createElement("div", { style: {
@@ -16,7 +16,7 @@ function StudyScreen(p) {
     background: t.accent,
     transition: "width 0.4s cubic-bezier(.2,.7,.2,1)",
     boxShadow: `0 0 10px ${t.accent}80`
-  } })), mode === "flashcard" && /* @__PURE__ */ React.createElement(FlashcardMode, { ...p }), mode === "quiz" && /* @__PURE__ */ React.createElement(QuizMode, { ...p }), mode === "write" && /* @__PURE__ */ React.createElement(WriteMode, { ...p }), mode === "listen" && /* @__PURE__ */ React.createElement(ListenMode, { ...p }), mode === "build" && /* @__PURE__ */ React.createElement(BuildMode, { ...p }), window.EXTRA_MODES && window.EXTRA_MODES[mode] && React.createElement(window.EXTRA_MODES[mode], p));
+  } })), mode === "flashcard" && /* @__PURE__ */ React.createElement(FlashcardMode, { ...p }), mode === "quiz" && /* @__PURE__ */ React.createElement(QuizMode, { ...p }), mode === "write" && /* @__PURE__ */ React.createElement(WriteMode, { ...p }), mode === "listen" && /* @__PURE__ */ React.createElement(ListenMode, { ...p }), mode === "build" && /* @__PURE__ */ React.createElement(BuildMode, { ...p }), window.EXTRA_MODES && window.EXTRA_MODES[mode] && React.createElement(window.EXTRA_MODES[mode], p), window.DaruCheer && /* @__PURE__ */ React.createElement(window.DaruCheer, { t, combo, idx }));
 }
 function FlashcardMode(p) {
   const { t, card, flipped, setFlipped, next, speakForce, romanjiPosition, showKeyboardHints, progress } = p;

@@ -225,7 +225,7 @@ function DataPanel({ t, progress, setProgress }) {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!parsed.cardStats) throw new Error("Invalid file");
-      setProgress(window.migrateProgress(parsed));
+      setProgress({ ...window.migrateProgress(parsed), resetAt: Date.now() }); // wins over other devices' copies
       setStatus({ ok: true, msg: "Progress imported." });
     } catch (err) {
       setStatus({ ok: false, msg: "Import failed. Not a valid progress file." });
@@ -233,7 +233,7 @@ function DataPanel({ t, progress, setProgress }) {
   };
   const reset = () => {
     if (!confirm("Reset all progress? This cannot be undone.")) return;
-    setProgress(window.emptyProgress());
+    setProgress({ ...window.emptyProgress(), resetAt: Date.now() }); // wins over other devices' copies
     setStatus({ ok: true, msg: "Progress reset." });
   };
   return (

@@ -159,6 +159,51 @@ function migrateProgress(p) {
   };
 }
 
+// Combine two copies of the same person's progress (e.g. two devices that both
+// studied offline) so neither loses work. `newer` supplies settings like dailyGoal.
+// shortcut: counts take the max per day/card instead of adding, so two devices
+// studying the same day offline undercount that day; exact sums would need per-device logs.
+function mergeProgress(a, b, newerIsA) {
+  a = migrateProgress(a); b = migrateProgress(b);
+  // A reset or import is a deliberate fresh start: the later one wins outright.
+  if ((a.resetAt || 0) !== (b.resetAt || 0)) return (a.resetAt || 0) > (b.resetAt || 0) ? a : b;
+  const [newer, older] = newerIsA ? [a, b] : [b, a];
+  const out = { ...older, ...newer };
+  const union = (x, y, choose) => {
+    const r = { ...x };
+    for (const k in y) r[k] = k in r ? choose(r[k], y[k]) : y[k];
+    return r;
+  };
+  for (const k of ["totalAnswered", "totalCorrect", "sessions", "bestStreak"]) out[k] = Math.max(a[k] || 0, b[k] || 0);
+  out.cardStats = union(older.cardStats, newer.cardStats, (x, y) =>
+    (y.attempts || 0) > (x.attempts || 0) || ((y.attempts || 0) === (x.attempts || 0) && (y.lastSeen || 0) >= (x.lastSeen || 0)) ? y : x);
+  out.dayLog = union(older.dayLog, newer.dayLog, (x, y) => ((y.cards || 0) >= (x.cards || 0) ? y : x));
+  out.badges = union(a.badges, b.badges, (x, y) => Math.min(x, y));
+  const seen = new Set();
+  out.history = [...older.history, ...newer.history]
+    .filter((h) => { const k = JSON.stringify(h); return seen.has(k) ? false : seen.add(k); })
+    .slice(-50);
+  // Streak: whichever copy studied most recently, then the longer run.
+  const day = (p) => (p.lastStudied ? new Date(p.lastStudied).getTime() : 0);
+  const s = day(a) !== day(b) ? (day(a) > day(b) ? a : b) : ((a.streakDays || 0) >= (b.streakDays || 0) ? a : b);
+  out.streakDays = s.streakDays; out.lastStudied = s.lastStudied;
+  out.course = {
+    lessons: union(older.course.lessons, newer.course.lessons, (x, y) => ({
+      ...x, ...y,
+      best: Math.max(x.best || 0, y.best || 0),
+      passed: !!(x.passed || y.passed),
+      passedAt: x.passedAt && y.passedAt ? Math.min(x.passedAt, y.passedAt) : (x.passedAt || y.passedAt || null),
+      learnedAt: x.learnedAt || y.learnedAt || null,
+    })),
+    days: union(older.course.days, newer.course.days, (x, y) => {
+      const r = { ...x };
+      for (const k in y) r[k] = r[k] || y[k];
+      return r;
+    }),
+  };
+  return out;
+}
+
 // A card counts as mastered once it's been seen twice with ≥80% correct.
 const isMastered = (s) => !!s && s.attempts >= 2 && s.correct / s.attempts >= 0.8;
 
@@ -307,6 +352,6 @@ Object.assign(window, {
   DAY_MS,
   forecastDueByDay, pushMistake, clearMistake,
   conjugateMasu, makeClozeFromSentence,
-  migrateProgress, isMastered, currentStreak, markStudied,
+  migrateProgress, mergeProgress, isMastered, currentStreak, markStudied,
   USERS, getUser, userKey, switchUser,
 });

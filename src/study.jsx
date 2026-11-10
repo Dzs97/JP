@@ -4,7 +4,7 @@
 const { useEffect: useEffectS } = React;
 
 function StudyScreen(p) {
-  const { t, mode, card, deck, idx } = p;
+  const { t, mode, card, deck, idx, combo } = p;
   if (!card) return null;
 
   const progressPct = ((idx + 1) / deck.length) * 100;
@@ -28,6 +28,7 @@ function StudyScreen(p) {
       {mode === "listen"    && <ListenMode {...p} />}
       {mode === "build"     && <BuildMode {...p} />}
       {window.EXTRA_MODES && window.EXTRA_MODES[mode] && React.createElement(window.EXTRA_MODES[mode], p)}
+      {window.DaruCheer && <window.DaruCheer t={t} combo={combo} idx={idx} />}
     </div>
   );
 }

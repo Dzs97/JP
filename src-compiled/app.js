@@ -51,8 +51,10 @@ function App() {
   const [courseCtx, setCourseCtx] = useState(null);
   const activeMode = courseCtx ? courseCtx.mode : mode;
   const [sessionBadges, setSessionBadges] = useState([]);
+  const [combo, setCombo] = useState(0);
   useEffect(() => {
     setSessionBadges([]);
+    setCombo(0);
   }, [deck]);
   const [showRomanji, setShowRomanji] = useState(true);
   const [voiceOn, setVoiceOn] = useState(true);
@@ -406,6 +408,7 @@ function App() {
       incorrect: score.incorrect + (wasCorrect ? 0 : 1)
     };
     setScore(ns);
+    setCombo((c) => wasCorrect ? c + 1 : 0);
     const up = JSON.parse(JSON.stringify(progress));
     const key = window.cardKey(card);
     up.cardStats[key] = window.srsReview(up.cardStats[key], r);
@@ -510,6 +513,7 @@ function App() {
     backToCourse,
     courseCtx,
     sessionBadges,
+    combo,
     categories,
     setCategories,
     toggleCat,

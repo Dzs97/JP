@@ -53,13 +53,15 @@
   // mood: "blank" (no eyes painted), "half" (one), "full" (both, smiling)
   function Daruma({ t, mood = "blank", size = 96, bounce = false }) {
     const ink = "#1C1A17", gold = "#D4A23A", face = "#FBF3E6";
-    const eye = (cx, painted) => h("g", { key: cx },
+    const eye = (cx, painted) => mood === "sleepy"
+      ? h("path", { key: cx, d: `M${cx - 6} 50q6 5 12 0`, stroke: ink, strokeWidth: 2.2, fill: "none", strokeLinecap: "round" })
+      : h("g", { key: cx },
       h("circle", { cx, cy: 50, r: 7.5, fill: "#FFFFFF", stroke: ink, strokeWidth: 1.6 }),
       painted && h("circle", { cx, cy: 50, r: 5, fill: ink }));
     const happy = mood === "full";
     return h("svg", {
       width: size, height: size * 1.12, viewBox: "0 0 100 112", role: "img",
-      "aria-label": `Daru the daruma, ${mood === "full" ? "both eyes painted" : mood === "half" ? "one eye painted" : "eyes not painted yet"}`,
+      "aria-label": `Daru the daruma, ${mood === "full" ? "both eyes painted" : mood === "half" ? "one eye painted" : mood === "sleepy" ? "sleepy" : "eyes not painted yet"}`,
       className: "daru" + (bounce ? " daru-bounce" : ""), style: { display: "block", overflow: "visible" },
     },
       h("ellipse", { cx: 50, cy: 108, rx: 34, ry: 4, fill: "#000", opacity: 0.08 }),
@@ -94,6 +96,27 @@
         },
       }, message)
     );
+  }
+
+  // ── Daru reacting during a session: combos and late nights ─────────
+  const comboMsg = (n) => n >= 15 ? `${n} in a row! 天才!` : n >= 10 ? `${n} in a row! すごい!` : `${n} in a row! いいね!`;
+  function DaruCheer({ t, combo, idx }) {
+    const [say, setSay] = React.useState(null);
+    React.useEffect(() => {
+      const hr = new Date().getHours();
+      if (idx === 0 && (hr >= 23 || hr < 4)) setSay({ mood: "sleepy", msg: "It's late. A short session still counts. おやすみ soon?", key: "late" });
+    }, [idx === 0]);
+    React.useEffect(() => {
+      if (combo > 0 && combo % 5 === 0) setSay({ mood: "full", msg: comboMsg(combo), key: combo });
+    }, [combo]);
+    React.useEffect(() => {
+      if (!say) return;
+      const id = setTimeout(() => setSay(null), say.mood === "sleepy" ? 4500 : 2400);
+      return () => clearTimeout(id);
+    }, [say]);
+    return h("div", { "aria-live": "polite", className: "daru-cheer" },
+      say && h("div", { key: say.key, className: "daru-cheer-in" },
+        h(Mascot, { t, mood: say.mood, message: say.msg, size: 46, bounce: say.mood === "full" })));
   }
 
   // ── Streak: last 7 days as dots ─────────────────────────────────────
@@ -158,6 +181,10 @@
     @keyframes daruBounce { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-8deg) } 75% { transform: rotate(8deg) } }
     .daru { transform-origin: 50% 95%; }
     .daru-bounce { animation: daruBounce 0.9s ease-in-out 2; }
+    .daru-cheer { position: fixed; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 40; pointer-events: none; }
+    .daru-cheer-in { animation: daruIn 0.25s ease-out; }
+    @keyframes daruIn { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+    @media (prefers-reduced-motion: reduce) { .daru-bounce, .daru-cheer-in { animation: none; } }
     .daru-bubble::before {
       content: ""; position: absolute; left: -7px; top: 50%; width: 12px; height: 12px;
       background: var(--bubble-bg); border-left: 1px solid var(--bubble-bd); border-bottom: 1px solid var(--bubble-bd);
@@ -166,5 +193,5 @@
   `;
   document.head.appendChild(style);
 
-  Object.assign(window, { BADGES, awardBadges, mascotState, Daruma, Mascot, WeekStrip, BadgeSeal, BadgeGrid });
+  Object.assign(window, { BADGES, awardBadges, mascotState, Daruma, Mascot, DaruCheer, WeekStrip, BadgeSeal, BadgeGrid });
 })();

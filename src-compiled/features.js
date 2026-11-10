@@ -164,7 +164,7 @@ function DataPanel({ t, progress, setProgress }) {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (!parsed.cardStats) throw new Error("Invalid file");
-      setProgress(window.migrateProgress(parsed));
+      setProgress({ ...window.migrateProgress(parsed), resetAt: Date.now() });
       setStatus({ ok: true, msg: "Progress imported." });
     } catch (err) {
       setStatus({ ok: false, msg: "Import failed. Not a valid progress file." });
@@ -172,7 +172,7 @@ function DataPanel({ t, progress, setProgress }) {
   };
   const reset = () => {
     if (!confirm("Reset all progress? This cannot be undone.")) return;
-    setProgress(window.emptyProgress());
+    setProgress({ ...window.emptyProgress(), resetAt: Date.now() });
     setStatus({ ok: true, msg: "Progress reset." });
   };
   return /* @__PURE__ */ React.createElement("div", { className: "surface-raised", style: { padding: "20px 22px" } }, /* @__PURE__ */ React.createElement("div", { className: "mono", style: { fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: t.textFaint, fontWeight: 600, marginBottom: 10 } }, "Data"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(

@@ -91,4 +91,41 @@ assert.equal(win.awardBadges(p).length, 0);         // nothing new the second ti
 p.history = [];                                      // history is capped; earned badges must stay
 assert.ok(p.badges.perfect);
 
+// Merge: two devices studied offline; both keep their work.
+const phone = { totalAnswered: 30, dailyGoal: 20, cardStats: { a: { attempts: 5, lastSeen: 5 } },
+  dayLog: { "2026-11-08": { cards: 30 } }, badges: { "first-card": 100 }, streakDays: 3, lastStudied: dayStr(0),
+  history: [{ date: "x", score: 90 }], course: { lessons: { L1: { passed: true, passedAt: 7, best: 80 } }, days: { d: { speak: true } } } };
+const laptop = { totalAnswered: 25, dailyGoal: 30, cardStats: { a: { attempts: 2 }, b: { attempts: 1 } },
+  dayLog: { "2026-11-09": { cards: 12 } }, badges: { "first-card": 50, perfect: 60 }, streakDays: 2, lastStudied: dayStr(1),
+  history: [{ date: "x", score: 90 }, { date: "y", score: 100 }], course: { lessons: { L1: { best: 95 } }, days: { d: { listen: true } } } };
+const m = win.mergeProgress(phone, laptop, false);
+assert.equal(m.totalAnswered, 30);
+assert.equal(m.cardStats.a.attempts, 5); assert.ok(m.cardStats.b);
+assert.equal(m.dayLog["2026-11-08"].cards, 30); assert.equal(m.dayLog["2026-11-09"].cards, 12);
+assert.equal(m.badges["first-card"], 50); assert.ok(m.badges.perfect);
+assert.equal(m.history.length, 2);                   // shared entry not duplicated
+assert.equal(m.streakDays, 3);                        // most recent study wins
+assert.equal(m.dailyGoal, 30);                        // settings come from the newer copy
+assert.ok(m.course.lessons.L1.passed); assert.equal(m.course.lessons.L1.best, 95);
+assert.ok(m.course.days.d.speak && m.course.days.d.listen);
+assert.equal(JSON.stringify(win.mergeProgress(m, m, true)), JSON.stringify(win.mergeProgress(m, m, false))); // stable
+// A reset on one device wins over the other's old progress.
+assert.equal(win.mergeProgress({ ...win.emptyProgress(), resetAt: 9 }, phone, false).totalAnswered, 0);
+
+// End to end: a pull with differing copies merges locally and pushes the result.
+await new Promise((r) => setTimeout(r, 500));        // let the start-up pull finish first
+store["jp-sync-joined"] = "1";
+store["jp-study-progress"] = JSON.stringify(phone);
+store["jp-sync-local-ts"] = "100";
+const posts = [];
+win.fetch = async (url, opts) => {
+  if (opts && opts.method === "POST") { posts.push(JSON.parse(opts.body)); return { ok: true, json: async () => ({}) }; }
+  return { ok: true, json: async () => ({ value: JSON.stringify(laptop), updatedAt: 200 }) };
+};
+await win.kvSync.doPull();
+const local = JSON.parse(store["jp-study-progress"]);
+assert.equal(local.totalAnswered, 30); assert.ok(local.cardStats.b && local.badges.perfect);
+await new Promise((r) => setTimeout(r, 3000));       // debounced push (start-up pull may restart it)
+assert.equal(posts.length, 1); assert.equal(JSON.parse(posts[0].value).cardStats.a.attempts, 5);
+
 console.log("✓ sync + migration + user + rewards checks passed");
