@@ -11,7 +11,7 @@ const win = {
     setItem: (k, v) => { store[k] = String(v); },
     removeItem: (k) => { delete store[k]; },
   },
-  document: { addEventListener() {}, hidden: false },
+  document: { addEventListener() {}, hidden: false, createElement: () => ({}), head: { appendChild() {} } },
   React: { createElement() {}, Fragment: {} },
   EventTarget, CustomEvent, crypto, setTimeout, clearTimeout, console,
   // Sync is always on now, so its timers fire during the test; answer like an empty server.
@@ -19,7 +19,7 @@ const win = {
 };
 win.window = win;
 vm.createContext(win);
-for (const f of ["src/data.js", "src/engine.js", "src/extras-sync.js"]) {
+for (const f of ["src/data.js", "src/engine.js", "src/extras-sync.js", "src/rewards.js"]) {
   vm.runInContext(readFileSync(f, "utf8"), win, { filename: f });
 }
 const { pick } = win.kvSync;
@@ -69,4 +69,20 @@ delete store["jp-user"];
 assert.equal(win.kvSync.getId(), "nihongo-main"); // the record main already syncs to
 assert.match(win.kvSync.getId(), /^[A-Za-z0-9_-]{8,64}$/); // must pass the server's ID check
 
-console.log("✓ sync + migration + user checks passed");
+// Streak only counts while unbroken; best streak survives a break.
+const dayStr = (ago) => { const d = new Date(); d.setDate(d.getDate() - ago); return d.toDateString(); };
+assert.equal(win.currentStreak({ streakDays: 4, lastStudied: dayStr(0) }), 4);
+assert.equal(win.currentStreak({ streakDays: 4, lastStudied: dayStr(1) }), 4);
+assert.equal(win.currentStreak({ streakDays: 4, lastStudied: dayStr(2) }), 0);
+assert.equal(win.migrateProgress({ streakDays: 6 }).bestStreak, 6);
+
+// Badges: awarded once, kept forever, returned only when new.
+const p = win.migrateProgress({ totalAnswered: 120, bestStreak: 3,
+  cardStats: { a: { attempts: 3, correct: 3 } }, history: [{ score: 100, cards: 10 }] });
+const fresh = win.awardBadges(p);
+assert.deepEqual([...fresh].sort(), ["answers-100", "first-card", "mastered-1", "perfect", "streak-3"]);
+assert.equal(win.awardBadges(p).length, 0);         // nothing new the second time
+p.history = [];                                      // history is capped; earned badges must stay
+assert.ok(p.badges.perfect);
+
+console.log("✓ sync + migration + user + rewards checks passed");

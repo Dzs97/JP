@@ -61,6 +61,9 @@ function App() {
   // Course sessions use their own mode so they never touch the Study tab's mode preference.
   const [courseCtx, setCourseCtx] = useState(null);
   const activeMode = courseCtx ? courseCtx.mode : mode;
+  // Badges earned during the current session, shown on the finish screen.
+  const [sessionBadges, setSessionBadges] = useState([]);
+  useEffect(() => { setSessionBadges([]); }, [deck]); // every session start sets a new deck
 
   // ── UI prefs (always on) ──────────────────────────────────────────
   const [showRomanji, setShowRomanji] = useState(true);
@@ -417,6 +420,15 @@ function App() {
     up.dayLog[today].cards += 1;
     up.dayLog[today].correct += wasCorrect ? 1 : 0;
 
+    // Streak: any answer today keeps it going (not only finishing a session)
+    const todayStr = new Date().toDateString();
+    if (up.lastStudied !== todayStr) {
+      const yd = new Date(); yd.setDate(yd.getDate() - 1); // calendar day, safe across DST changes
+      up.streakDays = up.lastStudied === yd.toDateString() ? (up.streakDays || 0) + 1 : 1;
+      up.lastStudied = todayStr;
+      up.bestStreak = Math.max(up.bestStreak || 0, up.streakDays);
+    }
+
     // Mistake queue bookkeeping
     if (!wasCorrect) {
       const q = up.mistakeQueue || [];
@@ -434,17 +446,14 @@ function App() {
         score: pct, cards: deck.length, mode: activeMode, duration,
       });
       if (up.history.length > 50) up.history = up.history.slice(-50);
-      const todayStr = new Date().toDateString();
-      if (up.lastStudied !== todayStr) {
-        const yd = new Date(); yd.setDate(yd.getDate() - 1); // calendar day, safe across DST changes
-        const y = yd.toDateString();
-        up.streakDays = up.lastStudied === y ? (up.streakDays || 0) + 1 : 1;
-        up.lastStudied = todayStr;
-      }
       if (courseCtx && window.courseRecord) window.courseRecord(up, courseCtx, pct);
+      const fresh = window.awardBadges ? window.awardBadges(up) : [];
+      if (fresh.length) setSessionBadges(b => [...b, ...fresh]);
       saveProgress(up);
       setFinished(true);
     } else {
+      const fresh = window.awardBadges ? window.awardBadges(up) : [];
+      if (fresh.length) setSessionBadges(b => [...b, ...fresh]);
       saveProgress(up);
       setIdx(i => i + 1);
       setFlipped(false);
@@ -475,10 +484,7 @@ function App() {
   // ── Stats ─────────────────────────────────────────────────────────
   const stats = useMemo(() => {
     const acc = progress.totalAnswered > 0 ? Math.round((progress.totalCorrect / progress.totalAnswered) * 100) : 0;
-    const mastered = window.ALL_CARDS.filter(c => {
-      const s = progress.cardStats[window.cardKey(c)];
-      return s && s.attempts >= 2 && s.correct / s.attempts >= 0.8;
-    }).length;
+    const mastered = window.ALL_CARDS.filter(c => window.isMastered(progress.cardStats[window.cardKey(c)])).length;
     const dueCount = window.ALL_CARDS.filter(c => {
       const s = progress.cardStats[window.cardKey(c)];
       return s && window.isDue(s);
@@ -502,7 +508,7 @@ function App() {
     t, density, romanjiPosition, showKeyboardHints,
     screen, setScreen,
     mode: activeMode, setMode,
-    startCourseDeck, backToCourse, courseCtx, categories, setCategories, toggleCat,
+    startCourseDeck, backToCourse, courseCtx, sessionBadges, categories, setCategories, toggleCat,
     sessionGoal, setSessionGoal, dueOnly, setDueOnly,
     deck, setDeck, idx, setIdx, flipped, setFlipped,
     score, setScore, quizOptions, quizSelected, setQuizSelected,

@@ -382,7 +382,9 @@ function BuildMode(p) {
 
 // ── Finish ──────────────────────────────────────────────────────────────
 function FinishScreen(p) {
-  const { t, score, deck, startStudy, setScreen, sessionStart, courseCtx, backToCourse } = p;
+  const { t, score, deck, startStudy, setScreen, sessionStart, courseCtx, backToCourse, sessionBadges = [], progress } = p;
+  const todayCards = progress?.dayLog?.[window.todayKey()]?.cards || 0;
+  const daruMood = todayCards >= (progress?.dailyGoal || 20) ? "full" : "half";
   const pct = deck.length ? Math.round((score.correct / deck.length) * 100) : 0;
   const duration = sessionStart ? Math.round((Date.now() - sessionStart) / 1000) : 0;
   const msg = pct >= 90 ? "素晴らしい — Outstanding!"
@@ -391,7 +393,9 @@ function FinishScreen(p) {
             : "練習あるのみ — Practice makes perfect.";
   return (
     <div className="fade-up" style={{ maxWidth: 560, margin: "64px auto 0", textAlign: "center" }}>
-      <div style={{ fontFamily: t.fontJp, fontSize: 90, color: `${t.accent}30`, lineHeight: 1, marginBottom: 8 }}>完</div>
+      {window.Daruma
+        ? <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}><window.Daruma t={t} mood={daruMood} size={110} bounce /></div>
+        : <div style={{ fontFamily: t.fontJp, fontSize: 90, color: `${t.accent}30`, lineHeight: 1, marginBottom: 8 }}>完</div>}
       <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: -1.2, color: t.text, margin: 0, fontFamily: t.fontUi }}>
         Session complete
       </h1>
@@ -413,6 +417,15 @@ function FinishScreen(p) {
           </div>
         </div>
       </div>
+
+      {sessionBadges.length > 0 && window.BadgeGrid && (
+        <div style={{ marginBottom: 24, textAlign: "left" }} role="status">
+          <div style={{ fontSize: 15, fontWeight: 700, color: t.accent, fontFamily: t.fontUi, textAlign: "center", marginBottom: 12 }}>
+            {sessionBadges.length === 1 ? "New badge earned!" : `${sessionBadges.length} new badges earned!`} 新しい印
+          </div>
+          <window.BadgeGrid t={t} progress={progress} only={sessionBadges} />
+        </div>
+      )}
 
       {courseCtx && courseCtx.kind === "quiz" && (() => {
         const pass = window.COURSE_PASS_PCT || 70;

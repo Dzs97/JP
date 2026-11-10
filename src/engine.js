@@ -125,7 +125,8 @@ const emptyProgress = () => ({
   cardStats: {},
   history: [],
   dayLog: {},
-  streakDays: 0, lastStudied: null,
+  streakDays: 0, lastStudied: null, bestStreak: 0,
+  badges: {},          // badge id → time earned (rewards.js)
   mistakeQueue: [],   // card fronts that were missed, FIFO
   dailyGoal: 20,
   onboardingDone: false,
@@ -149,11 +150,23 @@ function migrateProgress(p) {
     dayLog: { ...base.dayLog, ...(p.dayLog || {}) },
     history: Array.isArray(p.history) ? p.history : [],
     mistakeQueue: Array.isArray(p.mistakeQueue) ? p.mistakeQueue : [],
+    badges: { ...(p.badges || {}) },
+    bestStreak: Math.max(p.bestStreak || 0, p.streakDays || 0),
     course: {
       lessons: { ...((p.course && p.course.lessons) || {}) },
       days: { ...((p.course && p.course.days) || {}) },
     },
   };
+}
+
+// A card counts as mastered once it's been seen twice with ≥80% correct.
+const isMastered = (s) => !!s && s.attempts >= 2 && s.correct / s.attempts >= 0.8;
+
+// The stored streak only counts while it's unbroken: last study today or yesterday.
+function currentStreak(p) {
+  const yd = new Date(); yd.setDate(yd.getDate() - 1);
+  const alive = p.lastStudied === new Date().toDateString() || p.lastStudied === yd.toDateString();
+  return alive ? (p.streakDays || 0) : 0;
 }
 
 // ── SRS forecast: count of cards due on each of the next N days ────────
@@ -284,6 +297,6 @@ Object.assign(window, {
   DAY_MS,
   forecastDueByDay, pushMistake, clearMistake,
   conjugateMasu, makeClozeFromSentence,
-  migrateProgress,
+  migrateProgress, isMastered, currentStreak,
   USERS, getUser, userKey, switchUser,
 });

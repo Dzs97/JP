@@ -2,7 +2,7 @@
 // Strategy: stale-while-revalidate for same-origin assets (instant from cache,
 // refreshed in the background so deploys land on the next load); network-first
 // for navigations.
-const VERSION = "v6"; // above main's v5, so old cache-first caches are cleared on activate
+const VERSION = "v7"; // above main's v5, so old cache-first caches are cleared on activate
 const SHELL = `nihongo-shell-${VERSION}`; // single cache: background refreshes overwrite precached copies
 
 const PRECACHE = [
@@ -30,6 +30,7 @@ const PRECACHE = [
   "/src/extra-modes.js",
   "/src/extras-quickwins.js",
   "/src/extras-sync.js",
+  "/src/rewards.js",
 ];
 
 self.addEventListener("install", (event) => {
